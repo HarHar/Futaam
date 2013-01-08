@@ -22,7 +22,7 @@ class Parser(object):
 				self.dictionary = json.load(StringIO(txt[len('[json]\n'):]))
 			elif lines[0].lower() == '[pickle]':
 				self.dbtype = 'pickle'
-				self.dictionary = pickle.loads(txt[len('[pickle]\n':)])
+				self.dictionary = pickle.loads(txt[len('[pickle]\n'):])
 			else:
 				raise Exception('Invalid database type')
 		else:
