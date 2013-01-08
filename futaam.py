@@ -23,6 +23,7 @@ def massload(folder):
 
 t = []
 ifs = massload('interfaces/')
+interface = None
 for arg in sys.argv:
 	if arg[:2] == '--':
 		try:
@@ -32,5 +33,7 @@ for arg in sys.argv:
 			sys.exit(1)
 	else:
 		t.append(arg)
+
+if interface == None: interface = ifs['text']
 
 interface.main(t)
