@@ -5,6 +5,17 @@ import json
 import os
 from StringIO import StringIO
 
+def createDB(filename, dbtype):
+	if dbtype in ['json', 'pickle'] == False:
+		raise Exception('Wrong db type')
+	f = open(filename, 'w')
+	f.write('[' + dbtype + ']\n')
+	tmp = {}
+	if dbtype == 'pickle':
+		f.write(pickle.dumps(tmp))
+	elif dbtype == 'json':
+		f.write(json.dumps(tmp))
+
 class Parser(object):
 	def __init__(self, filename):
 		if os.path.exists(filename):
