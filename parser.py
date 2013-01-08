@@ -5,12 +5,16 @@ import json
 import os
 from StringIO import StringIO
 
-def createDB(filename, dbtype):
+def createDB(filename, dbtype, name='', description='', items=[]):
 	if dbtype in ['json', 'pickle'] == False:
 		raise Exception('Wrong db type')
+
+	if isinstance(items, list) == False: raise AssertionError
+	for item in items: if isinstance(item, dict) == False: raise AssertionError
+
 	f = open(filename, 'w')
 	f.write('[' + dbtype + ']\n')
-	tmp = {}
+	tmp = {'name': name, 'description': description, 'items': []}
 	if dbtype == 'pickle':
 		f.write(pickle.dumps(tmp))
 	elif dbtype == 'json':
