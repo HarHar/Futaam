@@ -13,7 +13,7 @@ def massload(folder):
 			if max(fullname.split('.')) == 'py':
 				try:
 					ff = open(fullname, 'U')
-					modls[max(fullname.split('/')).split('.')[0]] = imp.load_module(max(fullname.split('/')).split('.')[0], ff, os.path.realpath(fullname), ('.py', 'U', 1))
+					modls[fullname.split('/')[-1:][0].split('.')[0]] = imp.load_module(fullname.split('/')[-1:][0].split('.')[0], ff, os.path.realpath(fullname), ('.py', 'U', 1))
 				except Exception, info:
 					print('Could not load submodule: ' + fullname)
 					print('--- ' + str(info) + ' ---')
