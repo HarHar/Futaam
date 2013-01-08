@@ -35,3 +35,5 @@ class Parser(object):
 			f.write(pickle.dumps(self.dictionary))
 		elif self.type == 'json':
 			f.write(json.dumps(self.dictionary))
+
+		f.close()
