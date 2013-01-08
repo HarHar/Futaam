@@ -19,6 +19,7 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 		f.write(pickle.dumps(tmp))
 	elif dbtype == 'json':
 		f.write(json.dumps(tmp))
+	f.close()
 
 class Parser(object):
 	def __init__(self, filename):
