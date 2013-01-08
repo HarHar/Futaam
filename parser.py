@@ -29,11 +29,11 @@ class Parser(object):
 			raise Exception('File does not exists')
 	def save(self):
 		f = open(self.filename, 'w')
-		f.write('[' + self.type + ']\n')
+		f.write('[' + self.dbtype + ']\n')
 
-		if self.type == 'pickle':
+		if self.dbtype == 'pickle':
 			f.write(pickle.dumps(self.dictionary))
-		elif self.type == 'json':
+		elif self.dbtype == 'json':
 			f.write(json.dumps(self.dictionary))
 
 		f.close()
