@@ -18,3 +18,6 @@
 def main(argv):
 	print('Web interface. Arguments: ')
 	print(repr(argv))
+
+def help():
+	return 'Help page for web interface'

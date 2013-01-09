@@ -38,3 +38,6 @@ def main(argv):
 	app = QtGui.QApplication(argv)
 	w = gui()
 	exit(app.exec_())
+
+def help():
+	return 'Help page for Qt interface'

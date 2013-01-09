@@ -46,11 +46,12 @@ def getInterface(folder):
 				interfaces.append(fullname.split('/')[-1:][0].split('.')[0])
 	return interfaces
 
-def help(help):
-	if help == '':
+def help(intf):
+	if intf == '':
 		return 'General help'
 	else:
-		return 'Magic help' #Magic call that retrives the help from interfaces/interface[1:]
+		intf = intf.replace('-', '')
+		return load(os.path.join(path, 'interfaces/') + intf + '.py').help()
 
 arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
