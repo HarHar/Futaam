@@ -84,6 +84,7 @@ def main(argv):
 			ps1_temp = ps1_temp.replace('\%', '%' + chr(5))
 			for x in ps1_replace:
 				ps1_temp = ps1_temp.replace(x, ps1_replace[x])
+			ps1_temp = ps1_temp.replace(chr(5), '')
 			cmd = raw_input(ps1_temp)
 			cmdsplit = cmd.split(' ')
 			args = ''
@@ -109,10 +110,6 @@ def main(argv):
 		else:
 			print colors.warning + 'Command not recognized' + colors.default
 			continue
-
-
-
-
 
 def help():
 	ret = colors.header + 'Help for text interface' + colors.default + '\n'
