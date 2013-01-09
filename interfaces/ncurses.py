@@ -34,31 +34,91 @@ import os
 import threading
 from interfaces.common import *
 
+colors = utils.colors()
+
+def get_terminal_size(fd=1):
+    """
+    Returns height and width of current terminal. First tries to get
+    size via termios.TIOCGWINSZ, then from environment. Defaults to 25
+    lines x 80 columns if both methods fail.
+    :param fd: file descriptor (default: 1=stdout)
+    """
+    try:
+        import fcntl, termios, struct
+        hw = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+    except:
+        try:
+            hw = (os.environ['LINES'], os.environ['COLUMNS'])
+        except:  
+            hw = (25, 80)
+ 
+    return hw
+
+def get_terminal_height(fd=1):
+    """
+    Returns height of terminal if it is a tty, 999 otherwise
+    :param fd: file descriptor (default: 1=stdout)
+    """
+    if os.isatty(fd):
+        height = get_terminal_size(fd)[0]
+    else:
+        height = 999
+ 
+    return height
+ 
+def get_terminal_width(fd=1):
+    """
+    Returns width of terminal if it is a tty, 999 otherwise
+ 
+    :param fd: file descriptor (default: 1=stdout)
+    """
+    if os.isatty(fd):
+        width = get_terminal_size(fd)[1]
+    else:
+        width = 999
+ 
+    return width
+
 def main(argv):
 	curitem = 0
-	screen = curses.initscr()
-	curses.start_color()
-	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
 	dbfile = []
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
+	if len(dbfile) == 0:
+		print colors.fail + 'No database file specified' + colors.default
+		sys.exit(1)
 	dbs = []
 	for fn in dbfile:
 		dbs.append(parser.Parser(fn))
-	currentdb = 0			
+	currentdb = 0
+
+	screen = curses.initscr()
+	curses.cbreak()
+	curses.noecho()
+	curses.start_color()
+	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
+	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)	
 
 	def redraw():
+		terminalsize = get_terminal_size()
 		screen.clear()
 		screen.border(0)
 		screen.addstr(0, 2, dbs[currentdb].dictionary['name'] + ' - ' + dbs[currentdb].dictionary['description'], curses.color_pair(1))
-		screen.addstr(1, 1, '')
+		
+		screen.addstr(terminalsize[0]-2, 1, '[q] Quit')
 		screen.refresh()
 
+	redraw()
 	while True:
-		x = screen.getch()
-		screen.addstr(3, 3, str(x), curses.color_pair(2))	
+		try:
+			x = screen.getch()
+		except:
+			curses.endwin()
+		
+		if x == ord('q') or x == ord('Q'):
+			curses.endwin()
+			sys.exit(0)
 
 def help():
 	return 'Help page for curses interface'
