@@ -1,7 +1,8 @@
 #!/usr/bin/python
 from distutils.core import setup
 
-PACKAGE = "futaam"
+PACKAGE = "Futaam"
+SUBPACKAGES = ["interfaces", "parser"]
 NAME = "Futaam"
 DESCRIPTION = "An anime/manga list manager"
 AUTHOR = "HarHar"
@@ -17,7 +18,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="GPL",
     url=URL,
-    py_modules=[PACKAGE],
+    py_modules=[PACKAGE] + SUBPACKAGES,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: End Users/Desktop",
