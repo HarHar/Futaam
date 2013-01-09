@@ -81,6 +81,7 @@ def main(argv):
 			now = datetime.datetime.now()
 			ps1_replace = {'%N': db.dictionary['name'], '%D': db.dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S')}
 			ps1_temp = PS1
+			ps1_temp = ps1_temp.replace('\%', '%' + chr(5))
 			for x in ps1_replace:
 				ps1_temp = ps1_temp.replace(x, ps1_replace[x])
 			cmd = raw_input(ps1_temp)
