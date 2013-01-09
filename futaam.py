@@ -18,8 +18,8 @@ __version__ = "0.1"
 import sys
 import os
 import imp
-import utils
 import traceback
+import interfaces.common.utils as utils
 colors = utils.colors()
 
 def load(filepath):

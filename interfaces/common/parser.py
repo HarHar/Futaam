@@ -24,7 +24,8 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 		raise Exception('Wrong db type')
 
 	if isinstance(items, list) == False: raise AssertionError
-	for item in items: if isinstance(item, dict) == False: raise AssertionError
+	for item in items:
+		if isinstance(item, dict) == False: raise AssertionError
 
 	f = open(filename, 'w')
 	f.write('[' + dbtype + ']\n')
@@ -70,8 +71,4 @@ class Parser(object):
 			elif self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
 
-<<<<<<< HEAD
-			f.close()
-=======
 		f.close()
->>>>>>> added License (GPL3) and worked a bit on setup.py
