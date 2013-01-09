@@ -46,12 +46,24 @@ def getInterface(folder):
 				interfaces.append(fullname.split('/')[-1:][0].split('.')[0])
 	return interfaces
 
+def help(help):
+	if help == '':
+		return 'General help'
+	else:
+		return 'Magic help' #Magic call that retrives the help from interfaces/interface[1:]
+
 arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
 interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
 for arg in sys.argv[1:]:
-	if arg[:2] == '--':
+	if arg[:6] == '--help':
+		print(help(arg[6:]))
+		sys.exit(0)
+	elif arg[:2] == '-h':
+		print(help(arg[2:]))
+		sys.exit(0)
+	elif arg[:2] == '--':
 		if arg[2:] in interList:
 			if interface != None:
 				print(colors.warning + 'Ignoring argument --' + interface + '. Make sure interfaces don\'t conflict with internal triggers.' + colors.default)
