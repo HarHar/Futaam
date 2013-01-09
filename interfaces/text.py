@@ -17,9 +17,27 @@
 from interfaces.common import *
 import os
 import sys
+import ConfigParser
+import datetime
+
+PS1 = '[%N]> '
+configfile = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
+confs = ConfigParser.RawConfigParser()
+if os.path.exists(configfile): confs.read(configfile)
+try:
+	PS1 = confs.get('Futaam', 'PS1')
+except:
+	PS1 = '[%N]> '
+if PS1 == None: PS1 = '[%N]> '
+if PS1[-1:] != ' ': PS1 += ' '
 
 colors = utils.colors()
 def main(argv):
+	global PS1
+	global configfile
+	global confs
+	#GLOBAL VARIABLES ARRRRRGH
+
 	dbfile = ''
 	for x in argv:
 		if os.path.exists(x):
@@ -54,6 +72,45 @@ def main(argv):
 		print colors.fail + 'No database specified' + colors.default
 		print 'To create a database, use the argument "--create" or "-c" (no quotes)'
 		sys.exit(1)
+	db = parser.Parser(dbfile)
+	print colors.header + db.dictionary['name'] + colors.default + ' (' + db.dictionary['description'] + ')'
+	print 'Type help for cheat sheet\n'
+
+	while True:
+		try:
+			now = datetime.datetime.now()
+			ps1_replace = {'%N': db.dictionary['name'], '%D': db.dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S')}
+			ps1_temp = PS1
+			for x in ps1_replace:
+				ps1_temp = ps1_temp.replace(x, ps1_replace[x])
+			cmd = raw_input(ps1_temp)
+			cmdsplit = cmd.split(' ')
+			args = ''
+			for x in cmdsplit[1:]:
+				args += x + ' '
+			args = args[:-1]
+		except (EOFError, KeyboardInterrupt):
+			print colors.green + 'Bye~' + colors.default
+			sys.exit(0)
+
+		if cmdsplit[0].lower() in ['q', 'quit']:
+			print colors.green + 'Bye~' + colors.default
+			sys.exit(0)
+		elif cmdsplit[0].lower() in ['set_ps1', 'sps1']:
+			args += ' '
+			if confs.sections().__contains__('Futaam') == False:
+				confs.add_section('Futaam')
+			confs.set('Futaam', 'PS1', args)
+			with open(configfile, 'wb') as f:
+				confs.write(f)
+				f.close()
+			PS1 = args
+		else:
+			print colors.warning + 'Command not recognized' + colors.default
+			continue
+
+
+
 
 
 def help():
