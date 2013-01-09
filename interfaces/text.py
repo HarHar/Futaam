@@ -27,8 +27,8 @@ if os.path.exists(configfile): confs.read(configfile)
 try:
 	PS1 = confs.get('Futaam', 'PS1')
 except:
-	PS1 = '[%N]> '
-if PS1 == None: PS1 = '[%N]> '
+	PS1 = '[%green%%N%default%]> '
+if PS1 == None: PS1 = '[%green%%N%default%]> '
 if PS1[-1:] != ' ': PS1 += ' '
 
 colors = utils.colors()
@@ -79,18 +79,19 @@ def main(argv):
 	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
 	print 'Type help for cheat sheet'
 	if len(dbs) > 1:
-		print 'Type switchdb to change to the next database\n'
+		print 'Type switchdb to change to the next database'
+	sys.stdout.write('\n')
 
 	while True:
 		try:
 			now = datetime.datetime.now()
-			ps1_replace = {'%N': dbs[currentdb].dictionary['name'], '%D': dbs[currentdb].dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S')}
+			ps1_replace = {'%N': dbs[currentdb].dictionary['name'], '%D': dbs[currentdb].dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S'), '%blue%': colors.blue, '%green%': colors.green, '%red%': colors.fail, '%orange%': colors.warning, '%purple%': colors.header, '%default%': colors.default}
 			ps1_temp = PS1
 			ps1_temp = ps1_temp.replace('\%', '%' + chr(5))
 			for x in ps1_replace:
 				ps1_temp = ps1_temp.replace(x, ps1_replace[x])
 			ps1_temp = ps1_temp.replace(chr(5), '')
-			cmd = raw_input(ps1_temp)
+			cmd = raw_input(ps1_temp + colors.default)
 			cmdsplit = cmd.split(' ')
 			args = ''
 			for x in cmdsplit[1:]:
