@@ -14,7 +14,7 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 
 	f = open(filename, 'w')
 	f.write('[' + dbtype + ']\n')
-	tmp = {'name': name, 'description': description, 'items': []}
+	tmp = {'name': name, 'description': description, 'items': items}
 	if dbtype == 'pickle':
 		f.write(pickle.dumps(tmp))
 	elif dbtype == 'json':
