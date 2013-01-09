@@ -17,4 +17,4 @@
 
 def main(argv):
 	print('Text interface. Arguments: ')
-	print(repr(arg))
+	print(repr(argv))

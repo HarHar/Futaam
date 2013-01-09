@@ -17,4 +17,4 @@
 
 def main(argv):
 	print('Remote interface. Arguments: ')
-	print(repr(arg))
+	print(repr(argv))

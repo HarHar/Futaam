@@ -17,4 +17,4 @@
 
 def main(argv):
 	print('IRC interface. Arguments: ')
-	print(repr(arg))
+	print(repr(argv))
