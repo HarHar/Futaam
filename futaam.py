@@ -1,5 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+__version__ = "0.1"
 import sys
 import os
 import imp
@@ -9,6 +24,8 @@ def massload(folder):
 	from os.path import join
 	for root, dirs, files in os.walk(folder):
 		for f in files:
+			if f == "__init__.py":
+				continue
 			fullname = join(root, f)
 			if max(fullname.split('.')) == 'py':
 				try:
@@ -22,7 +39,7 @@ def massload(folder):
 	return modls
 
 t = []
-ifs = massload('interfaces/')
+ifs = massload('Futaam/interfaces/')
 interface = None
 for arg in sys.argv:
 	if arg[:2] == '--':
