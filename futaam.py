@@ -48,7 +48,7 @@ def getInterface(folder):
 
 def help(intf):
 	if intf == '':
-		return 'General help'
+		return '''General help'''
 	else:
 		intf = intf.replace('-', '')
 		return load(os.path.join(path, 'interfaces/') + intf + '.py').help()
