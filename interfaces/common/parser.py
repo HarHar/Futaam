@@ -37,9 +37,10 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class Parser(object):
-	def __init__(self, filename, host='localhost', port=0):
+	def __init__(self, filename, host='localhost', port=0, password=''):
 		self.host = host
 		self.port = port
+		self.password = password
 		if os.path.exists(filename):
 			if host == 'localhost':
 				self.filename = filename
@@ -70,5 +71,6 @@ class Parser(object):
 				f.write(pickle.dumps(self.dictionary))
 			elif self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
-
 		f.close()
+	def reload(self):
+		self.__init__(self.filename, self.host, self.port, self.password)
