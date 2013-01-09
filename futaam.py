@@ -54,7 +54,7 @@ for arg in sys.argv:
 	if arg[:2] == '--':
 		if arg[2:] in interList:
 			if interface != None:
-				print(colors.warning + 'Ignoring argument ' + interface + '. Make sure interfaces don\'t conflict with internal triggers.' + colors.default)
+				print(colors.warning + 'Ignoring argument --' + interface + '. Make sure interfaces don\'t conflict with internal triggers.' + colors.default)
 			interface = arg[2:]
 		else:
 			arguments.append(arg)
