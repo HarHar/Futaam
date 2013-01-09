@@ -39,6 +39,9 @@ def main(argv):
 					else:
 						break
 					i += 1
+			if os.path.exists(filename):
+				print colors.fail + 'File exists' + colors.default
+				sys.exit(1)
 			dbtype = raw_input('Type [json/pickle] [json]> ').lower()
 			if dbtype == '': dbtype = 'json'
 			title = raw_input('Database name> ')
