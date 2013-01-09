@@ -19,8 +19,12 @@ import sys
 import os
 import imp
 
-def massload(folder):
-	modls = {}
+def load(filepath)
+	# loads filepath
+
+def getInterface(folder):
+	# returns a list of interfaces without the .py
+	interfaces = []
 	from os.path import join
 	for root, dirs, files in os.walk(folder):
 		for f in files:
@@ -36,22 +40,24 @@ def massload(folder):
 					print('--- ' + str(info) + ' ---')
 					print traceback.format_exc()
 					exit()
-	return modls
+	return interfaces
 
-t = []
-z = os.path.dirname(os.path.realpath(__file__ ))
-ifs = massload(os.path.join(z, 'interfaces/'))
+arguments = []
+path = os.path.dirname(os.path.realpath(__file__ ))
+interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
 for arg in sys.argv:
 	if arg[:2] == '--':
-		try:
-			interface = ifs[arg[2:]]
-		except:
-			print 'Error loading module ' + arg[2:]
-			sys.exit(1)
+		if arg[2:] in interList:
+			if interface != None:
+				print("Ignoring argument " + arg + ". Make sure interfaces don't conflict with internal triggers.")
+			interface = arg[2:]
+		else:
+			t.append(arg)
 	else:
 		t.append(arg)
 
 if interface == None: interface = ifs['text']
 
-interface.main(t)
+load(interface)
+interface.main(arguments)
