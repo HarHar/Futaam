@@ -38,10 +38,10 @@ def main(argv):
 	global confs
 	#GLOBAL VARIABLES ARRRRRGH
 
-	dbfile = ''
+	dbfile = []
 	for x in argv:
 		if os.path.exists(x):
-			dbfile = x
+			dbfile.append(x)
 		elif x == '-c' or x == '--create':
 			print colors.header + 'Creating database' + colors.default + '\n'
 			filename = raw_input('Path to new file> ')
@@ -53,10 +53,10 @@ def main(argv):
 					else:
 						filename = 'unnamed.' + str(i) + '.ft'
 					if os.path.exists(filename):
+						i += 1
 						continue
 					else:
 						break
-					i += 1
 			if os.path.exists(filename):
 				print colors.fail + 'File exists' + colors.default
 				sys.exit(1)
@@ -68,18 +68,23 @@ def main(argv):
 			parser.createDB(filename, dbtype, title, description)
 			print '\n\n' + colors.green + 'Database created' + colors.default
 			sys.exit(0)
-	if dbfile == '':
+	if len(dbfile) == 0:
 		print colors.fail + 'No database specified' + colors.default
 		print 'To create a database, use the argument "--create" or "-c" (no quotes)'
 		sys.exit(1)
-	db = parser.Parser(dbfile)
-	print colors.header + db.dictionary['name'] + colors.default + ' (' + db.dictionary['description'] + ')'
-	print 'Type help for cheat sheet\n'
+	dbs = []
+	for fn in dbfile:
+		dbs.append(parser.Parser(fn))
+	currentdb = 0
+	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
+	print 'Type help for cheat sheet'
+	if len(dbs) > 1:
+		print 'Type switchdb to change to the next database\n'
 
 	while True:
 		try:
 			now = datetime.datetime.now()
-			ps1_replace = {'%N': db.dictionary['name'], '%D': db.dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S')}
+			ps1_replace = {'%N': dbs[currentdb].dictionary['name'], '%D': dbs[currentdb].dictionary['description'], '%h': now.strftime('%H'), '%m': now.strftime('%M'), chr(37) + 's': now.strftime('%S')}
 			ps1_temp = PS1
 			ps1_temp = ps1_temp.replace('\%', '%' + chr(5))
 			for x in ps1_replace:
@@ -107,6 +112,18 @@ def main(argv):
 				confs.write(f)
 				f.close()
 			PS1 = args
+		elif cmdsplit[0].lower() in ['help', 'h']:
+			print colors.header + 'Commands' + colors.default
+			print '\thelp or h - prints this'
+			print '\tquit or q - quits'
+			print '\tset_ps1 or sps1 - changes PS1'
+		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
+			try:
+				currentdb += 1
+				repr(dbs[currentdb])
+			except IndexError:
+				currentdb = 0
+			print 'Current database: ' + colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
 		else:
 			print colors.warning + 'Command not recognized' + colors.default
 			continue
