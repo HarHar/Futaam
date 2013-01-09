@@ -39,7 +39,8 @@ def massload(folder):
 	return modls
 
 t = []
-ifs = massload('Futaam/interfaces/')
+z = os.path.dirname(os.path.realpath(__file__ ))
+ifs = massload(os.path.join(z, 'interfaces/'))
 interface = None
 for arg in sys.argv:
 	if arg[:2] == '--':
