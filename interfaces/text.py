@@ -14,10 +14,32 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from interfaces.common import *
+import os
+import sys
 
+colors = utils.colors()
 def main(argv):
-	print('Text interface. Arguments: ')
-	print(repr(argv))
+	dbfile = ''
+	for x in argv:
+		if os.path.exists(x):
+			dbfile = x
+		elif x == '-c' or x == '--create':
+			print colors.header + 'Creating database' + colors.default + '\n'
+			filename = raw_input('Path to new file> ')
+			if filename == '': filename = 'unnamed.ft'
+			dbtype = raw_input('Type [json/pickle] [json]> ').lower()
+			if dbtype == '': dbtype = 'json'
+			title = raw_input('Database name> ')
+			if title == '': title = 'Unnamed'
+			description = raw_input('Description of your database> ') #No need to have a default one
+			parser.createDB(filename, dbtype, title, description)
+			print '\n\n' + colors.green + 'Database created' + colors.default
+			sys.exit(0)
+	if dbfile == '':
+		print colors.fail + 'No database specified' + colors.default
+		sys.exit(1)
+
 
 def help():
 	return 'Help page for text interface'
