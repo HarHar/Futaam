@@ -18,12 +18,22 @@ __version__ = "0.1"
 import sys
 import os
 import imp
+import utils
+colors = utils.colors()
 
-def load(filepath)
-	# loads filepath
+def load(filepath):
+	#Loads filepath
+	try:
+		ff = open(filepath, 'U')
+		return imp.load_module(filepath.split('/')[-1:][0].split('.')[0], ff, os.path.realpath(filepath), ('.py', 'U', 1))
+	except Exception, info:
+		print(colors.fail + 'Could not load submodule: ' + filepath + colors.default)
+		print('--- ' + str(info) + ' ---')
+		print traceback.format_exc()
+		exit(1)
 
 def getInterface(folder):
-	# returns a list of interfaces without the .py
+	#Returns a list of interfaces without the .py
 	interfaces = []
 	from os.path import join
 	for root, dirs, files in os.walk(folder):
@@ -32,14 +42,7 @@ def getInterface(folder):
 				continue
 			fullname = join(root, f)
 			if max(fullname.split('.')) == 'py':
-				try:
-					ff = open(fullname, 'U')
-					modls[fullname.split('/')[-1:][0].split('.')[0]] = imp.load_module(fullname.split('/')[-1:][0].split('.')[0], ff, os.path.realpath(fullname), ('.py', 'U', 1))
-				except Exception, info:
-					print('Could not load submodule: ' + fullname)
-					print('--- ' + str(info) + ' ---')
-					print traceback.format_exc()
-					exit()
+				interfaces.append(fullname.split('/')[-1:][0].split('.')[0])
 	return interfaces
 
 arguments = []
@@ -50,14 +53,13 @@ for arg in sys.argv:
 	if arg[:2] == '--':
 		if arg[2:] in interList:
 			if interface != None:
-				print("Ignoring argument " + arg + ". Make sure interfaces don't conflict with internal triggers.")
+				print(colors.warning + 'Ignoring argument ' + arg + '. Make sure interfaces don\'t conflict with internal triggers.' + colors.default)
 			interface = arg[2:]
 		else:
-			t.append(arg)
+			arguments.append(arg)
 	else:
-		t.append(arg)
+		arguments.append(arg)
 
 if interface == None: interface = ifs['text']
 
-load(os.path.join(path, 'interfaces/') + interface + ".py")
-interface.main(arguments)
+load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
