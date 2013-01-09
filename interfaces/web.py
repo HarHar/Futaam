@@ -16,4 +16,4 @@
 """
 def main(argv):
 	print('Web interface. Arguments: ')
-	print(repr(arg))
+	print(repr(argv))
