@@ -15,6 +15,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from PyQt4 import QtGui
+
+class gui(QtGui.QWidget):
+
+	def __init__(self):
+		super(gui, self).__init__()
+
+		self.initUI()
+
+	def initUI(self):
+		self.resize(250, 150)
+		self.move(300, 300)
+		self.setWindowTitle("Futaam")
+		QtGui.QLabel(text="Your Animu here", parent=self)
+		self.show()
+
 def main(argv):
 	print('GUI interface. Arguments: ')
-	print(repr(arg))
+	print(repr(argv))
+
+	app = QtGui.QApplication(argv)
+	w = gui()
+	exit(app.exec_())
