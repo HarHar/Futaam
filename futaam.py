@@ -48,9 +48,9 @@ def getInterface(folder):
 
 def help(help):
 	if help == '':
-		return 'General help'
+		return '''General help'''
 	else:
-		return 'Magic help' #Magic call that retrives the help from interfaces/interface[1:]
+		return '''Magic help''' #Magic call that retrives the help from interfaces/interface[1:]
 
 arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
