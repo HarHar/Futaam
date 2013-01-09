@@ -60,6 +60,6 @@ for arg in sys.argv:
 	else:
 		arguments.append(arg)
 
-if interface == None: interface = ifs['text']
+if interface == None: interface = 'text'
 
 load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
