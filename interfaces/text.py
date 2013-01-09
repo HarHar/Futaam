@@ -118,6 +118,8 @@ def main(argv):
 			print '\thelp or h - prints this'
 			print '\tquit or q - quits'
 			print '\tset_ps1 or sps1 - changes PS1'
+			print '\tswitchdb or sdb - changes working database when opened with multiple files'
+			print ''
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
 				currentdb += 1
