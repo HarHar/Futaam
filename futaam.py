@@ -50,7 +50,7 @@ arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
 interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
-for arg in sys.argv:
+for arg in sys.argv[1:]:
 	if arg[:2] == '--':
 		if arg[2:] in interList:
 			if interface != None:
