@@ -59,5 +59,5 @@ for arg in sys.argv:
 
 if interface == None: interface = ifs['text']
 
-load(interface)
+load(os.path.join(path, 'interfaces/') + interface + ".py")
 interface.main(arguments)
