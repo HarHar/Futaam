@@ -50,8 +50,7 @@ def help(intf):
 	if intf == '':
 		return '''General help'''
 	else:
-		intf = intf.replace('-', '')
-		return load(os.path.join(path, 'interfaces/') + intf + '.py').help()
+		return load(os.path.join(path, 'interfaces/') + intf[1:] + '.py').help()
 
 arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
