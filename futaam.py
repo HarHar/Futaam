@@ -19,6 +19,7 @@ import sys
 import os
 import imp
 import utils
+import traceback
 colors = utils.colors()
 
 def load(filepath):
