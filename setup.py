@@ -1,14 +1,26 @@
 #!/usr/bin/python
 from distutils.core import setup
+import os
 
-PACKAGE = "Futaam"
+PACKAGE = "futaam"
 SUBPACKAGES = ["interfaces", "parser"]
 NAME = "Futaam"
 DESCRIPTION = "An anime/manga list manager"
 AUTHOR = "HarHar"
 AUTHOR_EMAIL = "harhar-captain@live.com"
 URL = "https://github.com/HarHar/Futaam"
-VERSION = __import__(PACKAGE).__version__
+VERSION = "0.1"
+
+def get_interfaces():
+	ifs = []
+	os.chdir("interfaces")
+	for file in os.listdir(os.getcwd()):
+		if ".py" in file:
+			ifs.append("interfaces/" + file[:-3])
+	os.chdir("..")
+	return ifs
+INTERFACES = get_interfaces()
+SUBPACKAGES = ["parser"] + INTERFACES
 
 setup(
     name=NAME,
