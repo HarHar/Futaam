@@ -27,7 +27,18 @@ def main(argv):
 		elif x == '-c' or x == '--create':
 			print colors.header + 'Creating database' + colors.default + '\n'
 			filename = raw_input('Path to new file> ')
-			if filename == '': filename = 'unnamed.ft'
+			if filename == '':
+				i = 0
+				while True:
+					if i == 0:
+						filename = 'unnamed.ft'
+					else:
+						filename = 'unnamed.' + str(i) + '.ft'
+					if os.path.exists(filename):
+						continue
+					else:
+						break
+					i += 1
 			dbtype = raw_input('Type [json/pickle] [json]> ').lower()
 			if dbtype == '': dbtype = 'json'
 			title = raw_input('Database name> ')
@@ -43,4 +54,7 @@ def main(argv):
 
 
 def help():
-	return 'Help page for text interface'
+	ret = colors.header + 'Help for text interface' + colors.default + '\n'
+	ret += colors.header + 'Usage: ' + colors.default + sys.argv[0] + ' [filename] [options]\n\n'
+	ret += '\t--create or -c initiates the database creation routine'
+	return ret
