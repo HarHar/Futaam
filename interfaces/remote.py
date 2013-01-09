@@ -14,9 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys
-
 def main(argv):
 	print('Remote interface. Arguments: ')
-    for arg in sys.argv:
-        print(arg + " ")
+    print(repr(arg))
