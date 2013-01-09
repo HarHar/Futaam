@@ -48,7 +48,11 @@ def getInterface(folder):
 
 def help(intf):
 	if intf == '':
-		return '''General help'''
+		ret = colors.header + 'Usage:' + colors.default + ' ' + sys.argv[0] + ' [filename] [--interfacename] [options]\n\n'
+		ret += '\t--help or -h prints this help page\n'
+		ret += '\t--interfaces or -i prints the list of available interfaces\n'
+		ret += '\t--INTERFACENAME starts Futaam on the desired interface, ' + colors.warning + 'replace "INTERFACENAME" with one of the available interfaces' + colors.default + '\n'
+		return ret
 	else:
 		return load(os.path.join(path, 'interfaces/') + intf[1:] + '.py').help()
 
@@ -62,6 +66,15 @@ for arg in sys.argv[1:]:
 		sys.exit(0)
 	elif arg[:2] == '-h':
 		print(help(arg[2:]))
+		sys.exit(0)
+	elif arg == '--interfaces' or arg == '-i' or arg == '--modules' or arg == '-m':
+		sys.stdout.write(colors.header + 'Available interfaces: ' + colors.green)
+		txt = ''
+		for i in interList:
+			txt += i + ', '
+		txt = txt[:-2] + '.'
+		sys.stdout.write(txt + colors.default)
+		print '\n\nTo obtain help on them, use --help-interface, replacing \'interface\' with the name you want'
 		sys.exit(0)
 	elif arg[:2] == '--':
 		if arg[2:] in interList:
