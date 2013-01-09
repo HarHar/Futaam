@@ -22,13 +22,16 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class Parser(object):
-	def __init__(self, filename):
+	def __init__(self, filename, host='localhost', port=0):
+		self.host = host
+		self.port = port
 		if os.path.exists(filename):
-			self.filename = filename
-			f = open(filename, 'r')
-			txt = f.read().replace('\r', '')
-			lines = txt.split('\n')
-			f.close()
+			if host == 'localhost':
+				self.filename = filename
+				f = open(filename, 'r')
+				txt = f.read().replace('\r', '')
+				lines = txt.split('\n')
+				f.close()
 
 			if len(lines) == 0:
 				raise Exception('Empty file')
@@ -44,12 +47,13 @@ class Parser(object):
 		else:
 			raise Exception('File does not exists')
 	def save(self):
-		f = open(self.filename, 'w')
-		f.write('[' + self.dbtype + ']\n')
+		if self.host == 'localhost':
+			f = open(self.filename, 'w')
+			f.write('[' + self.dbtype + ']\n')
 
-		if self.dbtype == 'pickle':
-			f.write(pickle.dumps(self.dictionary))
-		elif self.dbtype == 'json':
-			f.write(json.dumps(self.dictionary))
+			if self.dbtype == 'pickle':
+				f.write(pickle.dumps(self.dictionary))
+			elif self.dbtype == 'json':
+				f.write(json.dumps(self.dictionary))
 
-		f.close()
+			f.close()
