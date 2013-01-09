@@ -38,6 +38,7 @@ def main(argv):
 			sys.exit(0)
 	if dbfile == '':
 		print colors.fail + 'No database specified' + colors.default
+		print 'To create a database, use the argument "--create" or "-c" (no quotes)'
 		sys.exit(1)
 
 
