@@ -60,6 +60,7 @@ arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
 interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
+if len(sys.argv) == 1: sys.argv.append('--help')
 for arg in sys.argv[1:]:
 	if arg[:6] == '--help':
 		print(help(arg[6:]))
