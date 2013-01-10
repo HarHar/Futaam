@@ -199,7 +199,7 @@ def main(argv):
 			curitem += 1
 			drawitems()
 		elif x == 259: #UP
-			if len(dbs[currentdb].dictionary['items'])-1 > curitem:
+			if curitem == 0:
 				continue
 			curitem -= 1
 			drawitems()
