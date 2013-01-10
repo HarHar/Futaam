@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'qtGui.ui'
 #
-# Created: Thu Jan 10 02:54:16 2013
+# Created: Thu Jan 10 04:53:14 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,9 +20,10 @@ class Ui_Futaam(object):
         Futaam.resize(809, 570)
         self.centralwidget = QtGui.QWidget(Futaam)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.columnView = QtGui.QColumnView(self.centralwidget)
-        self.columnView.setGeometry(QtCore.QRect(20, 10, 771, 481))
-        self.columnView.setObjectName(_fromUtf8("columnView"))
+        self.tableView = QtGui.QTableView(self.centralwidget)
+        self.tableView.setGeometry(QtCore.QRect(20, 10, 771, 481))
+        self.tableView.setObjectName(_fromUtf8("tableView"))
+        self.tableView.horizontalHeader().setStretchLastSection(True)
         self.pushButton = QtGui.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(20, 510, 86, 27))
         self.pushButton.setObjectName(_fromUtf8("pushButton"))
@@ -86,7 +87,7 @@ class Ui_Futaam(object):
         self.menuHelp.setTitle(QtGui.QApplication.translate("Futaam", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionOpen.setText(QtGui.QApplication.translate("Futaam", "Open", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose.setText(QtGui.QApplication.translate("Futaam", "Save", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionQuit.setText(QtGui.QApplication.translate("Futaam", "Quit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setText(QtGui.QApplication.translate("Futaam", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_Entry.setText(QtGui.QApplication.translate("Futaam", "Add Entry", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDelete_Entry.setText(QtGui.QApplication.translate("Futaam", "Delete Entry", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSwap_Entries.setText(QtGui.QApplication.translate("Futaam", "Swap Entries", None, QtGui.QApplication.UnicodeUTF8))
