@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Fuutam</string>
+   <string>Futaam</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QColumnView" name="columnView">
@@ -33,6 +33,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Add a new entry.</string>
+    </property>
     <property name="text">
      <string>Add Entry</string>
     </property>
@@ -45,6 +48,12 @@
       <width>86</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
+    <property name="toolTip">
+     <string>Close this window.</string>
     </property>
     <property name="autoFillBackground">
      <bool>false</bool>
@@ -62,6 +71,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Remove selected entry.</string>
+    </property>
     <property name="text">
      <string>Delete Entry</string>
     </property>
@@ -73,7 +85,7 @@
      <x>0</x>
      <y>0</y>
      <width>809</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
