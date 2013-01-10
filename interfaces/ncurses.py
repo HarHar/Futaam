@@ -205,11 +205,13 @@ def main(argv):
 			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
 				continue
 			curitem += 1
+			redraw()
 			drawitems()
 		elif x == 259: #UP
 			if curitem == 0:
 				continue
 			curitem -= 1
+			redraw()
 			drawitems()
 		else:
 			screen.addstr(10, 10, str(x))
