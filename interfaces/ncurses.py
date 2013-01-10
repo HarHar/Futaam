@@ -97,8 +97,8 @@ def main(argv):
 	curses.cbreak()
 	curses.noecho()
 	curses.start_color()
-	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)	
+	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK) #Red
+	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK) #Blue
 
 	def redraw():
 		terminalsize = get_terminal_size()
@@ -108,6 +108,7 @@ def main(argv):
 		
 		screen.addstr(terminalsize[0]-2, 1, '[q] Quit')
 		screen.refresh()
+		curses.flash()
 
 	redraw()
 	while True:

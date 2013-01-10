@@ -38,6 +38,7 @@ class colors():
         self.green = '\033[92m'
         self.warning = '\033[93m'
         self.fail = '\033[91m'
+        self.bold = '\033[1m'
         self.default = '\033[0m'
     def disable(self):
         self.header = ''
