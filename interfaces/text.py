@@ -31,6 +31,7 @@ except:
 if PS1 == None: PS1 = '[%green%%N%default%]> '
 if PS1[-1:] != ' ': PS1 += ' '
 
+MAL = utils.MALWrapper()
 colors = utils.colors()
 def main(argv):
 	global PS1
@@ -131,13 +132,42 @@ def main(argv):
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default)
+			am = ''
+			while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
 
-			genre = raw_input(colors.bold + '<Genre> ' + colors.default)
+			searchResults = MAL.search(title, am)
+			i = 0
+			for r in searchResults:
+				print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				i += 1
+			print colors.bold + '[N] ' + colors.default + 'None of the above'
+			accepted = False
+			while accepted == False:
+				which = raw_input(colors.bold + 'Choose> ' + colors.default)
+				if which.lower() == 'n':
+					accepted = True
+				if which.isdigit():
+					if int(which) <= len(searchResults):
+						malanime = searchResults[int(which)]
+						deep = MAL.details(malanime['id'], 'anime')
+						accepted = True
+
+			if which == 'n':
+				genre = raw_input(colors.bold + '<Genre> ' + colors.default)
+			else:
+				g = ''
+				for genre in deep['genres']:
+					g = g + genre + '/'
+				genre = g[:-1]
+				title = deep['title']
 
 			status = ''
 			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/D] ' + colors.default).lower()[0]
 
-			lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default)
+			if status != 'w':
+				lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default)
+			else:
+				lastEp = str(malanime['episodes'])
 
 			obs = raw_input(colors.bold + '<Observations> ' + colors.default)
 
@@ -145,7 +175,7 @@ def main(argv):
 				dbs[currentdb].dictionary['count'] += 1
 			except:
 				dbs[currentdb].dictionary['count'] = 1
-			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'name': title, 'genre': genre, 'status': status, 'lastwatched': lastEp, 'obs': obs})
+			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': status, 'lastwatched': lastEp, 'obs': obs})
 			dbs[currentdb].save()
 			print colors.green + 'Entry added' + colors.default + '\n'
 		else:
