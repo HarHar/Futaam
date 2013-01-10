@@ -135,6 +135,10 @@ def main(argv):
 				for field in fields:
 					screen.addstr(t, 27, field, curses.A_BOLD)
 					sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
+					if sizeleft <= 3:
+						screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3] + '...')
+						t += 1
+						continue
 					fix = ' ' * sizeleft
 					screen.addstr(t, 27 + len(field), fields[field] + fix)
 					t += 1
@@ -175,7 +179,6 @@ def main(argv):
 						break
 					screen.addstr(l, s, info['synopsis'][t:t+workwidth])
 					t += workwidth
-
 
 	redraw()
 	drawitems()
