@@ -153,6 +153,30 @@ def main(argv):
 			x += 1
 			i += 1
 
+	def drawinfo():
+		terminalsize = get_terminal_size()
+		s = 27
+		l = 7
+
+		workwidth = terminalsize[1] - s-2
+		n = 0
+		if dbs[currentdb].dictionary['items'][curitem].get('aid') != None:
+			info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
+			screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
+			if len(info['synopsis']) < workwidth:
+				screen.addstr(l, s + len('Synopsis: '), info['synopsis'])
+			else:
+				screen.addstr(l, s + len('Synopsis: '), info['synopsis'][:workwidth-len('Synopsis: ')])
+				t = workwidth-len('Synopsis: ')
+				while len(info['synopsis'][t:t+workwidth]) != 0:
+					l += 1
+					if l >= terminalsize[0]-5:
+						screen.addstr(l, s, info['synopsis'][t:t+workwidth-5] + '(...)')
+						break
+					screen.addstr(l, s, info['synopsis'][t:t+workwidth])
+					t += workwidth
+
+
 	redraw()
 	drawitems()
 	while True:
@@ -166,6 +190,9 @@ def main(argv):
 		if x == ord('q') or x == ord('Q'):
 			curses.endwin()
 			sys.exit(0)
+		elif x == ord('M') or x == ord('m'):
+			drawinfo()
+			continue
 		elif x == 258: #DOWN
 			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
 				continue
