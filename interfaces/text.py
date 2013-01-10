@@ -135,7 +135,7 @@ def main(argv):
 			genre = raw_input(colors.bold + '<Genre> ' + colors.default)
 
 			status = ''
-			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/N] ' + colors.default).lower()[0]
+			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/D] ' + colors.default).lower()[0]
 
 			lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default)
 
