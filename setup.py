@@ -24,7 +24,6 @@ def get_subpackages():
 	return packs
 
 SUBPACKAGES = get_subpackages()
-print SUBPACKAGES
 
 setup(
     name=NAME,
