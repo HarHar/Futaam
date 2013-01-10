@@ -25,7 +25,8 @@
 
 		x,25 = '|' where x is not in reserved
 
-		4{...},30 = info
+		4{...},30 = info where x % 2 = 0
+		   x    y 
 """
 
 import curses
@@ -33,8 +34,11 @@ import sys
 import os
 import threading
 from interfaces.common import *
+import locale
+locale.setlocale(locale.LC_ALL,"")
 
 colors = utils.colors()
+MAL = utils.MALWrapper()
 
 def get_terminal_size(fd=1):
     """
@@ -94,30 +98,86 @@ def main(argv):
 	currentdb = 0
 
 	screen = curses.initscr()
+	screen.keypad(1)
 	curses.cbreak()
 	curses.noecho()
 	curses.start_color()
-	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK) #Red
-	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK) #Blue
+	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK) 
+	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK) 
+	curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK) 
+	curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK) 
 
 	def redraw():
 		terminalsize = get_terminal_size()
 		screen.clear()
 		screen.border(0)
 		screen.addstr(0, 2, dbs[currentdb].dictionary['name'] + ' - ' + dbs[currentdb].dictionary['description'], curses.color_pair(1))
-		screen.addstr(terminalsize[0]-2, 1, '[q] Quit')
+		for line in range(1, terminalsize[0]-1):
+			screen.addstr(line, 25, u'│'.encode('utf-8'))
+
+		screen.addstr(terminalsize[0]-2, 1, '[q] Quit | [m] fetch MAL info')
 		screen.refresh()
 
+	def drawitems():
+		terminalsize = get_terminal_size()
+		i = 0
+		y = 1
+		x = 2
+		for entry in dbs[currentdb].dictionary['items']:
+			if len(entry['name']) >= 23:
+				name = entry['name'][:20] + '...'
+			else:
+				name = entry['name']
+			if i == curitem:
+				bold = curses.A_BOLD
+				fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': anime_translated_status[entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
+				t = 1
+				for field in fields:
+					screen.addstr(t, 27, field, curses.A_BOLD)
+					sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
+					fix = ' ' * sizeleft
+					screen.addstr(t, 27 + len(field), fields[field] + fix)
+					t += 1
+			else:
+				bold = 0
+
+			if entry['status'].lower() == 'w':
+				screen.addstr(x, y, name, curses.color_pair(3) + bold)
+			elif entry['status'].lower() == 'd':
+				screen.addstr(x, y, name, curses.color_pair(1) + bold)
+			elif entry['status'].lower() == 'c':
+				screen.addstr(x, y, name, curses.color_pair(2) + bold)
+			elif entry['status'].lower() == 'h':
+				screen.addstr(x, y, name, curses.color_pair(4) + bold)
+
+			x += 1
+			i += 1
+
 	redraw()
+	drawitems()
 	while True:
 		try:
 			x = screen.getch()
 		except:
 			curses.endwin()
 		
+		if x == curses.KEY_RESIZE: redraw(); drawitems(); continue
+
 		if x == ord('q') or x == ord('Q'):
 			curses.endwin()
 			sys.exit(0)
+		elif x == 258: #DOWN
+			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
+				continue
+			curitem += 1
+			drawitems()
+		elif x == 259: #UP
+			if len(dbs[currentdb].dictionary['items'])-1 > curitem:
+				continue
+			curitem -= 1
+			drawitems()
+		else:
+			screen.addstr(10, 10, str(x))
 
 def help():
 	return 'Help page for curses interface'
