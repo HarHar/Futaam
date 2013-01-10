@@ -105,10 +105,8 @@ def main(argv):
 		screen.clear()
 		screen.border(0)
 		screen.addstr(0, 2, dbs[currentdb].dictionary['name'] + ' - ' + dbs[currentdb].dictionary['description'], curses.color_pair(1))
-		
 		screen.addstr(terminalsize[0]-2, 1, '[q] Quit')
 		screen.refresh()
-		curses.flash()
 
 	redraw()
 	while True:
