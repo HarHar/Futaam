@@ -80,21 +80,69 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionAdd_Entry"/>
+    <addaction name="actionDelete_Entry"/>
+    <addaction name="actionEdit_Entry"/>
+    <addaction name="actionSwap_Entries"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionAbout_Futaam"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionAdd_Entry">
+   <property name="text">
+    <string>Add Entry</string>
+   </property>
+  </action>
+  <action name="actionDelete_Entry">
+   <property name="text">
+    <string>Delete Entry</string>
+   </property>
+  </action>
+  <action name="actionSwap_Entries">
+   <property name="text">
+    <string>Swap Entries</string>
+   </property>
+  </action>
+  <action name="actionEdit_Entry">
+   <property name="text">
+    <string>Edit Entry</string>
+   </property>
+  </action>
+  <action name="actionAbout_Futaam">
+   <property name="text">
+    <string>About Futaam</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>

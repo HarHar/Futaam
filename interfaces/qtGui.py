@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'qtGui.ui'
 #
-# Created: Thu Jan 10 02:38:42 2013
+# Created: Thu Jan 10 02:54:16 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,6 +44,30 @@ class Ui_Futaam(object):
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         Futaam.setMenuBar(self.menubar)
+        self.actionOpen = QtGui.QAction(Futaam)
+        self.actionOpen.setObjectName(_fromUtf8("actionOpen"))
+        self.actionClose = QtGui.QAction(Futaam)
+        self.actionClose.setObjectName(_fromUtf8("actionClose"))
+        self.actionQuit = QtGui.QAction(Futaam)
+        self.actionQuit.setObjectName(_fromUtf8("actionQuit"))
+        self.actionAdd_Entry = QtGui.QAction(Futaam)
+        self.actionAdd_Entry.setObjectName(_fromUtf8("actionAdd_Entry"))
+        self.actionDelete_Entry = QtGui.QAction(Futaam)
+        self.actionDelete_Entry.setObjectName(_fromUtf8("actionDelete_Entry"))
+        self.actionSwap_Entries = QtGui.QAction(Futaam)
+        self.actionSwap_Entries.setObjectName(_fromUtf8("actionSwap_Entries"))
+        self.actionEdit_Entry = QtGui.QAction(Futaam)
+        self.actionEdit_Entry.setObjectName(_fromUtf8("actionEdit_Entry"))
+        self.actionAbout_Futaam = QtGui.QAction(Futaam)
+        self.actionAbout_Futaam.setObjectName(_fromUtf8("actionAbout_Futaam"))
+        self.menuFile.addAction(self.actionOpen)
+        self.menuFile.addAction(self.actionClose)
+        self.menuFile.addAction(self.actionQuit)
+        self.menuEdit.addAction(self.actionAdd_Entry)
+        self.menuEdit.addAction(self.actionDelete_Entry)
+        self.menuEdit.addAction(self.actionEdit_Entry)
+        self.menuEdit.addAction(self.actionSwap_Entries)
+        self.menuHelp.addAction(self.actionAbout_Futaam)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -60,4 +84,12 @@ class Ui_Futaam(object):
         self.menuFile.setTitle(QtGui.QApplication.translate("Futaam", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuEdit.setTitle(QtGui.QApplication.translate("Futaam", "Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("Futaam", "Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionOpen.setText(QtGui.QApplication.translate("Futaam", "Open", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClose.setText(QtGui.QApplication.translate("Futaam", "Save", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setText(QtGui.QApplication.translate("Futaam", "Quit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAdd_Entry.setText(QtGui.QApplication.translate("Futaam", "Add Entry", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionDelete_Entry.setText(QtGui.QApplication.translate("Futaam", "Delete Entry", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSwap_Entries.setText(QtGui.QApplication.translate("Futaam", "Swap Entries", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionEdit_Entry.setText(QtGui.QApplication.translate("Futaam", "Edit Entry", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAbout_Futaam.setText(QtGui.QApplication.translate("Futaam", "About Futaam", None, QtGui.QApplication.UnicodeUTF8))
 
