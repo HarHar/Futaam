@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'qtGui.ui'
 #
-# Created: Thu Jan 10 04:53:14 2013
+# Created: Thu Jan 10 06:02:48 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -23,12 +23,15 @@ class Ui_Futaam(object):
         self.tableView = QtGui.QTableView(self.centralwidget)
         self.tableView.setGeometry(QtCore.QRect(20, 10, 771, 481))
         self.tableView.setObjectName(_fromUtf8("tableView"))
+        self.tableView.horizontalHeader().setVisible(True)
         self.tableView.horizontalHeader().setStretchLastSection(True)
+        self.tableView.verticalHeader().setVisible(False)
         self.pushButton = QtGui.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(20, 510, 86, 27))
         self.pushButton.setObjectName(_fromUtf8("pushButton"))
         self.pushButton_2 = QtGui.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(700, 510, 86, 27))
+        self.pushButton_2.setAcceptDrops(False)
         self.pushButton_2.setAutoFillBackground(False)
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
         self.pushButton_3 = QtGui.QPushButton(self.centralwidget)
@@ -78,9 +81,12 @@ class Ui_Futaam(object):
         QtCore.QMetaObject.connectSlotsByName(Futaam)
 
     def retranslateUi(self, Futaam):
-        Futaam.setWindowTitle(QtGui.QApplication.translate("Futaam", "Fuutam", None, QtGui.QApplication.UnicodeUTF8))
+        Futaam.setWindowTitle(QtGui.QApplication.translate("Futaam", "Futaam", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton.setToolTip(QtGui.QApplication.translate("Futaam", "Add a new entry.", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton.setText(QtGui.QApplication.translate("Futaam", "Add Entry", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_2.setToolTip(QtGui.QApplication.translate("Futaam", "Close this window.", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_2.setText(QtGui.QApplication.translate("Futaam", "Close", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_3.setToolTip(QtGui.QApplication.translate("Futaam", "Remove selected entry.", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_3.setText(QtGui.QApplication.translate("Futaam", "Delete Entry", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("Futaam", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuEdit.setTitle(QtGui.QApplication.translate("Futaam", "Edit", None, QtGui.QApplication.UnicodeUTF8))

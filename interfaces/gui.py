@@ -16,68 +16,55 @@
 """
 
 import interfaces.qtGui
-from PyQt4 import Qt
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
-		self.animuList = [["Best Anime","x","y","z","q"]]
-		return
+		super(TableModel, self).__init__()
+		self.animeList = [["Best Anime","x","y","z","q"]]
+		self.headers = ["Title","Genre","Status","Watched","Observations"]
 
-	def columnCount(self):
-		return 4
+	def columnCount(self, parent = QtCore.QModelIndex()):
+		return 5
 
-	def data(self, index, role = Qt.DisplayRole):
+	def data(self, index, role = QtCore.Qt.DisplayRole):
 		if index.isValid() == False:
 			return QtCore.QVariant()
 		if index.row() >= self.rowCount() or index.row() < 0:
 			return QtCore.QVariant()
 
-		if role == Qt.DisplayRole:
+		if role == QtCore.Qt.DisplayRole:
 			if index.column() == 0:
-				return animuList[0][index.row()]
+				return self.animeList[index.row()][0]
 			elif index.column() == 1:
-				return animuList[1][index.row()]
+				return self.animeList[index.row()][1]
 			elif index.column() == 2:
-				return animuList[2][index.row()]
+				return self.animeList[index.row()][2]
 			elif index.column() == 3:
-				return animuList[3][index.row()]
+				return self.animeList[index.row()][3]
 			elif index.column() == 4:
-				return animuList[4][index.row()]
+				return self.animeList[index.row()][4]
 
 		return QtCore.QVariant()
 
-	def headerData(self, section, orientation, role):
-		if role == QtCore.DisplayRole():
-			if orientation == Qt.Horizontal:
-				if section == 0:
-					return "Title"
-				elif section == 1:
-					return "Genre"
-				elif section == 2:
-					return "Status"
-				elif section == 3:
-					return "Episodes Watched"
-				elif section == 4:
-					return "Observations"
-		return QtCore.QVariant
+	def headerData(self, column, orientation, role = QtCore.Qt.DisplayRole):
+		if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+			return QtCore.QVariant(self.headers[column])
+		return QtCore.QVariant()
 
-	def rowCount(self):
-		return 0
+	def rowCount(self, parent = QtCore.QModelIndex()):
+		return len(self.animeList)
 
 def main(argv):
 	print('GUI interface. Arguments: ')
 	print(repr(argv))
 
-	model = TableModel()
-	model.setColumnCount(5)
-	#model.insertRow(1,["Anime","25","Watched","Awesome","Cool show"])
-
 	app = QtGui.QApplication(argv)
 	window = QtGui.QMainWindow()
 	ui = interfaces.qtGui.Ui_Futaam()
 	ui.setupUi(window)
+	model = TableModel()
 	ui.tableView.setModel(model)
 	window.show()
 
