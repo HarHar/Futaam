@@ -120,6 +120,11 @@ def main(argv):
 
 	def drawitems():
 		terminalsize = get_terminal_size()
+		if terminalsize[0] < 12 or terminalsize[1] < 46:
+			screen.keypad(0)
+			curses.endwin()
+			print colors.fail + '\nScreen too small :C' + colors.default
+			sys.exit(1)
 		i = 0
 		y = 1
 		x = 2
@@ -175,7 +180,7 @@ def main(argv):
 				while len(info['synopsis'][t:t+workwidth]) != 0:
 					l += 1
 					if l >= terminalsize[0]-5:
-						screen.addstr(l, s, info['synopsis'][t:t+workwidth-5] + '(...)')
+						screen.addstr(l, s, info['synopsis'][t:t+workwidth-5] + '...')
 						break
 					screen.addstr(l, s, info['synopsis'][t:t+workwidth])
 					t += workwidth
