@@ -119,6 +119,7 @@ def main(argv):
 			print '\tquit or q - quits'
 			print '\tset_ps1 or sps1 - changes PS1'
 			print '\tswitchdb or sdb - changes working database when opened with multiple files'
+			print '\tadd or a - adds an entry'
 			print ''
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
@@ -127,6 +128,26 @@ def main(argv):
 			except IndexError:
 				currentdb = 0
 			print 'Current database: ' + colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
+		elif cmdsplit[0].lower() in ['add', 'a']:
+			title = ''
+			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default)
+
+			genre = raw_input(colors.bold + '<Genre> ' + colors.default)
+
+			status = ''
+			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/N] ' + colors.default).lower()[0]
+
+			lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default)
+
+			obs = raw_input(colors.bold + '<Observations> ' + colors.default)
+
+			try:
+				dbs[currentdb].dictionary['count'] += 1
+			except:
+				dbs[currentdb].dictionary['count'] = 1
+			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'name': title, 'genre': genre, 'status': status, 'lastwatched': lastEp, 'obs': obs})
+			dbs[currentdb].save()
+			print colors.green + 'Entry added' + colors.default + '\n'
 		else:
 			print colors.warning + 'Command not recognized' + colors.default
 			continue
