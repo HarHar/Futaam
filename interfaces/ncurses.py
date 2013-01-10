@@ -167,7 +167,7 @@ def main(argv):
 		s = 27
 		l = 7
 
-		workwidth = terminalsize[1] - s-2
+		workwidth = terminalsize[1] - s-1
 		n = 0
 		if dbs[currentdb].dictionary['items'][curitem].get('aid') != None:
 			info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
@@ -180,9 +180,9 @@ def main(argv):
 				while len(info['synopsis'][t:t+workwidth]) != 0:
 					l += 1
 					if l >= terminalsize[0]-5:
-						screen.addstr(l, s, info['synopsis'][t:t+workwidth-5] + '...')
+						screen.addstr(l, s, utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...'))
 						break
-					screen.addstr(l, s, info['synopsis'][t:t+workwidth])
+					screen.addstr(l, s, utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', '')))
 					t += workwidth
 
 	redraw()
