@@ -37,6 +37,7 @@ def main(argv):
 	global PS1
 	global configfile
 	global confs
+	global colors
 	#GLOBAL VARIABLES ARRRRRGH
 
 	dbfile = []
@@ -129,6 +130,16 @@ def main(argv):
 			except IndexError:
 				currentdb = 0
 			print 'Current database: ' + colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
+		elif cmdsplit[0].lower() in ['l', 'ls', 'list']:
+			if len(dbs[currentdb].dictionary['items']) == 0:
+				print colors.warning + 'No entries found! Use "add" for adding one' + colors.default
+				continue
+			else:
+				for entry in dbs[currentdb].dictionary['items']:
+					rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
+					if entry['status'].lower() in rcolors:
+						sys.stdout.write(rcolors[entry['status'].lower()])
+					print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default)
