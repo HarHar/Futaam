@@ -51,9 +51,9 @@ def main(argv):
 				i = 0
 				while True:
 					if i == 0:
-						filename = 'unnamed.ft'
+						filename = 'unnamed.db'
 					else:
-						filename = 'unnamed.' + str(i) + '.ft'
+						filename = 'unnamed.' + str(i) + '.db'
 					if os.path.exists(filename):
 						i += 1
 						continue
