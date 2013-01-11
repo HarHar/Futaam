@@ -191,14 +191,14 @@ def main(argv):
 			if len(info['synopsis']) < workwidth:
 				screen.addstr(l, s + len('Synopsis: '), info['synopsis'])
 			else:
-				screen.addstr(l, s + len('Synopsis: '), info['synopsis'][:workwidth-len('Synopsis: ')])
+				screen.addstr(l, s + len('Synopsis: '), utils.HTMLEntitiesToUnicode(info['synopsis'][:workwidth-len('Synopsis: ')]).encode('utf-8'))
 				t = workwidth-len('Synopsis: ')
 				while len(info['synopsis'][t:t+workwidth]) != 0:
 					l += 1
 					if l >= terminalsize[0]-5:
-						screen.addstr(l, s, utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...'))
+						screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
 						break
-					screen.addstr(l, s, utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', '')))
+					screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
 					t += workwidth
 
 	redraw()
