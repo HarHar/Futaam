@@ -54,7 +54,7 @@ def main(argv):
 						filename = 'unnamed.db'
 					else:
 						filename = 'unnamed.' + str(i) + '.db'
-					db os.path.exists(filename):
+					if os.path.exists(filename):
 						i += 1
 						continue
 					else:
