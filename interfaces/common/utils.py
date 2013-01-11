@@ -31,6 +31,8 @@ except:
 anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watching', 'w': 'Watched', 'd': 'Dropped'}
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
 
+translated_status = {'anime': anime_translated_status, 'manga': manga_translated_status}
+
 class colors():
     def __init__(self):
         self.enable()

@@ -139,7 +139,7 @@ def main(argv):
 				name = entry['name']
 			if i == curitem:
 				bold = curses.A_BOLD
-				fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': anime_translated_status[entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
+				fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': translated_status[entry['type'].lower()][entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
 				t = 1
 				for field in fields:
 					screen.addstr(t, 27, field, curses.A_BOLD)
