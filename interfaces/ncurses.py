@@ -35,6 +35,7 @@ import os
 import threading
 from interfaces.common import *
 import locale
+import urllib2
 locale.setlocale(locale.LC_ALL,"")
 
 colors = utils.colors()
@@ -176,7 +177,11 @@ def main(argv):
 		workwidth = terminalsize[1] - s-1
 		n = 0
 		if dbs[currentdb].dictionary['items'][curitem].get('aid') != None:
-			info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
+			try:
+				info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
+			except urllib2.HTTPError, info:
+				screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
+				return
 			screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
 			if len(info['synopsis']) < workwidth:
 				screen.addstr(l, s + len('Synopsis: '), info['synopsis'])
