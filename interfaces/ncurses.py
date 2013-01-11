@@ -133,7 +133,7 @@ def main(argv):
 		i = 0
 		y = 1
 		x = 2
-		for entry in dbs[currentdb].dictionary['items'][:terminalsize[0]-4]:
+		for entry in dbs[currentdb].dictionary['items'][curitem:terminalsize[0]-4+curitem]:
 			if len(entry['name']) >= 23:
 				name = entry['name'][:20] + '...'
 			else:
@@ -146,15 +146,16 @@ def main(argv):
 					screen.addstr(t, 27, field, curses.A_BOLD)
 					sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
 					if sizeleft <= 3:
-						screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3] + '...')
+						screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
 						t += 1
 						continue
 					fix = ' ' * sizeleft
-					screen.addstr(t, 27 + len(field), fields[field] + fix)
+					screen.addstr(t, 27 + len(field), fields[field].encode('utf-8') + fix)
 					t += 1
 			else:
 				bold = 0
 
+			name = name.encode('utf-8')
 			if entry['status'].lower() == 'w':
 				screen.addstr(x, y, name, curses.color_pair(3) + bold)
 			elif entry['status'].lower() == 'd':
