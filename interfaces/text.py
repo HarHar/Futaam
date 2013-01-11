@@ -140,6 +140,31 @@ def main(argv):
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
 					print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
+		elif cmdsplit[0].lower() in ['d', 'delete']:
+			if args.isdigit() == False:
+				print colors.fail + 'Argument must be the index number' + colors.default
+				continue
+			if dbs[currentdb].dictionary['count'] < int(args) or int(args)<0:
+				print colors.fail + 'Entry not found' + colors.default
+				continue
+			for entry in dbs[currentdb].dictionary['items']:
+				if entry['id'] == int(args):
+					confirm = ''
+					while (confirm in ['y', 'n']) == False:
+						confirm = raw_input(colors.warning + 'Are you sure? [y/n] ').lower()
+					dbs[currentdb].dictionary['items'].remove(entry)
+					dbs[currentdb].dictionary['count'] -= 1
+					break
+			else:
+				print colors.fail + 'Entry not found! There is probably an error with your database and that makes me very sad :c' + colors.default
+				continue
+
+			##### REBUILD IDS #####
+			for x in xrange(0, dbs[currentdb].dictionary['count']):
+				dbs[currentdb].dictionary['items'][x]['id'] = x
+			#######################
+			dbs[currentdb].save()
+
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default)
