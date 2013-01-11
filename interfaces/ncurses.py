@@ -105,7 +105,9 @@ def main(argv):
 	curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK) 
 	curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK) 
 	curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK) 
-	curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK) 
+	curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+	curses.init_pair(5, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+
 
 	footer = '[q] Quit / [m] MAL info / [d] delete'
 
@@ -130,7 +132,7 @@ def main(argv):
 		i = 0
 		y = 1
 		x = 2
-		for entry in dbs[currentdb].dictionary['items']:
+		for entry in dbs[currentdb].dictionary['items'][:terminalsize[0]-4]:
 			if len(entry['name']) >= 23:
 				name = entry['name'][:20] + '...'
 			else:
@@ -160,6 +162,8 @@ def main(argv):
 				screen.addstr(x, y, name, curses.color_pair(2) + bold)
 			elif entry['status'].lower() == 'h':
 				screen.addstr(x, y, name, curses.color_pair(4) + bold)
+			elif entry['status'].lower() == 'q':
+				screen.addstr(x, y, name, curses.color_pair(5) + bold)
 
 			x += 1
 			i += 1
