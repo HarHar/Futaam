@@ -21,11 +21,12 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 import interfaces.qtGui
+from interfaces.common import *
 
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
 		super(TableModel, self).__init__()
-		self.animeList = [["Best Anime","x","y","z","q"]]
+		self.animeList = []
 		self.headers = ["Title","Genre","Status","Watched","Observations"]
 
 	def columnCount(self, parent = QtCore.QModelIndex()):
@@ -60,7 +61,9 @@ class TableModel(QtCore.QAbstractTableModel):
 		return len(self.animeList)
 
 	def load_db(self, filename):
-
+		self.db = Parser(filename)
+		for entry in self.db.dictionary['items']:
+			self.animeList.append([entry["name"], entry["genre"], entry["status"], entry["lastwatched"], entry["obs"]])
 
 def main(argv):
 	print('GUI interface. Arguments: ')
@@ -70,7 +73,9 @@ def main(argv):
 	window = QtGui.QMainWindow()
 	ui = interfaces.qtGui.Ui_Futaam()
 	ui.setupUi(window)
+
 	model = TableModel()
+	model.load_db(argv[0])
 	ui.tableView.setModel(model)
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
