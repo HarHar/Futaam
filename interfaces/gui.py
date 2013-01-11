@@ -63,7 +63,7 @@ class TableModel(QtCore.QAbstractTableModel):
 	def load_db(self, filename):
 		self.db = Parser(filename)
 		for entry in self.db.dictionary['items']:
-			self.animeList.append([entry["name"], entry["genre"], anime_translated_status[entry["status"]], entry["lastwatched"], entry["obs"]])
+			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
 
 def openFile():
 	global model
