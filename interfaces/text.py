@@ -212,6 +212,8 @@ def main(argv):
 			except:
 				dbs[currentdb].dictionary['count'] = 1
 			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': status, 'lastwatched': lastEp, 'obs': obs})
+			for x in xrange(0, dbs[currentdb].dictionary['count']):
+				dbs[currentdb].dictionary['items'][x]['id'] = x			
 			dbs[currentdb].save()
 			print colors.green + 'Entry added' + colors.default + '\n'
 		else:
