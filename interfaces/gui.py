@@ -14,10 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-import interfaces.qtGui
 from PyQt4 import QtGui
 from PyQt4 import QtCore
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+import interfaces.qtGui
 
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
@@ -56,6 +59,9 @@ class TableModel(QtCore.QAbstractTableModel):
 	def rowCount(self, parent = QtCore.QModelIndex()):
 		return len(self.animeList)
 
+	def load_db(self, filename):
+
+
 def main(argv):
 	print('GUI interface. Arguments: ')
 	print(repr(argv))
@@ -66,6 +72,9 @@ def main(argv):
 	ui.setupUi(window)
 	model = TableModel()
 	ui.tableView.setModel(model)
+
+	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
+
 	window.show()
 
 	exit(app.exec_())
