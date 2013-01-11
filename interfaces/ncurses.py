@@ -107,6 +107,8 @@ def main(argv):
 	curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK) 
 	curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK) 
 
+	footer = '[q] Quit / [m] MAL info / [d] delete'
+
 	def redraw():
 		terminalsize = get_terminal_size()
 		screen.clear()
@@ -115,7 +117,7 @@ def main(argv):
 		for line in range(1, terminalsize[0]-1):
 			screen.addstr(line, 25, u'│'.encode('utf-8'))
 
-		screen.addstr(terminalsize[0]-2, 1, '[q] Quit | [m] fetch MAL info')
+		screen.addstr(terminalsize[0]-2, 1, footer)
 		screen.refresh()
 
 	def drawitems():
@@ -201,6 +203,22 @@ def main(argv):
 		elif x == ord('M') or x == ord('m'):
 			drawinfo()
 			continue
+		elif x == ord('d') or x == ord('D'):
+			for entry in dbs[currentdb].dictionary['items']:
+				if entry['id'] == curitem:
+					dbs[currentdb].dictionary['items'].remove(entry)
+					dbs[currentdb].dictionary['count'] -= 1
+					break
+			else:
+				continue
+
+			##### REBUILD IDS #####
+			for x in xrange(0, dbs[currentdb].dictionary['count']):
+				dbs[currentdb].dictionary['items'][x]['id'] = x
+			#######################
+			dbs[currentdb].save()
+			redraw()
+			drawitems()
 		elif x == 258: #DOWN
 			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
 				continue
