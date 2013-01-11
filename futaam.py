@@ -42,8 +42,6 @@ def getInterface(folder):
 		for f in files:
 			if f == "__init__.py" or f == "utils.py" or f == "parser.py" or f == "qtGui.py" or f == "qtGui.ui":
 				continue
-			#if f == "utils.py":
-			#	continue
 			fullname = join(root, f)
 			if max(fullname.split('.')) == 'py' or max(fullname.split('.')) == 'js':
 				interfaces.append(fullname.split('/')[-1:][0].split('.')[0])
