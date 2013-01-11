@@ -67,7 +67,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
 def openFile():
 	global model
-	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*.*)")
+	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 	if filename != None:
 		model = TableModel()
 		model.load_db(filename)
