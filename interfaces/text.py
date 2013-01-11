@@ -122,6 +122,7 @@ def main(argv):
 			print '\tset_ps1 or sps1 - changes PS1'
 			print '\tswitchdb or sdb - changes working database when opened with multiple files'
 			print '\tadd or a - adds an entry'
+			print '\tdelete, del or d - deletes an entry with the given index'
 			print ''
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
@@ -140,7 +141,7 @@ def main(argv):
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
 					print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
-		elif cmdsplit[0].lower() in ['d', 'delete']:
+		elif cmdsplit[0].lower() in ['d', 'del', 'delete']:
 			if args.isdigit() == False:
 				print colors.fail + 'Argument must be the index number' + colors.default
 				continue
