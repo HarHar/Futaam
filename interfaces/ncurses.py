@@ -133,16 +133,16 @@ def main(argv):
 		i = 0
 		y = 1
 		x = 2
-		if len(dbs[currentdb].dictionary['items']) > terminalsize[0]-4:
-			showing = dbs[currentdb].dictionary['items'][curitem:terminalsize[0]-4+curitem]
+		if curitem > (terminalsize[0]-5):
+			showing = dbs[currentdb].dictionary['items'][curitem-terminalsize[0]+5:curitem+1]
 		else:
-			showing = dbs[currentdb].dictionary['items']
+			showing = dbs[currentdb].dictionary['items'][:terminalsize[0]-4]
 		for entry in showing:
 			if len(entry['name']) >= 23:
 				name = entry['name'][:20] + '...'
 			else:
 				name = entry['name']
-			if i == curitem:
+			if entry['id'] == curitem:
 				bold = curses.A_REVERSE
 				fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': translated_status[entry['type'].lower()][entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
 				t = 1
