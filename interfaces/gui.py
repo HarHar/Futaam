@@ -65,9 +65,17 @@ class TableModel(QtCore.QAbstractTableModel):
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], anime_translated_status[entry["status"]], entry["lastwatched"], entry["obs"]])
 
+def openFile():
+	global model
+	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam database file")
+	if filename != None:
+		model.animelist = []
+		model.load_db(filename)
+		#ui.tableView.setModel(model)
+
 def main(argv):
-	print('GUI interface. Arguments: ')
-	print(repr(argv))
+	global model
+	global ui
 
 	app = QtGui.QApplication(argv)
 	window = QtGui.QMainWindow()
@@ -79,6 +87,7 @@ def main(argv):
 	ui.tableView.setModel(model)
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
+	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL(_fromUtf8("triggered()")), openFile)
 
 	window.show()
 
