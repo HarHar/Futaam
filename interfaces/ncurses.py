@@ -99,7 +99,7 @@ def main(argv):
 
 	global footer
 	global f2
-	footer = '[q] quit / [m] MAL info / [d] delete'
+	footer = '[q] quit / [d] delete / [a] add / [s] synopsis'
 	f2 = footer
 
 	def addEntry():
@@ -396,7 +396,7 @@ def main(argv):
 		if x == ord('q') or x == ord('Q'):
 			curses.endwin()
 			sys.exit(0)
-		elif x == ord('M') or x == ord('m'):
+		elif x == ord('S') or x == ord('s'):
 			drawinfo()
 			continue
 		elif x == ord('a') or x == ord('A'):
