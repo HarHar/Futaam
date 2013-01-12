@@ -178,10 +178,10 @@ def main(argv):
 					pass
 				else:
 					if t == 'anime':
-						lastEp = prompt('<Last episode watched> ', 8)
+						lastEp = prompt('<Last episode watched> ', 8).replace('\n', '')
 					else:
-						lastEp = prompt('<Last chapter read> ', 9)
-				obs = prompt('<Observations> ', 10)
+						lastEp = prompt('<Last chapter read> ', 9).replace('\n', '')
+				obs = prompt('<Observations> ', 10).replace('\n', '')
 
 				try:
 					dbs[currentdb].dictionary['count'] += 1
@@ -189,7 +189,7 @@ def main(argv):
 					dbs[currentdb].dictionary['count'] = 1
 				dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': t, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
 				for x in xrange(0, dbs[currentdb].dictionary['count']):
-					dbs[currentdb].dictionary['items'][x]['id'] = x			
+					dbs[currentdb].dictionary['items'][x]['id'] = x	
 				dbs[currentdb].save()
 				screen.addstr(11, 2, 'Entry added!', curses.color_pair(3) + curses.A_REVERSE)
 				screen.refresh()
