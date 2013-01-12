@@ -170,7 +170,10 @@ def main(argv):
 				screen.addstr(7, 2, '[D] - ' + utils.translated_status[t]['d'])
 				x = ''
 				while (x.lower() in ['w', 'c', 'q', 'h', 'd']) == False:
-					x = chr(screen.getch())
+					x = screen.getch()
+					if x > 256:
+						continue
+					x = chr(x)
 				if x.lower() == 'w':
 					lastEp = str(malanime['episodes'])
 				elif x.lower() == 'q':
