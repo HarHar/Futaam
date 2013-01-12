@@ -16,8 +16,7 @@
 """
 
 def main(argv):
-	print('Web interface. Arguments: ')
-	print(repr(argv))
+	print 'See https://github.com/that4chanwolf/Fuutan-Web'
 
 def help():
-	return 'Help page for web interface'
+	return 'Placeholder, don\'t use this'
