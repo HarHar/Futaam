@@ -16,7 +16,7 @@
 """
 
 def main(argv):
-	print 'See https://github.com/that4chanwolf/Fuutan-Web'
+	print 'See https://github.com/that4chanwolf/Fuutam-Web'
 
 def help():
 	return 'Placeholder, don\'t use this'
