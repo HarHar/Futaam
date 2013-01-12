@@ -23,6 +23,7 @@ from interfaces.common import *
 import locale
 import urllib2
 locale.setlocale(locale.LC_ALL,"")
+from time import sleep as sleep
 
 colors = utils.colors()
 MAL = utils.MALWrapper()
@@ -96,16 +97,109 @@ def main(argv):
 	curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 	curses.init_pair(5, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
 
-
-	footer = '[q] Quit / [m] MAL info / [d] delete'
+	global footer
+	global f2
+	footer = '[q] quit / [m] MAL info / [d] delete'
+	f2 = footer
 
 	def addEntry():
 		redraw(True)
+		screen.addstr(2, 2, 'Press A for anime')
+		screen.addstr(3, 2, 'Press M for manga')
+		screen.addstr(4, 2, 'Press C to cancel')
+		x = 0
+		while (x in [ord('a'), ord('m'), ord('A'), ord('M'), ord('c'), ord('C')]) == False:
+			x = screen.getch()
+		if x in [ord('c'), ord('C')]:
+			redraw()
+			drawitems()
+			return
+		elif x in [ord('a'), ord('A')]:
+			t = 'anime'
+		else:
+			t = 'manga'
+
+		redraw(True)
 		name = prompt('Name: ', 2)
-		genre = prompt('Genre: ', 3)
-		obs = prompt('Observations: ', 4)
+		searchResults = MAL.search(name, t)
+		i = 0
+		for x in searchResults:
+			searchResults[i]['index'] = i
+			searchResults[i]['am'] = t
+			i += 1
+		global footer
+		global f2
+		footer = '[ENTER] Choose / [C] Cancel'
 		redraw()
-		drawitems()
+		global scuritem
+		scuritem = 0
+		drawSearch(searchResults)
+		while True:
+			x = screen.getch()
+			if x == 258: #DOWN
+				if len(searchResults)-1 == scuritem:
+					continue
+				scuritem += 1
+				redraw()
+				drawSearch(searchResults)
+			elif x == 259: #UP
+				if scuritem == 0:
+					continue
+				scuritem -= 1
+				redraw()
+				drawSearch(searchResults)
+			elif x == ord('c') or x == ord('C'):
+				footer = f2
+				redraw()
+				drawitems()
+				return
+			elif x == 10:
+				malanime = searchResults[scuritem]
+				deep = MAL.details(malanime['id'], t)
+				g = ''
+				for genre in deep['genres']:
+					g = g + genre + '/'
+				genre = g[:-1]
+				title = deep['title']
+				redraw(True)
+				screen.addstr(2, 2, '[Status]', curses.A_BOLD)
+				screen.addstr(3, 2, '[W] - ' + utils.translated_status[t]['w'])
+				screen.addstr(4, 2, '[C] - ' + utils.translated_status[t]['c'])
+				screen.addstr(5, 2, '[Q] - ' + utils.translated_status[t]['q'])
+				screen.addstr(6, 2, '[H] - ' + utils.translated_status[t]['h'])
+				screen.addstr(7, 2, '[D] - ' + utils.translated_status[t]['d'])
+				x = ''
+				while (x.lower() in ['w', 'c', 'q', 'h', 'd']) == False:
+					x = chr(screen.getch())
+				if x.lower() == 'w':
+					lastEp = str(malanime['episodes'])
+				elif x.lower() == 'q':
+					lastEp = ''
+					pass
+				else:
+					if t == 'anime':
+						lastEp = prompt('<Last episode watched> ', 8)
+					else:
+						lastEp = prompt('<Last chapter read> ', 9)
+				obs = prompt('<Observations> ', 10)
+
+				try:
+					dbs[currentdb].dictionary['count'] += 1
+				except:
+					dbs[currentdb].dictionary['count'] = 1
+				dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': t, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
+				for x in xrange(0, dbs[currentdb].dictionary['count']):
+					dbs[currentdb].dictionary['items'][x]['id'] = x			
+				dbs[currentdb].save()
+				screen.addstr(11, 2, 'Entry added!', curses.color_pair(3) + curses.A_REVERSE)
+				screen.refresh()
+				sleep(2)
+				global f2
+				global footer
+				footer = f2
+				redraw()
+				drawitems()
+				return
 
 	def prompt(p, line):
 		terminalsize = get_terminal_size()
@@ -131,9 +225,71 @@ def main(argv):
 			w += 1
 			ret += chr(x)
 		return ret
-		
+
+	def drawSearch(searchResults):
+		terminalsize = get_terminal_size()
+		if terminalsize[0] < 12 or terminalsize[1] < 46:
+			screen.keypad(0)
+			curses.endwin()
+			print colors.fail + '\nScreen too small :C' + colors.default
+			sys.exit(1)
+		i = 0
+		y = 1
+		x = 2
+		if scuritem > (terminalsize[0]-5):
+			showing = searchResults[scuritem-terminalsize[0]+5:scuritem+1]
+		else:
+			showing = searchResults[:terminalsize[0]-4]
+		for entry in showing:
+			if len(entry['title']) >= 23:
+				name = entry['title'][:20] + '...'
+			else:
+				name = entry['title']
+			if entry['index'] == scuritem:
+				bold = curses.A_REVERSE
+				if entry['am'] == 'anime':
+					fields = {'Title: ': entry['title'], 'Type: ': entry['type'], 'Episodes: ': str(entry['episodes']), 'Status: ': entry['status']}
+				else:
+					fields = {'Title: ': entry['title'], 'Type: ': entry['type'], 'Chapters: ': str(entry['chapters']), 'Status: ': entry['status']}
+				t = 1
+				for field in fields:
+					if fields[field] == None: fields[field] = ''
+					screen.addstr(t, 27, field, curses.A_BOLD)
+					sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
+					if sizeleft <= 3:
+						screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
+						t += 1
+						continue
+					fix = ' ' * sizeleft
+					screen.addstr(t, 27 + len(field), fields[field].encode('utf-8') + fix)
+					t += 1
+				s = 27
+				l = t + 1
+				workwidth = terminalsize[1] - s-1
+				screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
+				if len(entry['synopsis']) < workwidth:
+					screen.addstr(l, s + len('Synopsis: '), entry['synopsis'])
+				else:
+					screen.addstr(l, s + len('Synopsis: '), utils.HTMLEntitiesToUnicode(entry['synopsis'][:workwidth-len('Synopsis: ')]).encode('utf-8'))
+					t = workwidth-len('Synopsis: ')
+					while len(entry['synopsis'][t:t+workwidth]) != 0:
+						l += 1
+						if l >= terminalsize[0]-5:
+							screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
+							break
+						screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
+						t += workwidth				
+			else:
+				bold = 0
+
+			name = name.encode('utf-8')
+			screen.addstr(x, y, name, bold)
+
+			x += 1
+			i += 1		
 
 	def redraw(noxtra=False):
+		global footer
 		terminalsize = get_terminal_size()
 		screen.clear()
 		screen.border(0)
