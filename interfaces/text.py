@@ -168,7 +168,7 @@ def main(argv):
 
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
-			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default)
+			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default).replace('\n', '')
 			am = ''
 			while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
 
@@ -180,7 +180,7 @@ def main(argv):
 			print colors.bold + '[N] ' + colors.default + 'None of the above'
 			accepted = False
 			while accepted == False:
-				which = raw_input(colors.bold + 'Choose> ' + colors.default)
+				which = raw_input(colors.bold + 'Choose> ' + colors.default).replace('\n', '')
 				if which.lower() == 'n':
 					accepted = True
 				if which.isdigit():
@@ -190,7 +190,7 @@ def main(argv):
 						accepted = True
 
 			if which == 'n':
-				genre = raw_input(colors.bold + '<Genre> ' + colors.default)
+				genre = raw_input(colors.bold + '<Genre> ' + colors.default).replace('\n', '')
 			else:
 				g = ''
 				for genre in deep['genres']:
@@ -202,11 +202,11 @@ def main(argv):
 			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/D] ' + colors.default).lower()[0]
 
 			if status != 'w':
-				lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default)
+				lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default).replace('\n', '')
 			else:
 				lastEp = str(malanime['episodes'])
 
-			obs = raw_input(colors.bold + '<Observations> ' + colors.default)
+			obs = raw_input(colors.bold + '<Observations> ' + colors.default).replace('\n', '')
 
 			try:
 				dbs[currentdb].dictionary['count'] += 1
