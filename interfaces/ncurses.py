@@ -98,15 +98,50 @@ def main(argv):
 
 	footer = '[q] Quit / [m] MAL info / [d] delete'
 
-	def redraw():
+	def addEntry():
+		redraw(True)
+		name = prompt('Name: ', 2)
+		genre = prompt('Genre: ', 3)
+		obs = prompt('Observations: ', 4)
+		redraw()
+		drawitems()
+
+	def prompt(p, line):
+		terminalsize = get_terminal_size()
+		screen.addstr(line, 2, p)
+		screen.refresh()
+		screen.addstr(line, len(p) + 2, ' '*15, curses.A_REVERSE)
+		ret = ''
+		x = 0
+		w = len(p) + 2
+		while x != 10:
+			x = screen.getch()
+			if x == 263: #backspace
+				if w <= len(p) + 2:
+					continue
+				screen.addstr(line, w-1, ' ', curses.A_REVERSE)
+				screen.addstr(line, w-1, '', curses.A_REVERSE)
+				w -= 1
+				ret = ret[:-1]
+				continue
+			if w > terminalsize[1]-5:
+				continue				
+			screen.addstr(line, w, chr(x), curses.A_REVERSE)
+			w += 1
+			ret += chr(x)
+		return ret
+		
+
+	def redraw(noxtra=False):
 		terminalsize = get_terminal_size()
 		screen.clear()
 		screen.border(0)
 		screen.addstr(0, 2, dbs[currentdb].dictionary['name'] + ' - ' + dbs[currentdb].dictionary['description'], curses.color_pair(1))
-		for line in range(1, terminalsize[0]-1):
-			screen.addstr(line, 25, u'│'.encode('utf-8'))
+		if noxtra == False:
+			for line in range(1, terminalsize[0]-1):
+				screen.addstr(line, 25, u'│'.encode('utf-8'))
 
-		screen.addstr(terminalsize[0]-2, 1, footer)
+			screen.addstr(terminalsize[0]-2, 1, footer)
 		screen.refresh()
 
 	def drawitems():
@@ -203,6 +238,8 @@ def main(argv):
 		elif x == ord('M') or x == ord('m'):
 			drawinfo()
 			continue
+		elif x == ord('a') or x == ord('A'):
+			addEntry()
 		elif x == ord('d') or x == ord('D'):
 			for entry in dbs[currentdb].dictionary['items']:
 				if entry['id'] == curitem:
