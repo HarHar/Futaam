@@ -15,20 +15,6 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-""" IGNORE THIS
-
-		reserved = {
-			0 = border/title
-			height = border
-			height-1 = keybinds
-		}
-
-		x,25 = '|' where x is not in reserved
-
-		4{...},30 = info where x % 2 = 0
-		   x    y 
-"""
-
 import curses
 import sys
 import os
@@ -249,4 +235,4 @@ def main(argv):
 			screen.addstr(10, 10, str(x))
 
 def help():
-	return 'Help page for curses interface'
+	return 'No particular arguments for this interface... Sorry to disappoint'
