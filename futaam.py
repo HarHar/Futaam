@@ -20,6 +20,7 @@ import os
 import imp
 import traceback
 import interfaces.common.utils as utils
+import subprocess
 colors = utils.colors()
 
 def load(filepath):
@@ -44,7 +45,7 @@ def getInterface(folder):
 			#if f == "utils.py":
 			#	continue
 			fullname = join(root, f)
-			if max(fullname.split('.')) == 'py':
+			if max(fullname.split('.')) == 'py' or max(fullname.split('.')) == 'js':
 				interfaces.append(fullname.split('/')[-1:][0].split('.')[0])
 	return interfaces
 
@@ -56,7 +57,11 @@ def help(intf):
 		ret += '\t--INTERFACENAME starts Futaam on the desired interface, ' + colors.warning + 'replace "INTERFACENAME" with one of the available interfaces' + colors.default + '\n'
 		return ret
 	else:
-		return load(os.path.join(path, 'interfaces/') + intf[1:] + '.py').help()
+		if os.path.exists(os.path.join(path, 'interfaces/') + intf[1:] + '.py'):
+			return load(os.path.join(path, 'interfaces/') + intf[1:] + '.py').help()
+		elif os.path.exists(os.path.join(path, 'interfaces/') + intf[1:] + '.js'):
+			return subprocess.Popen(['node', os.path.join(path, 'interfaces/') + intf[1:] + '.js', '--help'], stdout=subprocess.PIPE).communicate()[0]
+
 
 arguments = []
 path = os.path.dirname(os.path.realpath(__file__ ))
@@ -91,4 +96,7 @@ for arg in sys.argv[1:]:
 
 if interface == None: interface = 'text'
 
-load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
+if os.path.exists(os.path.join(path, 'interfaces/') + interface + '.py'):
+	load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
+elif os.path.join(path, 'interfaces/') + interface + '.js':
+	subprocess.Popen(['node', os.path.join(path, 'interfaces/') + interface + '.js'] + arguments)
