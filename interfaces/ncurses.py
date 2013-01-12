@@ -229,6 +229,10 @@ def main(argv):
 		try:
 			x = screen.getch()
 		except:
+			curses.nocbreak()
+			stdscr.keypad(0)
+			curses.echo()
+			curses.curs_set(1)
 			curses.endwin()
 		
 		if x == curses.KEY_RESIZE: redraw(); drawitems(); continue
