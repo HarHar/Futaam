@@ -99,7 +99,7 @@ def main(argv):
 
 	global footer
 	global f2
-	footer = '[Q]uit / [D]elete / [E]dit / [A]dd / [S]ynopsis'
+	footer = '[Q]uit / [D]elete / [E]dit / [A]dd / [S]ynopsis / [I]mage'
 	f2 = footer
 
 	def addEntry():
@@ -420,6 +420,16 @@ def main(argv):
 			x += 1
 			i += 1
 
+	def sI():
+		if dbs[currentdb].dictionary['items'][curitem].get('aid') != None:
+			try:
+				info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
+			except urllib2.HTTPError, info:
+				screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
+				return
+			utils.showImage(info['image_url'])
+
+
 	def drawinfo():
 		terminalsize = get_terminal_size()
 		s = 27
@@ -487,6 +497,8 @@ def main(argv):
 			drawitems()
 		elif x == ord('e') or x == ord('E'):
 			edit()
+		elif x == ord('i') or x == ord('I'):
+			sI()
 		elif x == 258: #DOWN
 			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
 				continue
