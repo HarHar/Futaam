@@ -16,12 +16,13 @@
 """
 from PyQt4 import QtGui
 from PyQt4 import QtCore
+from PyQt4 import uic
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
     _fromUtf8 = lambda s: s
-import interfaces.qtGui
 from interfaces.common import *
+import interfaces.qtGui
 
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
@@ -65,6 +66,31 @@ class TableModel(QtCore.QAbstractTableModel):
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
 
+class DeleteEntryDialog(QtGui.QDialog):
+	def __init__(self, parent = None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setupUi()
+		self.setModal(True)
+
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+
+	def setupUi(self):
+		self.layout = QtGui.QHBoxLayout()
+		self.pushButton = QtGui.QPushButton("Delete")
+		self.pushButton.setGeometry(QtCore.QRect(10, 70, 86, 27))
+		self.pushButton.setObjectName(_fromUtf8("pushButton"))
+		self.pushButton_2 = QtGui.QPushButton("Cancel")
+		self.pushButton_2.setGeometry(QtCore.QRect(150, 70, 86, 27))
+		self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+		self.comboBox = QtGui.QComboBox()
+		self.comboBox.setGeometry(QtCore.QRect(80, 20, 78, 25))
+		self.comboBox.setObjectName(_fromUtf8("comboBox"))
+		
+		self.layout.addWidget(self.comboBox)
+		self.layout.addWidget(self.pushButton)
+		self.layout.addWidget(self.pushButton_2)
+		self.setLayout(self.layout)
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -73,10 +99,15 @@ def openFile():
 		model.load_db(filename)
 		ui.tableView.setModel(model)
 
+def deleteEntry():
+	global model
+	global ui
+	dialog = DeleteEntryDialog(parent=ui.centralwidget)
+	dialog.exec_()
+
 def main(argv):
 	global model
 	global ui
-
 	app = QtGui.QApplication(argv)
 	window = QtGui.QMainWindow()
 	ui = interfaces.qtGui.Ui_Futaam()
@@ -88,7 +119,7 @@ def main(argv):
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL(_fromUtf8("triggered()")), openFile)
-
+	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), deleteEntry)
 	window.show()
 
 	exit(app.exec_())
