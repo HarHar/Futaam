@@ -20,6 +20,7 @@ import urllib2
 import re
 from HTMLParser import HTMLParser
 from PIL import Image
+import shutil
 try:
 	from BeautifulSoup import BeautifulStoneSoup
 	from bs4 import BeautifulSoup
@@ -32,6 +33,13 @@ anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watc
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
 
 translated_status = {'anime': anime_translated_status, 'manga': manga_translated_status}
+
+def showImage(url):
+    remote_fo = urllib2.urlopen(url)
+    with open('tempfile.' + url.split('.')[len(url.split('.'))-1], 'wb') as local_fo:
+        shutil.copyfileobj(remote_fo, local_fo)
+    im = Image.open('tempfile.' + url.split('.')[len(url.split('.'))-1])
+    im.show()
 
 class colors():
     def __init__(self):
