@@ -81,7 +81,8 @@ class AddEntryDialog(QtGui.QDialog):
 		self.setModal(True)
 
 		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
-	
+		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL(_fromUtf8("editingFinished()")), self.populateCB)
+
 	def setupUi(self):
 		self.layout = QtGui.QGridLayout()
 
@@ -107,6 +108,11 @@ class AddEntryDialog(QtGui.QDialog):
 
 		self.statusLabel = QtGui.QLabel("Status:")
 		self.statusCB = QtGui.QComboBox()
+		self.statusCB.addItem("Watched")
+		self.statusCB.addItem("Queued")
+		self.statusCB.addItem("Dropped")
+		self.statusCB.addItem("Watching")
+		self.statusCB.addItem("On Hold")
 		self.statusLayout = QtGui.QHBoxLayout()
 		self.statusLayout.addWidget(self.statusLabel)
 		self.statusLayout.addWidget(self.statusCB)
@@ -137,6 +143,16 @@ class AddEntryDialog(QtGui.QDialog):
 		self.layout.addItem(self.obsLayout)
 		self.layout.addItem(self.buttonLayout)
 		self.setLayout(self.layout)
+
+	def populateCB(self):
+		self.selectCB.clear()
+		title = self.titleLine.text()
+		if self.animeButton.isChecked() == True:
+			search_results = utils.MALWrapper.search(title, "anime")
+		else:
+			search_results = utils.MALWrapper.search(title, "manga")
+		for result in search_results:
+			self.selectCB.addItem(str(result["title"]))
 
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
