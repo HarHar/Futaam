@@ -99,7 +99,7 @@ def main(argv):
 
 	global footer
 	global f2
-	footer = '[q] quit / [d] delete / [a] add / [s] synopsis'
+	footer = '[q] quit / [d] delete / [e] edit / [a] add / [s] synopsis'
 	f2 = footer
 
 	def addEntry():
@@ -204,14 +204,48 @@ def main(argv):
 				drawitems()
 				return
 
-	def prompt(p, line):
-		terminalsize = get_terminal_size()
-		screen.addstr(line, 2, p)
+	def edit():
+		entry = dbs[currentdb].dictionary['items'][curitem]
+		redraw()
+		drawitems(True)
+
+		changefields = [{'dbentry': 'name', 'prompt': 'Title: '}, {'dbentry': 'genre', 'prompt': 'Genre: '}, {'dbentry': 'status', 'prompt': 'Status: '}, {'dbentry': 'lastwatched', 'prompt': 'Last watched: '}, {'dbentry': 'obs', 'prompt': 'Observations: '}]
+
+		t = 1
+		for field in changefields:
+			if field['dbentry'] == 'status':
+				screen.addstr(t, 27, 'Status [W/C/Q/H/D]')
+				x = ''
+				while (x.lower() in ['w', 'c', 'q', 'h', 'd']) == False:
+					x = screen.getch()
+					if x > 256:
+						continue
+					x = chr(x)
+				dbs[currentdb].dictionary['items'][curitem]['status'] = x.lower()
+				t += 1
+				continue
+			dbs[currentdb].dictionary['items'][curitem][field['dbentry']] = prompt(field['prompt'], t, 27, entry[field['dbentry']])
+			t += 1
+		screen.addstr(t+1, 27, 'Entry edited!', curses.color_pair(3) + curses.A_REVERSE)
 		screen.refresh()
-		screen.addstr(line, len(p) + 2, ' '*15, curses.A_REVERSE)
-		ret = ''
+		sleep(2)
+		dbs[currentdb].save()
+		redraw()
+		drawitems()
+
+	def prompt(p, line, y, default=''):
+		terminalsize = get_terminal_size()
+		curses.curs_set(1)
+		screen.addstr(line, y, p, curses.A_BOLD)
+		screen.refresh()
+		screen.addstr(line, len(p) + y, ' '*15, curses.A_REVERSE)
+		ret = default
 		x = 0
-		w = len(p) + 2
+		w = len(p) + y
+		if default != '':
+			screen.addstr(line, w, default, curses.A_REVERSE)
+			w += len(default)
+
 		while x != 10:
 			x = screen.getch()
 			if x == 263: #backspace
@@ -223,10 +257,12 @@ def main(argv):
 				ret = ret[:-1]
 				continue
 			if w > terminalsize[1]-5:
-				continue				
+				continue
 			screen.addstr(line, w, chr(x), curses.A_REVERSE)
 			w += 1
 			ret += chr(x)
+		ret = ret.replace('\n', '')
+		curses.curs_set(0)
 		return ret
 
 	def drawSearch(searchResults):
@@ -304,7 +340,7 @@ def main(argv):
 			screen.addstr(terminalsize[0]-2, 1, footer)
 		screen.refresh()
 
-	def drawitems():
+	def drawitems(noSidePanel=False):
 		terminalsize = get_terminal_size()
 		if terminalsize[0] < 12 or terminalsize[1] < 46:
 			screen.keypad(0)
@@ -325,18 +361,19 @@ def main(argv):
 				name = entry['name']
 			if entry['id'] == curitem:
 				bold = curses.A_REVERSE
-				fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': translated_status[entry['type'].lower()][entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
-				t = 1
-				for field in fields:
-					screen.addstr(t, 27, field, curses.A_BOLD)
-					sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
-					if sizeleft <= 3:
-						screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
+				if noSidePanel == False:
+					fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': translated_status[entry['type'].lower()][entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
+					t = 1
+					for field in fields:
+						screen.addstr(t, 27, field, curses.A_BOLD)
+						sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
+						if sizeleft <= 3:
+							screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
+							t += 1
+							continue
+						fix = ' ' * sizeleft
+						screen.addstr(t, 27 + len(field), fields[field].encode('utf-8') + fix)
 						t += 1
-						continue
-					fix = ' ' * sizeleft
-					screen.addstr(t, 27 + len(field), fields[field].encode('utf-8') + fix)
-					t += 1
 			else:
 				bold = 0
 
@@ -420,6 +457,8 @@ def main(argv):
 			dbs[currentdb].save()
 			redraw()
 			drawitems()
+		elif x == ord('e') or x == ord('E'):
+			edit()
 		elif x == 258: #DOWN
 			if len(dbs[currentdb].dictionary['items'])-1 == curitem:
 				continue
