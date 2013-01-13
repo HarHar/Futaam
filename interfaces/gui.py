@@ -101,7 +101,7 @@ def openFile():
 
 def save():
 	global model
-	model.db.save()
+	()
 
 def deleteEntry():
 	global model
@@ -123,7 +123,7 @@ def main(argv):
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL(_fromUtf8("triggered()")), openFile)
-	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL(_fromUtf8("triggered()")), save)
+	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL(_fromUtf8("triggered()")), model.db.save)
 	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), deleteEntry)
 	window.show()
 
