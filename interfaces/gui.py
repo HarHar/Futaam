@@ -53,6 +53,12 @@ class TableModel(QtCore.QAbstractTableModel):
 
 		return QtCore.QVariant()
 
+	def getAnimeNames(self):
+		names = []
+		for anime in self.animeList:
+			names.append(anime[0])
+		return names
+
 	def headerData(self, column, orientation, role = QtCore.Qt.DisplayRole):
 		if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
 			return QtCore.QVariant(self.headers[column])
@@ -67,11 +73,12 @@ class TableModel(QtCore.QAbstractTableModel):
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
 
 class DeleteEntryDialog(QtGui.QDialog):
-	def __init__(self, parent = None):
+	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
 		self.setupUi()
 		self.setModal(True)
 
+		self.comboBox.addItems(names)
 		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
 
 	def setupUi(self):
@@ -85,7 +92,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 		self.comboBox = QtGui.QComboBox()
 		self.comboBox.setGeometry(QtCore.QRect(80, 20, 78, 25))
 		self.comboBox.setObjectName(_fromUtf8("comboBox"))
-		
+			
 		self.layout.addWidget(self.comboBox)
 		self.layout.addWidget(self.pushButton)
 		self.layout.addWidget(self.pushButton_2)
@@ -102,7 +109,9 @@ def openFile():
 def deleteEntry():
 	global model
 	global ui
-	dialog = DeleteEntryDialog(parent=ui.centralwidget)
+	animeNames = model.getAnimeNames()
+	
+	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=animeNames)
 	dialog.exec_()
 
 def main(argv):
