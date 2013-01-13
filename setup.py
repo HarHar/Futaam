@@ -2,6 +2,18 @@
 from distutils.core import setup
 import os
 import stat
+import platform
+
+def cutDot(t, d):
+	out = ''
+	dc = 0
+	for l in t:
+		out += l
+		if l == '.':
+			dc += 1
+		if dc == d:
+			break
+	return out
 
 PACKAGE = "futaam"
 NAME = "Futaam"
@@ -51,8 +63,8 @@ if os.name == "nt":
 else:
 	print "Putting a symlink to futaam.py in /usr/bin/"
 	try:
-		os.symlink("/usr/lib/python2.7/site-packages/futaam.py", "/usr/bin/futaam")
+		os.symlink("/usr/lib/python"+ cutDot(platform.python_version(), 2).rstrip('.') +"/site-packages/futaam.py", "/usr/bin/futaam")
 	except:
 		os.remove("/usr/bin/futaam")
-		os.symlink("/usr/lib/python2.7/site-packages/futaam.py", "/usr/bin/futaam")
+		os.symlink("/usr/lib/python"+ cutDot(platform.python_version(), 2).rstrip('.') +"/site-packages/futaam.py", "/usr/bin/futaam")
 		os.popen("chmod +x /usr/bin/futaam")
