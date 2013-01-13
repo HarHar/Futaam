@@ -29,6 +29,7 @@ class TableModel(QtCore.QAbstractTableModel):
 		super(TableModel, self).__init__()
 		self.animeList = []
 		self.headers = ["Title","Genre","Status","Watched","Observations"]
+		self.active_file = ""
 
 	def columnCount(self, parent = QtCore.QModelIndex()):
 		return 5
@@ -68,6 +69,7 @@ class TableModel(QtCore.QAbstractTableModel):
 		return len(self.animeList)
 
 	def load_db(self, filename):
+		self.active_file = filename
 		self.db = Parser(filename)
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
@@ -79,6 +81,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 		self.setModal(True)
 
 		self.comboBox.addItems(names)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.setReturnCode)
 		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
 
 	def setupUi(self):
@@ -98,6 +101,11 @@ class DeleteEntryDialog(QtGui.QDialog):
 		self.layout.addWidget(self.pushButton_2)
 		self.setLayout(self.layout)
 
+	def setReturnCode(self):
+		# add one to the index since QDialog already uses the 0
+		# return code to signify normal closing
+		self.done(self.comboBox.currentIndex() + 1)
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -112,7 +120,31 @@ def deleteEntry():
 	animeNames = model.getAnimeNames()
 	
 	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=animeNames)
-	dialog.exec_()
+	toDelete = dialog.exec_()
+	if toDelete == 0:
+		return
+	# see comment in DeleteEntryDialog.setReturnCode()
+	toDelete = toDelete - 1
+	for entry in model.db.dictionary['items']:
+		if entry['id'] == toDelete:
+			model.db.dictionary['items'].remove(entry)
+			model.db.dictionary['count'] -= 1
+			model.db.save()
+			break
+	# rebuild IDs
+	for x in xrange(0, model.db.dictionary['count']):
+		model.db.dictionary['items'][x]['id'] = x
+	# reload table
+	filename = model.active_file
+	model = TableModel()
+	model.load_db(filename)
+	ui.tableView.setModel(model)
+
+def addEntry():
+	global model
+	global ui
+	
+	return
 
 def main(argv):
 	global model
