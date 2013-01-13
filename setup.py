@@ -15,11 +15,11 @@ def get_subpackages():
 	packs = []
 	os.chdir("interfaces")
 	for file in os.listdir(os.getcwd()):
-		if ".py" in file:
+		if file[-2:] == "py":
 			packs.append("interfaces/" + file[:-3])
 	os.chdir("common")
 	for file in os.listdir(os.getcwd()):
-		if ".py" in file:
+		if file[-2:] == "py":
 			packs.append("interfaces/common/" + file[:-3])
 	os.chdir("../..")
 	return packs
