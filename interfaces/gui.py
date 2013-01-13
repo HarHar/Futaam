@@ -99,10 +99,6 @@ def openFile():
 		model.load_db(filename)
 		ui.tableView.setModel(model)
 
-def save():
-	global model
-	()
-
 def deleteEntry():
 	global model
 	global ui
