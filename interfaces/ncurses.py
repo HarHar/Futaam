@@ -204,12 +204,37 @@ def main(argv):
 				drawitems()
 				return
 
+	def alert(s, time=2):
+		terminalsize = get_terminal_size()
+		redraw(True)
+		x_m = terminalsize[0] / 2
+		x_y = (terminalsize[1] / 2) - (len(s) / 2)
+
+		screen.addstr(x_m-1, x_y-1, ' ' * (len(s) + 2), curses.color_pair(1) + curses.A_REVERSE)
+		screen.addstr(x_m, x_y-1, ' ', curses.color_pair(1) + curses.A_REVERSE)
+		screen.addstr(x_m, x_y, s, curses.color_pair(1))
+		screen.addstr(x_m, x_y+len(s), ' ', curses.color_pair(1) + curses.A_REVERSE)
+		screen.addstr(x_m+1, x_y-1, ' ' * (len(s) + 2), curses.color_pair(1) + curses.A_REVERSE)
+
+		screen.refresh()
+		sleep(time)
+
+
 	def edit():
+		terminalsize = get_terminal_size()
 		entry = dbs[currentdb].dictionary['items'][curitem]
 		redraw()
 		drawitems(True)
 
 		changefields = [{'dbentry': 'name', 'prompt': 'Title: '}, {'dbentry': 'genre', 'prompt': 'Genre: '}, {'dbentry': 'status', 'prompt': 'Status: '}, {'dbentry': 'lastwatched', 'prompt': 'Last watched: '}, {'dbentry': 'obs', 'prompt': 'Observations: '}]
+
+		#Screen size check
+		for field in changefields:
+			if (len(dbs[currentdb].dictionary['items'][curitem][field['dbentry']]) + len(field['prompt']) + 27) > terminalsize[1]:
+				alert('Screen too small')
+				redraw()
+				drawitems()
+				return
 
 		t = 1
 		for field in changefields:
