@@ -273,7 +273,7 @@ def main(argv):
 
 		while x != 10:
 			x = screen.getch()
-			if x > 255:
+			if x > 255 and x != 263:
 				continue
 			if x == 263: #backspace
 				if w <= len(p) + 2:
