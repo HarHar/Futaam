@@ -74,6 +74,70 @@ class TableModel(QtCore.QAbstractTableModel):
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
 
+class AddEntryDialog(QtGui.QDialog):
+	def __init__(self, parent = None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setupUi()
+		self.setModal(True)
+
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+	
+	def setupUi(self):
+		self.layout = QtGui.QGridLayout()
+
+		self.titleLabel = QtGui.QLabel("Title:")
+		self.titleLine = QtGui.QLineEdit()
+		self.titleLayout = QtGui.QHBoxLayout()
+		self.titleLayout.addWidget(self.titleLabel)
+		self.titleLayout.addWidget(self.titleLine)
+
+		self.typeLabel = QtGui.QLabel("Type:")
+		self.animeButton = QtGui.QRadioButton("Anime")
+		self.mangaButton = QtGui.QRadioButton("Manga")
+		self.typeLayout = QtGui.QHBoxLayout()
+		self.typeLayout.addWidget(self.typeLabel)
+		self.typeLayout.addWidget(self.animeButton)
+		self.typeLayout.addWidget(self.mangaButton)
+
+		self.selectLabel = QtGui.QLabel("Select Search Item:")
+		self.selectCB = QtGui.QComboBox()
+		self.selectLayout = QtGui.QHBoxLayout()
+		self.selectLayout.addWidget(self.selectLabel)
+		self.selectLayout.addWidget(self.selectCB)
+
+		self.statusLabel = QtGui.QLabel("Status:")
+		self.statusCB = QtGui.QComboBox()
+		self.statusLayout = QtGui.QHBoxLayout()
+		self.statusLayout.addWidget(self.statusLabel)
+		self.statusLayout.addWidget(self.statusCB)
+
+		self.lwLabel = QtGui.QLabel("Episodes Watched/Chapters Read:")
+		self.lwLine = QtGui.QLineEdit()
+		self.lwLayout = QtGui.QHBoxLayout()
+		self.lwLayout.addWidget(self.lwLabel)
+		self.lwLayout.addWidget(self.lwLine)
+
+		self.obsLabel = QtGui.QLabel("Observations:")
+		self.obsLine = QtGui.QLineEdit()
+		self.obsLayout = QtGui.QHBoxLayout()
+		self.obsLayout.addWidget(self.obsLabel)
+		self.obsLayout.addWidget(self.obsLine)
+
+		self.pushButton = QtGui.QPushButton("Add Entry")
+		self.pushButton_2 = QtGui.QPushButton("Cancel")
+		self.buttonLayout = QtGui.QHBoxLayout()
+		self.buttonLayout.addWidget(self.pushButton)
+		self.buttonLayout.addWidget(self.pushButton_2)
+
+		self.layout.addItem(self.titleLayout)
+		self.layout.addItem(self.typeLayout)
+		self.layout.addItem(self.selectLayout)
+		self.layout.addItem(self.statusLayout)
+		self.layout.addItem(self.lwLayout)
+		self.layout.addItem(self.obsLayout)
+		self.layout.addItem(self.buttonLayout)
+		self.setLayout(self.layout)
+
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
@@ -83,18 +147,12 @@ class DeleteEntryDialog(QtGui.QDialog):
 		self.comboBox.addItems(names)
 		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.setReturnCode)
 		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
-
+		
 	def setupUi(self):
 		self.layout = QtGui.QHBoxLayout()
 		self.pushButton = QtGui.QPushButton("Delete")
-		self.pushButton.setGeometry(QtCore.QRect(10, 70, 86, 27))
-		self.pushButton.setObjectName(_fromUtf8("pushButton"))
 		self.pushButton_2 = QtGui.QPushButton("Cancel")
-		self.pushButton_2.setGeometry(QtCore.QRect(150, 70, 86, 27))
-		self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
 		self.comboBox = QtGui.QComboBox()
-		self.comboBox.setGeometry(QtCore.QRect(80, 20, 78, 25))
-		self.comboBox.setObjectName(_fromUtf8("comboBox"))
 			
 		self.layout.addWidget(self.comboBox)
 		self.layout.addWidget(self.pushButton)
@@ -144,7 +202,8 @@ def addEntry():
 	global model
 	global ui
 	
-	return
+	dialog = AddEntryDialog(parent=ui.centralwidget)
+	dialog.exec_()
 
 def main(argv):
 	global model
@@ -155,6 +214,8 @@ def main(argv):
 	ui.setupUi(window)
 
 	model = TableModel()
+	if len(argv) == 0:
+		help()
 	model.load_db(argv[0])
 	ui.tableView.setModel(model)
 
@@ -162,9 +223,11 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL(_fromUtf8("triggered()")), openFile)
 	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL(_fromUtf8("triggered()")), model.db.save)
 	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), deleteEntry)
+	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), addEntry)
 	window.show()
 
 	exit(app.exec_())
 
 def help():
-	return 'Help page for Qt interface'
+	print """USAGE: ./futaam.py --gui [DATABASE]"""
+	quit()
