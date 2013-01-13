@@ -420,12 +420,14 @@ def main(argv):
 			x += 1
 			i += 1
 
-	def sI():
+	def sI():		
 		if dbs[currentdb].dictionary['items'][curitem].get('aid') != None:
 			try:
 				info = MAL.details(dbs[currentdb].dictionary['items'][curitem]['aid'], dbs[currentdb].dictionary['items'][curitem]['type'])
 			except urllib2.HTTPError, info:
-				screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
+				alert('Error: ' + str(info), 2)
+				redraw()
+				drawitems()
 				return
 			utils.showImage(info['image_url'])
 
