@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from distutils.core import setup
 import os
+import stat
 
 PACKAGE = "futaam"
 NAME = "Futaam"
@@ -33,8 +34,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="GPL",
     url=URL,
-    py_modules=[PACKAGE]+SUBPACKAGES,
-	#packages=SUBPACKAGES,
+    py_modules=[PACKAGE] + SUBPACKAGES,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: End Users/Desktop",
@@ -43,3 +43,11 @@ setup(
         "Programming Language :: Python",
     ]
 )
+
+print "Putting a symlink to futaam.py in /usr/bin/"
+try:
+	os.symlink("/usr/lib/python2.7/site-packages/futaam.py", "/usr/bin/futaam")
+except:
+	os.remove("/usr/bin/futaam")
+	os.symlink("/usr/lib/python2.7/site-packages/futaam.py", "/usr/bin/futaam")
+os.popen("chmod +x /usr/bin/futaam")
