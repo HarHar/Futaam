@@ -44,8 +44,9 @@ setup(
     ]
 )
 if os.name == "nt":
-	print "Why are you using Windows in >2013?"
-	print "This script would make things so much more convenient for you if you weren't"
+	print ">2013"
+	print ">Windows"
+	print "ISHIGGY"
 	quit()
 else:
 	print "Putting a symlink to futaam.py in /usr/bin/"
@@ -54,4 +55,4 @@ else:
 	except:
 		os.remove("/usr/bin/futaam")
 		os.symlink("/usr/lib/python2.7/site-packages/futaam.py", "/usr/bin/futaam")
-	os.popen("chmod +x /usr/bin/futaam")
+		os.popen("chmod +x /usr/bin/futaam")
