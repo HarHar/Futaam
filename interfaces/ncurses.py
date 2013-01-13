@@ -258,7 +258,7 @@ def main(argv):
 		redraw()
 		drawitems()
 
-	def prompt(p, line, y, default=''):
+	def prompt(p, line, y=2, default=''):
 		terminalsize = get_terminal_size()
 		curses.curs_set(1)
 		screen.addstr(line, y, p, curses.A_BOLD)
