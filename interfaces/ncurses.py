@@ -273,8 +273,6 @@ def main(argv):
 
 		while x != 10:
 			x = screen.getch()
-			if x > 255 and x != 263:
-				continue
 			if x == 263: #backspace
 				if w <= len(p) + 2:
 					continue
@@ -285,9 +283,12 @@ def main(argv):
 				continue
 			if w > terminalsize[1]-5:
 				continue
-			screen.addstr(line, w, chr(x), curses.A_REVERSE)
+			try:
+				screen.addstr(line, w, unichr(x), curses.A_REVERSE)
+			except:
+				continue
 			w += 1
-			ret += chr(x)
+			ret += unichr(x)
 		ret = ret.replace('\n', '')
 		curses.curs_set(0)
 		return ret
