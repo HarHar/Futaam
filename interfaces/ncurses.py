@@ -99,7 +99,7 @@ def main(argv):
 
 	global footer
 	global f2
-	footer = '[q] quit / [d] delete / [e] edit / [a] add / [s] synopsis'
+	footer = '[Q]uit / [D]elete / [E]dit / [A]dd / [S]ynopsis'
 	f2 = footer
 
 	def addEntry():
