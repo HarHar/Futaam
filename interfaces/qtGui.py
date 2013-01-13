@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'qtGui.ui'
 #
-# Created: Fri Jan 11 09:12:36 2013
+# Created: Sat Jan 12 19:27:32 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,8 +39,8 @@ class Ui_Futaam(object):
         Futaam.setMenuBar(self.menubar)
         self.actionOpen = QtGui.QAction(Futaam)
         self.actionOpen.setObjectName(_fromUtf8("actionOpen"))
-        self.actionClose = QtGui.QAction(Futaam)
-        self.actionClose.setObjectName(_fromUtf8("actionClose"))
+        self.actionSave = QtGui.QAction(Futaam)
+        self.actionSave.setObjectName(_fromUtf8("actionSave"))
         self.actionQuit = QtGui.QAction(Futaam)
         self.actionQuit.setObjectName(_fromUtf8("actionQuit"))
         self.actionAdd_Entry = QtGui.QAction(Futaam)
@@ -54,7 +54,7 @@ class Ui_Futaam(object):
         self.actionAbout_Futaam = QtGui.QAction(Futaam)
         self.actionAbout_Futaam.setObjectName(_fromUtf8("actionAbout_Futaam"))
         self.menuFile.addAction(self.actionOpen)
-        self.menuFile.addAction(self.actionClose)
+        self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionQuit)
         self.menuEdit.addAction(self.actionAdd_Entry)
         self.menuEdit.addAction(self.actionDelete_Entry)
@@ -74,7 +74,7 @@ class Ui_Futaam(object):
         self.menuEdit.setTitle(QtGui.QApplication.translate("Futaam", "Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("Futaam", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionOpen.setText(QtGui.QApplication.translate("Futaam", "Open", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionClose.setText(QtGui.QApplication.translate("Futaam", "Save", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSave.setText(QtGui.QApplication.translate("Futaam", "Save", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setText(QtGui.QApplication.translate("Futaam", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_Entry.setText(QtGui.QApplication.translate("Futaam", "Add Entry", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDelete_Entry.setText(QtGui.QApplication.translate("Futaam", "Delete Entry", None, QtGui.QApplication.UnicodeUTF8))
