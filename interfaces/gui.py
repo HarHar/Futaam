@@ -16,7 +16,6 @@
 """
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-from PyQt4 import uic
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -82,6 +81,8 @@ class AddEntryDialog(QtGui.QDialog):
 
 		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
 		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL(_fromUtf8("editingFinished()")), self.populateCB)
+		QtCore.QObject.connect(self.selectCB, QtCore.SIGNAL(_fromUtf8("currentIndexChanged()")), self.animeSelected)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.addAnime)
 
 	def setupUi(self):
 		self.layout = QtGui.QGridLayout()
@@ -153,6 +154,14 @@ class AddEntryDialog(QtGui.QDialog):
 			search_results = utils.MALWrapper.search(title, "manga")
 		for result in search_results:
 			self.selectCB.addItem(str(result["title"]))
+		self.results = search_results
+
+	def animeSelected(self, index):
+		print "test"
+		print index
+
+	def addAnime(self):
+		return
 
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
