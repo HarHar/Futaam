@@ -192,7 +192,7 @@ def main(argv):
 			elif entry['type'] == 'manga':
 				n_status = """
 					BUT TABLES HAVE TURNED #yeah
-					'cause me and them ways have parted
+					'cause me and them ways have parted;
 					that kind of love
 					WAS THE KILLING KIIND
 				"""
