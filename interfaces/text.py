@@ -33,6 +33,20 @@ if PS1[-1:] != ' ': PS1 += ' '
 
 MAL = utils.MALWrapper()
 colors = utils.colors()
+
+def pickEntry(index, db):
+	if index.isdigit() == False:
+		print colors.fail + 'Argument must be the index number' + colors.default
+		return None
+	if db.dictionary['count'] < int(index) or int(index)<0:
+		print colors.fail + 'Entry not found' + colors.default
+		return None
+	for entry in db.dictionary['items']:
+		if entry['id'] == int(index): return entry
+	else:
+		print colors.fail + 'Entry not found! There is probably an error with your database and that makes me very sad :c' + colors.default
+		return None
+
 def main(argv):
 	global PS1
 	global configfile
@@ -142,30 +156,70 @@ def main(argv):
 						sys.stdout.write(rcolors[entry['status'].lower()])
 					print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
 		elif cmdsplit[0].lower() in ['d', 'del', 'delete']:
-			if args.isdigit() == False:
-				print colors.fail + 'Argument must be the index number' + colors.default
-				continue
-			if dbs[currentdb].dictionary['count'] < int(args) or int(args)<0:
-				print colors.fail + 'Entry not found' + colors.default
-				continue
-			for entry in dbs[currentdb].dictionary['items']:
-				if entry['id'] == int(args):
-					confirm = ''
-					while (confirm in ['y', 'n']) == False:
-						confirm = raw_input(colors.warning + 'Are you sure? [y/n] ').lower()
-					dbs[currentdb].dictionary['items'].remove(entry)
-					dbs[currentdb].dictionary['count'] -= 1
-					break
-			else:
-				print colors.fail + 'Entry not found! There is probably an error with your database and that makes me very sad :c' + colors.default
-				continue
+			entry = pickEntry(args, dbs[currentdb])
+			if entry == None: continue
+			confirm = ''
+			while (confirm in ['y', 'n']) == False:
+				confirm = raw_input(colors.warning + 'Are you sure? [y/n] ').lower()
+			dbs[currentdb].dictionary['items'].remove(entry)
+			dbs[currentdb].dictionary['count'] -= 1
 
 			##### REBUILD IDS #####
 			for x in xrange(0, dbs[currentdb].dictionary['count']):
 				dbs[currentdb].dictionary['items'][x]['id'] = x
 			#######################
 			dbs[currentdb].save()
+		elif cmdsplit[0].lower() in ['edit', 'e']:
+			#INTRO I
+			entry = pickEntry(args, dbs[currentdb])
+			if entry == None: continue
 
+			#INTRO II
+			n_name = raw_input('Name: [' + entry['name'].decode('utf8') + '] ').replace('\n', '')
+			n_genre = raw_input('Genre: [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
+
+			#ZIGZAGGING
+			if entry['type'] == 'anime':
+				n_status = """
+					There was a time,
+					when I was so brooken hearted;
+					love wasn't much
+					of a friend of miine..
+				"""
+				while (n_status in ['w', 'c', 'q', 'h', 'd', '']) == False:
+					n_status = raw_input('Status: [W/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
+				n_lw = raw_input('Last episode watched: [' + entry['lastwatched'] + ']> ').replace('\n', '')
+			elif entry['type'] == 'manga':
+				n_status = """
+					BUT TABLES HAVE TURNED #yeah
+					'cause me and them ways have parted
+					that kind of love
+					WAS THE KILLING KIIND
+				"""
+				while (n_status in ['r', 'c', 'q', 'h', 'd', '']) == False:
+					n_status = raw_input('Status: [R/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
+				if n_status == 'r': n_status = 'w'
+				n_lw = raw_input('Last page/chapter read: [' + entry['lastwatched'] + ']> ').replace('\n', '')
+
+			#EXTENDED SINGLE NOTE
+			n_obs = raw_input('Observations: [' + entry['obs'] + ']> ')
+
+			#BEGIN THE SOLO
+			if n_name == '': n_name = entry['name']
+			dbs[currentdb].dictionary['items'][int(args)]['name'] = n_name
+			if n_genre == '': n_genre = entry['genre']
+			dbs[currentdb].dictionary['items'][int(args)]['genre'] = n_genre
+			if n_status == '': n_status = entry['status']
+			dbs[currentdb].dictionary['items'][int(args)]['status'] = n_status
+			if n_lw == '': n_lw = entry['lastwatched']
+			dbs[currentdb].dictionary['items'][int(args)]['lastwatched'] = n_lw
+			if n_obs == '': n_obs = entry['obs']
+			dbs[currentdb].dictionary['items'][int(args)]['obs'] = n_obs
+
+			#Peaceful end
+			dbs[currentdb].save()
+			print colors.green + 'Done' + colors.default
+			continue
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default).replace('\n', '')
