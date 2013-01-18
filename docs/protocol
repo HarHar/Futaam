@@ -1,0 +1,33 @@
+-- Plain connection (no encryption)
+-- Password sent as md5
+-- Command-based
+-- All commands passed as json
+
+////////////////////////////////////
+Theoretical connection (from parser.py[client] to remote.py[server])
+'>' = client sends & server receives
+'<' = server sends & client receives
+
+----------------------
+Connection begins
+	> [hashed password]
+
+If password is correct
+	< OK
+else
+	connection closes
+
+----------------------
+Command syntax
+	{'cmd': str in 'pull/push/save/sdb/etc', 'args': str in '##whatever##'}
+
+----------------------
+Response syntax
+	{'cmd': str, 'response': str}
+
+----------------------
+Command list
+	* pull - returns the content of the current database's file
+	* push - replaces the dictionary's content with the arguments
+	* save - write dictionary to the disk
+	* sdb  - if more than one database file is given to remote.py, go to the next
