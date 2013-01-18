@@ -1,5 +1,4 @@
--- Plain connection (no encryption)
--- Password sent as md5
+-- SHA256 password-encrypted connection
 -- Command-based
 -- All commands passed as json
 
@@ -15,15 +14,16 @@ Connection begins
 If password is correct
 	< OK
 else
+	< 305 NOT AUTHORIZED
 	connection closes
 
 ----------------------
 Command syntax
-	{'cmd': str in 'pull/push/save/sdb/etc', 'args': str in '##whatever##'}
+	> {'cmd': str in 'pull/push/save/sdb/etc', 'args': str in '##whatever##'}
 
 ----------------------
 Response syntax
-	{'cmd': str, 'response': str}
+	< {'cmd': str, 'response': str}
 
 ----------------------
 Command list
