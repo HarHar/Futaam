@@ -20,6 +20,49 @@ import hashlib
 from interfaces.common import *
 import socket
 import SocketServer
+import json
+
+class rServer(SocketServer.BaseRequestHandler):
+	def setup(self):
+		global password
+		print '[INFO] ' + repr(self.client_address) + ' connected'
+
+		try:
+			hashed_pass = self.request.recv(4096).strip('\n').strip('\r')
+		except:
+			return
+
+		if hashed_pass != password:
+			self.request.send('305 NOT AUTHORIZED')
+			print '[INFO] ' + repr(self.client_address) + ' has sent an invalid password'
+			self.request.close()
+		else:
+			self.request.send('OK')
+			try:
+				self.conns[self.request] = ''
+			except:
+				self.conns = {}
+				self.conns[self.request] = ''
+
+	def handle(self):
+		#self.client_address[0] == ip (str)
+		#self.request == socket.socket
+		data = 'that4chanwolf is gentoo'
+		wholething = ''
+		while data:
+			try:
+				data = self.request.recv(4096)
+			except:
+				continue
+			if (self.request in self.conns) == False: continue
+			self.conns[self.request] += data
+			if self.conns[self.request][-1:] == chr(4):
+				print '[DEBUG] {CMD received} ' + repr(self.conns[self.request])
+				self.conns[self.request] = ''
+				continue
+
+	def finish(self):
+		pass
 
 colors = utils.colors()
 def main(argv):
@@ -39,7 +82,8 @@ def main(argv):
 				print colors.fail + 'Missing password' + colors.default
 				sys.exit(1)	
 			else:
-				password = argv[i+1]
+				global password
+				password = hashlib.sha256(argv[i+1]).hexdigest()
 		elif arg in ['--port']:
 			if len(argv) <= i:
 				print colors.fail + 'Missing port' + colors.default
@@ -48,34 +92,19 @@ def main(argv):
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)	
 			else:
+				global port
 				port = int(argv[i+1])
 		i += 1
 	if files == [] or password == '':
 		print colors.bold + 'Usage: ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
 		sys.exit(1)
 	else:
-		"""
-		We drink to our youth to the days come and gone
-		For the age of oppression is now nearly done
-		We'll drive out the empire from this land that we own
-		With our blood and our steel we will take back our home
-
-		All hail to Ulfric you are the high king
-		In your great honor we drink and we'll sing
-		We're the children of Skyrim and we fight all our lives
-		And when Sovngarde beckons every one of us dies
-
-		But this land is ours and we'll see it wiped clean
-		Of the scourge that has sullied our hopes and our dreams
-
-		All hail to Ulfric you are the high king
-		In your great honor we drink and we'll sing
-		We're the children of Skyrim and we fight all our lives
-		And when Sovngarde beckons every one of us dies
-
-		We drink to our youth to days come and gone
-		For the age of oppression is now nearly done...
-		"""
+		print '[INFO] Listening on port ' + str(port)
+		rserver = SocketServer.ThreadingTCPServer(('', port), rServer)
+		try:
+			rserver.serve_forever()
+		except KeyboardInterrupt:
+			os.kill(os.getpid(), 9) #seppuku
 
 def help():
 	return 'Help page for remote interface'
