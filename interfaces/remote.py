@@ -82,7 +82,7 @@ class rServer(SocketServer.BaseRequestHandler):
 					if readonly:
 						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
 						continue
-					dbs[curdb].dictionary = json.loads(StringIO(cmd['args']))
+					dbs[curdb].dictionary = json.load(StringIO(cmd['args']))
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
