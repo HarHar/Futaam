@@ -21,6 +21,10 @@ from interfaces.common import *
 import socket
 import SocketServer
 import json
+from StringIO import StringIO
+
+port = 8500
+password = ''
 
 class rServer(SocketServer.BaseRequestHandler):
 	def setup(self):
@@ -30,13 +34,15 @@ class rServer(SocketServer.BaseRequestHandler):
 		try:
 			hashed_pass = self.request.recv(4096).strip('\n').strip('\r')
 		except:
+			print '[INFO] '+ repr(self.client_addess) + ' has disconnected'
 			return
 
 		if hashed_pass != password:
 			self.request.send('305 NOT AUTHORIZED')
-			print '[INFO] ' + repr(self.client_address) + ' has sent an invalid password'
+			print '[INFO] ' + repr(self.client_address) + ' has sent an invalid password and is now disconnected'
 			self.request.close()
 		else:
+			print '[INFO] ' + repr(self.client_address) + ' has successfully logged in'
 			self.request.send('OK')
 			try:
 				self.conns[self.request] = ''
@@ -55,19 +61,20 @@ class rServer(SocketServer.BaseRequestHandler):
 			except:
 				continue
 			if (self.request in self.conns) == False: continue
-			self.conns[self.request] += data
+			self.conns[self.request] += data.replace('\n', '').replace('\r', '')
 			if self.conns[self.request][-1:] == chr(4):
-				print '[DEBUG] {CMD received} ' + repr(self.conns[self.request])
+				cmd = json.load(StringIO(self.conns[self.request][:-1]))
+				print '[DEBUG] {CMD received} cmd=' + repr(cmd['cmd']) + ' args=' + repr(cmd['args'])
 				self.conns[self.request] = ''
 				continue
 
 	def finish(self):
-		pass
+		print '[INFO] A client has disconnected'
 
 colors = utils.colors()
 def main(argv):
-	password = ''
-	port = 8500
+	global port
+	global password
 	files = []
 
 	i = 0
@@ -82,7 +89,6 @@ def main(argv):
 				print colors.fail + 'Missing password' + colors.default
 				sys.exit(1)	
 			else:
-				global password
 				password = hashlib.sha256(argv[i+1]).hexdigest()
 		elif arg in ['--port']:
 			if len(argv) <= i:
@@ -92,7 +98,6 @@ def main(argv):
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)	
 			else:
-				global port
 				port = int(argv[i+1])
 		i += 1
 	if files == [] or password == '':
