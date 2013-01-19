@@ -27,6 +27,7 @@ port = 8500
 password = ''
 dbs = []
 curdb = 0
+readonly = False
 
 class rServer(SocketServer.BaseRequestHandler):
 	def setup(self):
@@ -57,6 +58,7 @@ class rServer(SocketServer.BaseRequestHandler):
 		#self.request == socket.socket
 		global dbs
 		global curdb
+		global readonly
 
 		data = 'that4chanwolf is gentoo'
 		wholething = ''
@@ -77,11 +79,17 @@ class rServer(SocketServer.BaseRequestHandler):
 					res['response'] = json.dumps(dbs[curdb].dictionary)
 					self.request.send(json.dumps(res) + chr(4))
 				elif cmd['cmd'] == 'push':
+					if readonly:
+						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
+						continue
 					dbs[curdb].dictionary = json.loads(StringIO(cmd['args']))
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
 				elif cmd['cmd'] == 'save':
+					if readonly:
+						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
+						continue					
 					dbs[curdb].save()
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
@@ -92,7 +100,7 @@ class rServer(SocketServer.BaseRequestHandler):
 						repr(dbs[curdb])
 					except IndexError:
 						curdb = 0
-						
+
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
 				continue
@@ -105,6 +113,7 @@ def main(argv):
 	global port
 	global password
 	global dbs
+	global readonly
 	files = []
 
 	i = 0
@@ -129,6 +138,8 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				port = int(argv[i+1])
+		elif arg in ['--readonly', '-ro']:
+			readonly = True
 		i += 1
 	if files == [] or password == '':
 		print colors.bold + 'Usage: ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
