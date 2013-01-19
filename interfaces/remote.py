@@ -142,7 +142,7 @@ def main(argv):
 			readonly = True
 		i += 1
 	if files == [] or password == '':
-		print colors.bold + 'Usage: ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
+		print colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
 		sys.exit(1)
 	else:
 		for fn in files:
@@ -156,4 +156,7 @@ def main(argv):
 			os.kill(os.getpid(), 9) #seppuku
 
 def help():
-	return 'Help page for remote interface'
+	hlp = ''
+	hlp += colors.header + '[Usage] ' + colors.default
+	hlp += sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number] [--readonly]\n'
+	return hlp
