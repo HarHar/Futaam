@@ -189,6 +189,38 @@ class DeleteEntryDialog(QtGui.QDialog):
 		# return code to signify normal closing
 		self.done(self.comboBox.currentIndex() + 1)
 
+class SwapEntryDialog(QtGui.QDialog):
+	def __init__(self, parent = None, names = []):
+		QtGui.QDialog.__init__(self, parent)
+		self.setupUi()
+		self.setModal(True)
+		self.model = model
+		self.ui = ui
+
+		self.entry1Box.addItems(names)
+		self.entry2Box.addItems(names)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.swap)
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+		
+	def setupUi(self):
+		self.layout = QtGui.QHBoxLayout()
+		self.pushButton = QtGui.QPushButton("Swap")
+		self.pushButton_2 = QtGui.QPushButton("Cancel")
+		self.entry1Box = QtGui.QComboBox()
+		self.entry2Box = QtGui.QComboBox()
+
+		self.layout.addWidget(self.entry1Box)
+		self.layout.addWidget(self.entry2Box)
+		self.layout.addWidget(self.pushButton)
+		self.layout.addWidget(self.pushButton_2)
+		self.setLayout(self.layout)
+
+	def swap(self):
+		entry1 = self.entry1Box.currentIndex()
+		entry2 = self.entry2Box.currentIndex()
+		doSwap(entry1, entry2)
+		self.done(0)
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -230,6 +262,32 @@ def addEntry():
 	dialog = AddEntryDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
+def swapEntries():
+	global model
+	global ui
+	animeNames = model.getAnimeNames()
+
+	dialog = SwapEntryDialog(names=animeNames, parent=ui.centralwidget)
+	dialog.exec_()
+
+def doSwap(index1, index2):
+	global model
+	global ui
+
+	entry1 = model.db.dictionary['items'][index1]
+	entry2 = model.db.dictionary['items'][index2]
+	model.db.dictionary['items'][index1] = entry2
+	model.db.dictionary['items'][index2] = entry1
+	model.db.save()
+	# rebuild IDs
+	for x in xrange(0, model.db.dictionary['count']):
+		model.db.dictionary['items'][x]['id'] = x
+	#reload table
+	filename = model.active_file
+	model = TableModel()
+	model.load_db(filename)
+	ui.tableView.setModel(model)
+
 def main(argv):
 	global model
 	global ui
@@ -249,8 +307,9 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL(_fromUtf8("triggered()")), model.db.save)
 	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), deleteEntry)
 	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), addEntry)
+	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL(_fromUtf8("triggered()")), swapEntries)
+	
 	window.show()
-
 	exit(app.exec_())
 
 def help():
