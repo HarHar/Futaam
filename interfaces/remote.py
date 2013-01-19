@@ -25,6 +25,8 @@ from StringIO import StringIO
 
 port = 8500
 password = ''
+dbs = []
+curdb = 0
 
 class rServer(SocketServer.BaseRequestHandler):
 	def setup(self):
@@ -53,6 +55,9 @@ class rServer(SocketServer.BaseRequestHandler):
 	def handle(self):
 		#self.client_address[0] == ip (str)
 		#self.request == socket.socket
+		global dbs
+		global curdb
+
 		data = 'that4chanwolf is gentoo'
 		wholething = ''
 		while data:
@@ -66,6 +71,11 @@ class rServer(SocketServer.BaseRequestHandler):
 				cmd = json.load(StringIO(self.conns[self.request][:-1]))
 				print '[DEBUG] {CMD received} cmd=' + repr(cmd['cmd']) + ' args=' + repr(cmd['args'])
 				self.conns[self.request] = ''
+
+				if cmd['cmd'] == 'pull':
+					res = {'cmd': cmd['cmd'], 'response': ''}
+					res['response'] = json.dumps(dbs[curdb].dictionary)
+					self.request.send(json.dumps(res) + chr(4))
 				continue
 
 	def finish(self):
@@ -75,6 +85,7 @@ colors = utils.colors()
 def main(argv):
 	global port
 	global password
+	global dbs
 	files = []
 
 	i = 0
@@ -104,6 +115,9 @@ def main(argv):
 		print colors.bold + 'Usage: ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
 		sys.exit(1)
 	else:
+		for fn in files:
+			dbs.append(parser.Parser(fn))
+
 		print '[INFO] Listening on port ' + str(port)
 		rserver = SocketServer.ThreadingTCPServer(('', port), rServer)
 		try:
