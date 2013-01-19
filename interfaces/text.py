@@ -55,6 +55,9 @@ def main(argv):
 	#GLOBAL VARIABLES ARRRRRGH
 
 	dbfile = []
+	host = ''
+	port = 8500
+	i = 0
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
@@ -83,15 +86,53 @@ def main(argv):
 			description = raw_input('Description of your database> ') #No need to have a default one
 			parser.createDB(filename, dbtype, title, description)
 			print '\n\n' + colors.green + 'Database created' + colors.default
-			sys.exit(0)
-	if len(dbfile) == 0:
+			sys.exit(0)						
+		elif x == '--host':
+			if len(argv) <= i:
+				print colors.fail + 'Missing host' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing host' + colors.default
+				sys.exit(1)	
+			else:
+				host = argv[i+1]
+		elif x == '--port':
+			if len(argv) <= i:
+				print colors.fail + 'Missing port' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
+				print colors.fail + 'Missing port' + colors.default
+				sys.exit(1)	
+			else:
+				port = int(argv[i+1])
+		elif x == '--password':
+			if len(argv) <= i:
+				print colors.fail + 'Missing password' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing password' + colors.default
+				sys.exit(1)	
+			else:
+				password = argv[i+1]
+		i += 1	
+	if len(dbfile) == 0 and host == '':
 		print colors.fail + 'No database specified' + colors.default
 		print 'To create a database, use the argument "--create" or "-c" (no quotes)'
 		sys.exit(1)
-	dbs = []
-	for fn in dbfile:
-		dbs.append(parser.Parser(fn))
-	currentdb = 0
+
+	if host == '':
+		dbs = []
+		for fn in dbfile:
+			dbs.append(parser.Parser(fn))
+		currentdb = 0
+	else:
+		if password == '':
+			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+			sys.exit(1)
+		dbs = []
+		dbs.append(parser.Parser(host=host, port=port, password=password))
+		currentdb = 0
+
 	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
 	print 'Type help for cheat sheet'
 	if len(dbs) > 1:
