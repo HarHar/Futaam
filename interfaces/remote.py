@@ -76,6 +76,11 @@ class rServer(SocketServer.BaseRequestHandler):
 					res = {'cmd': cmd['cmd'], 'response': ''}
 					res['response'] = json.dumps(dbs[curdb].dictionary)
 					self.request.send(json.dumps(res) + chr(4))
+				elif cmd['cmd'] == 'push':
+					dbs[curdb].dictionary = json.loads(StringIO(cmd['args']))
+
+					res = {'cmd': cmd['cmd'], 'response': 'OK'}
+					self.request.send(json.dumps(res) + chr(4))
 				continue
 
 	def finish(self):
