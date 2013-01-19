@@ -92,7 +92,18 @@ class Parser(object):
 			elif self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
 		else:
-			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)})) #jsonception
+			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)}) + chr(4)) #jsonception
 		f.close()
 	def reload(self):
+		if self.host != '': self.sock.close()
 		self.__init__(self.filename, self.host, self.port, self.password)
+	def rNext(self):
+		if self.host != '':
+			self.sock.send(json.dumps({'cmd': 'sdb', 'args': ''}) + chr(4))
+			sleep(1)
+			cmd = {'cmd': 'pull', 'args': ''}
+			self.sock.sendall(json.dumps(cmd) + chr(4))
+			rc = ''
+			while rc[-1:] != chr(4):
+				rc += self.sock.recv(4096)
+			self.dictionary = json.load(StringIO(rc[:-1]))			
