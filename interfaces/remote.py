@@ -77,6 +77,8 @@ class rServer(SocketServer.BaseRequestHandler):
 					res = {'cmd': cmd['cmd'], 'response': ''}
 					res['response'] = json.dumps(dbs[curdb].dictionary)
 					self.request.send(json.dumps(res) + chr(4))
+
+					print '[INFO] ' + repr(self.client_address) + ' has pulled the database'
 				elif cmd['cmd'] == 'push':
 					if readonly:
 						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
@@ -85,6 +87,8 @@ class rServer(SocketServer.BaseRequestHandler):
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
+
+					print '[INFO] ' + repr(self.client_address) + ' has pushed to the database'
 				elif cmd['cmd'] == 'save':
 					if readonly:
 						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
@@ -93,6 +97,8 @@ class rServer(SocketServer.BaseRequestHandler):
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
+
+					print '[INFO] ' + repr(self.client_address) + ' has saved the database'
 				elif cmd['cmd'] == 'sdb':
 					try:
 						curdb += 1
@@ -102,6 +108,8 @@ class rServer(SocketServer.BaseRequestHandler):
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
+
+					print '[INFO] ' + repr(self.client_address) + ' has switched to the next database'
 				continue
 
 	def finish(self):
