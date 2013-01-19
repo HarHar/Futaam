@@ -18,6 +18,9 @@ import pickle
 import json
 import os
 from StringIO import StringIO
+import socket
+from time import sleep
+import hashlib
 
 def createDB(filename, dbtype, name='', description='', items=[]):
 	if dbtype in ['json', 'pickle'] == False:
@@ -37,17 +40,34 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class Parser(object):
-	def __init__(self, filename, host='localhost', port=0, password=''):
+	def __init__(self, filename='', host='', port=8500, password=''):
 		self.host = host
 		self.port = port
 		self.password = password
+		if host != '':
+			self.sock = socket.socket()
+			self.sock.connect((host, port))
+			sleep(0.6)
+			self.sock.sendall(hashlib.sha256(password).hexdigest())
+			rc = self.sock.recv(1024)
+			if rc == 'OK':
+				sleep(1)
+				cmd = {'cmd': 'pull', 'args': ''}
+				self.sock.sendall(json.dumps(cmd) + chr(4))
+
+				rc = ''
+				while rc[-1:] != chr(4):
+					rc += self.sock.recv(4096)
+				self.dictionary = json.load(StringIO(rc[:-1]))
+				return
+			else:
+				raise Exception(rc)			
 		if os.path.exists(filename):
-			if host == 'localhost':
-				self.filename = filename
-				f = open(filename, 'r')
-				txt = f.read().replace('\r', '')
-				lines = txt.split('\n')
-				f.close()
+			self.filename = filename
+			f = open(filename, 'r')
+			txt = f.read().replace('\r', '')
+			lines = txt.split('\n')
+			f.close()
 
 			if len(lines) == 0:
 				raise Exception('Empty file')
