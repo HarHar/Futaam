@@ -218,6 +218,8 @@ class SwapEntryDialog(QtGui.QDialog):
 	def swap(self):
 		entry1 = self.entry1Box.currentIndex()
 		entry2 = self.entry2Box.currentIndex()
+		if entry1 == entry2:
+			self.done(0)
 		doSwap(entry1, entry2)
 		self.done(0)
 
