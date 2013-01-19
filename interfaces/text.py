@@ -172,12 +172,13 @@ def main(argv):
 			PS1 = args
 		elif cmdsplit[0].lower() in ['help', 'h']:
 			print colors.header + 'Commands' + colors.default
-			print '\thelp or h - prints this'
-			print '\tquit or q - quits'
-			print '\tset_ps1 or sps1 - changes PS1'
-			print '\tswitchdb or sdb - changes working database when opened with multiple files'
-			print '\tadd or a - adds an entry'
-			print '\tdelete, del or d - deletes an entry with the given index'
+			print '\thelp or h \t\t - prints this'
+			print '\tquit or q \t\t - quits'
+			print '\tset_ps1 or sps1 \t - changes PS1'
+			print '\tswitchdb or sdb \t - changes working database when opened with multiple files'
+			print '\tadd or a \t\t - adds an entry'
+			print '\tdelete, del or d \t - deletes an entry with the given index'
+			print '\tedit or e \t\t - edits an entry'
 			print ''
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
