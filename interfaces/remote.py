@@ -71,7 +71,6 @@ class rServer(SocketServer.BaseRequestHandler):
 			self.conns[self.request] += data.replace('\n', '').replace('\r', '')
 			if self.conns[self.request][-1:] == chr(4):
 				cmd = json.load(StringIO(self.conns[self.request][:-1]))
-				print '[DEBUG] {CMD received} cmd=' + repr(cmd['cmd']) + ' args=' + repr(cmd['args'])
 				self.conns[self.request] = ''
 
 				if cmd['cmd'] == 'pull':
