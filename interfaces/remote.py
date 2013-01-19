@@ -85,7 +85,16 @@ class rServer(SocketServer.BaseRequestHandler):
 					dbs[curdb].save()
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
-					self.request.send(json.dumps(res) + chr(4))					
+					self.request.send(json.dumps(res) + chr(4))
+				elif cmd['cmd'] == 'sdb':
+					try:
+						curdb += 1
+						repr(dbs[curdb])
+					except IndexError:
+						curdb = 0
+						
+					res = {'cmd': cmd['cmd'], 'response': 'OK'}
+					self.request.send(json.dumps(res) + chr(4))
 				continue
 
 	def finish(self):
