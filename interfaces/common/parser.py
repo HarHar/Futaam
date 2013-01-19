@@ -91,9 +91,9 @@ class Parser(object):
 				f.write(pickle.dumps(self.dictionary))
 			elif self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
+			f.close()
 		else:
 			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)}) + chr(4)) #jsonception
-		f.close()
 	def reload(self):
 		if self.host != '': self.sock.close()
 		self.__init__(self.filename, self.host, self.port, self.password)
