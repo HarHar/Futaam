@@ -83,7 +83,7 @@ class Parser(object):
 		else:
 			raise Exception('File does not exists')
 	def save(self):
-		if self.host == 'localhost':
+		if self.host == '':
 			f = open(self.filename, 'w')
 			f.write('[' + self.dbtype + ']\n')
 
@@ -91,6 +91,8 @@ class Parser(object):
 				f.write(pickle.dumps(self.dictionary))
 			elif self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
+		else:
+			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)})) #jsonception
 		f.close()
 	def reload(self):
 		self.__init__(self.filename, self.host, self.port, self.password)
