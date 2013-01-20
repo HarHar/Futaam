@@ -248,14 +248,8 @@ def deleteEntry():
 			model.db.dictionary['count'] -= 1
 			model.db.save()
 			break
-	# rebuild IDs
-	for x in xrange(0, model.db.dictionary['count']):
-		model.db.dictionary['items'][x]['id'] = x
-	# reload table
-	filename = model.active_file
-	model = TableModel()
-	model.load_db(filename)
-	ui.tableView.setModel(model)
+	rebuildIds()
+	reloadTable()
 
 def addEntry():
 	global model
@@ -281,15 +275,22 @@ def doSwap(index1, index2):
 	model.db.dictionary['items'][index1] = entry2
 	model.db.dictionary['items'][index2] = entry1
 	model.db.save()
-	# rebuild IDs
+	rebuildIds()
+	reloadTable()
+
+def rebuildIds():
+	global model
 	for x in xrange(0, model.db.dictionary['count']):
 		model.db.dictionary['items'][x]['id'] = x
-	#reload table
+
+def reloadTable():
+	global model
+	global ui
 	filename = model.active_file
 	model = TableModel()
 	model.load_db(filename)
 	ui.tableView.setModel(model)
-
+			
 def main(argv):
 	global model
 	global ui
