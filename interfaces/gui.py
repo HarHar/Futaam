@@ -289,7 +289,14 @@ def reloadTable():
 	model = TableModel()
 	model.load_db(filename)
 	ui.tableView.setModel(model)
-			
+
+def displayAbout():
+	global ui
+	title = "Futaam"
+	aboutText = """A free and open source anime manager.
+https://github.com/HarHar/Futaam"""
+	QtGui.QMessageBox.about(ui.centralwidget, title, aboutText)
+
 def main(argv):
 	global model
 	global ui
@@ -310,7 +317,8 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), deleteEntry)
 	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), addEntry)
 	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), swapEntries)
-	
+	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
+
 	window.show()
 	exit(app.exec_())
 
