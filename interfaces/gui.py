@@ -76,6 +76,7 @@ class TableModel(QtCore.QAbstractTableModel):
 class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle("Add Entry")
 		self.setupUi()
 		self.setModal(True)
 
@@ -166,6 +167,7 @@ class AddEntryDialog(QtGui.QDialog):
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle("Delete Entry")
 		self.setupUi()
 		self.setModal(True)
 
@@ -192,6 +194,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 class SwapEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle("Swap Entries")
 		self.setupUi()
 		self.setModal(True)
 		self.model = model
