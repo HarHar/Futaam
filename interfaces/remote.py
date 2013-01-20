@@ -28,24 +28,30 @@ password = ''
 dbs = []
 curdb = 0
 readonly = False
+daemon = False
+
+def nprint(s):
+	global daemon
+	if not daemon:
+		print(s)
 
 class rServer(SocketServer.BaseRequestHandler):
 	def setup(self):
 		global password
-		print '[INFO] ' + repr(self.client_address) + ' connected'
+		nprint('[INFO] ' + repr(self.client_address) + ' connected')
 
 		try:
 			hashed_pass = self.request.recv(4096).strip('\n').strip('\r')
 		except:
-			print '[INFO] '+ repr(self.client_addess) + ' has disconnected'
+			nprint('[INFO] '+ repr(self.client_addess) + ' has disconnected')
 			return
 
 		if hashed_pass != password:
 			self.request.send('305 NOT AUTHORIZED')
-			print '[INFO] ' + repr(self.client_address) + ' has sent an invalid password and is now disconnected'
+			nprint('[INFO] ' + repr(self.client_address) + ' has sent an invalid password and is now disconnected')
 			self.request.close()
 		else:
-			print '[INFO] ' + repr(self.client_address) + ' has successfully logged in'
+			nprint('[INFO] ' + repr(self.client_address) + ' has successfully logged in')
 			self.request.send('OK')
 			try:
 				self.conns[self.request] = ''
@@ -78,7 +84,7 @@ class rServer(SocketServer.BaseRequestHandler):
 					res['response'] = json.dumps(dbs[curdb].dictionary)
 					self.request.send(json.dumps(res) + chr(4))
 
-					print '[INFO] ' + repr(self.client_address) + ' has pulled the database'
+					nprint('[INFO] ' + repr(self.client_address) + ' has pulled the database')
 				elif cmd['cmd'] == 'push':
 					if readonly:
 						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
@@ -88,17 +94,17 @@ class rServer(SocketServer.BaseRequestHandler):
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
 
-					print '[INFO] ' + repr(self.client_address) + ' has pushed to the database'
+					nprint('[INFO] ' + repr(self.client_address) + ' has pushed to the database')
 				elif cmd['cmd'] == 'save':
 					if readonly:
 						self.request.send(json.dumps({'cmd': cmd['cmd'], 'response': 'Read-only database'}) + chr(4))
-						continue					
+						continue
 					dbs[curdb].save()
 
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
 
-					print '[INFO] ' + repr(self.client_address) + ' has saved the database'
+					nprint('[INFO] ' + repr(self.client_address) + ' has saved the database')
 				elif cmd['cmd'] == 'sdb':
 					try:
 						curdb += 1
@@ -109,14 +115,24 @@ class rServer(SocketServer.BaseRequestHandler):
 					res = {'cmd': cmd['cmd'], 'response': 'OK'}
 					self.request.send(json.dumps(res) + chr(4))
 
-					print '[INFO] ' + repr(self.client_address) + ' has switched to the next database'
+					nprint('[INFO] ' + repr(self.client_address) + ' has switched to the next database')
 				continue
 
 	def finish(self):
-		print '[INFO] A client has disconnected'
+		nprint('[INFO] A client has disconnected')
 
 colors = utils.colors()
 def main(argv):
+	global daemon
+	for opt in ['-d', '--daemon', '-f', '--fork']:
+		if argv.__contains__(opt):
+			daemon = True
+			break
+
+	if daemon:
+		if os.fork() != 0:
+			exit()
+
 	global port
 	global password
 	global dbs
@@ -129,19 +145,19 @@ def main(argv):
 			files.append(arg)
 		elif arg in ['--pass', '--password']:
 			if len(argv) <= i:
-				print colors.fail + 'Missing password' + colors.default
+				nprint(colors.fail + 'Missing password' + colors.default)
 				sys.exit(1)
 			elif argv[i+1].startswith('--'):
-				print colors.fail + 'Missing password' + colors.default
+				nprint(colors.fail + 'Missing password' + colors.default)
 				sys.exit(1)	
 			else:
 				password = hashlib.sha256(argv[i+1]).hexdigest()
 		elif arg in ['--port']:
 			if len(argv) <= i:
-				print colors.fail + 'Missing port' + colors.default
+				nprint(colors.fail + 'Missing port' + colors.default)
 				sys.exit(1)
 			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
-				print colors.fail + 'Missing port' + colors.default
+				nprint(colors.fail + 'Missing port' + colors.default)
 				sys.exit(1)	
 			else:
 				port = int(argv[i+1])
@@ -149,13 +165,13 @@ def main(argv):
 			readonly = True
 		i += 1
 	if files == [] or password == '':
-		print colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]'
+		nprint(colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]')
 		sys.exit(1)
 	else:
 		for fn in files:
 			dbs.append(parser.Parser(fn))
 
-		print '[INFO] Listening on port ' + str(port)
+		nprint('[INFO] Listening on port ' + str(port))
 		rserver = SocketServer.ThreadingTCPServer(('', port), rServer)
 		try:
 			rserver.serve_forever()
