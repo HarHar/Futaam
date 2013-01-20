@@ -16,10 +16,6 @@
 """
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
 from interfaces.common import *
 import interfaces.qtGui
 
@@ -80,10 +76,10 @@ class AddEntryDialog(QtGui.QDialog):
 		self.setupUi()
 		self.setModal(True)
 
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
-		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL(_fromUtf8("editingFinished()")), self.populateCB)
-		QtCore.QObject.connect(self.selectCB, QtCore.SIGNAL(_fromUtf8("currentIndexChanged()")), self.animeSelected)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.addAnime)
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
+		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
+		QtCore.QObject.connect(self.selectCB, QtCore.SIGNAL("currentIndexChanged()"), self.animeSelected)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.addAnime)
 
 	def setupUi(self):
 		self.layout = QtGui.QGridLayout()
@@ -172,8 +168,8 @@ class DeleteEntryDialog(QtGui.QDialog):
 		self.setModal(True)
 
 		self.comboBox.addItems(names)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.setReturnCode)
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.setReturnCode)
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
 		
 	def setupUi(self):
 		self.layout = QtGui.QHBoxLayout()
@@ -202,8 +198,8 @@ class SwapEntryDialog(QtGui.QDialog):
 
 		self.entry1Box.addItems(names)
 		self.entry2Box.addItems(names)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), self.swap)
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL(_fromUtf8("clicked()")), self.close)
+		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.swap)
+		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
 		
 	def setupUi(self):
 		self.layout = QtGui.QHBoxLayout()
@@ -308,12 +304,12 @@ def main(argv):
 	model.load_db(argv[0])
 	ui.tableView.setModel(model)
 
-	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), window.close)
-	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL(_fromUtf8("triggered()")), openFile)
-	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL(_fromUtf8("triggered()")), model.db.save)
-	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), deleteEntry)
-	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL(_fromUtf8("triggered()")), addEntry)
-	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL(_fromUtf8("triggered()")), swapEntries)
+	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), window.close)
+	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), openFile)
+	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL("triggered()"), model.db.save)
+	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), deleteEntry)
+	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), addEntry)
+	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), swapEntries)
 	
 	window.show()
 	exit(app.exec_())
