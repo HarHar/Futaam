@@ -248,9 +248,9 @@ def main(argv):
 
 			#BEGIN THE SOLO
 			if n_name == '': n_name = entry['name']
-			dbs[currentdb].dictionary['items'][int(args)]['name'] = n_name
+			dbs[currentdb].dictionary['items'][int(args)]['name'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_name))
 			if n_genre == '': n_genre = entry['genre']
-			dbs[currentdb].dictionary['items'][int(args)]['genre'] = n_genre
+			dbs[currentdb].dictionary['items'][int(args)]['genre'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_genre))
 			if n_status == '': n_status = entry['status']
 			dbs[currentdb].dictionary['items'][int(args)]['status'] = n_status
 			if n_lw == '': n_lw = entry['lastwatched']
@@ -308,7 +308,7 @@ def main(argv):
 				dbs[currentdb].dictionary['count'] += 1
 			except:
 				dbs[currentdb].dictionary['count'] = 1
-			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': status, 'lastwatched': lastEp, 'obs': obs})
+			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': malanime['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': status, 'lastwatched': lastEp, 'obs': obs})
 			for x in xrange(0, dbs[currentdb].dictionary['count']):
 				dbs[currentdb].dictionary['items'][x]['id'] = x			
 			dbs[currentdb].save()

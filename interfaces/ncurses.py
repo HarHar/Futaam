@@ -231,7 +231,7 @@ def main(argv):
 					dbs[currentdb].dictionary['count'] += 1
 				except:
 					dbs[currentdb].dictionary['count'] = 1
-				dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': t, 'aid': malanime['id'], 'name': title, 'genre': genre, 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
+				dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': t, 'aid': malanime['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
 				for x in xrange(0, dbs[currentdb].dictionary['count']):
 					dbs[currentdb].dictionary['items'][x]['id'] = x	
 				dbs[currentdb].save()
