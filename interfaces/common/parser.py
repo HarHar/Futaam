@@ -21,6 +21,28 @@ from StringIO import StringIO
 import socket
 from time import sleep
 import hashlib
+ 
+class SafeUnpickler(pickle.Unpickler):
+    PICKLE_SAFE = {
+        'copy_reg': set(['_reconstructor']),
+        '__builtin__': set(['object'])
+    }
+    def find_class(self, module, name):
+        if not module in self.PICKLE_SAFE:
+            raise pickle.UnpicklingError(
+                'Attempting to unpickle unsafe module %s' % module
+            )
+        __import__(module)
+        mod = sys.modules[module]
+        if not name in self.PICKLE_SAFE[module]:
+            raise pickle.UnpicklingError(
+                'Attempting to unpickle unsafe class %s' % name
+            )
+        klass = getattr(mod, name)
+        return klass
+    @classmethod
+    def loads(cls, pickle_string):
+        return cls(StringIO(pickle_string)).load()
 
 def createDB(filename, dbtype, name='', description='', items=[]):
 	if dbtype in ['json', 'pickle'] == False:
@@ -77,7 +99,7 @@ class Parser(object):
 				self.dictionary = json.load(StringIO(txt[len('[json]\n'):]))
 			elif lines[0].lower() == '[pickle]':
 				self.dbtype = 'pickle'
-				self.dictionary = pickle.loads(txt[len('[pickle]\n'):])
+				self.dictionary = SafeUnpickler.loads(txt[len('[pickle]\n'):])
 			else:
 				raise Exception('Invalid database type')
 		else:
