@@ -111,11 +111,7 @@ class AddEntryDialog(QtGui.QDialog):
 
 		self.statusLabel = QtGui.QLabel("Status:")
 		self.statusCB = QtGui.QComboBox()
-		self.statusCB.addItem("Watched")
-		self.statusCB.addItem("Queued")
-		self.statusCB.addItem("Dropped")
-		self.statusCB.addItem("Watching")
-		self.statusCB.addItem("On Hold")
+		self.statusCB.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		self.statusLayout = QtGui.QHBoxLayout()
 		self.statusLayout.addWidget(self.statusLabel)
 		self.statusLayout.addWidget(self.statusCB)
@@ -230,12 +226,15 @@ class SwapEntryDialog(QtGui.QDialog):
 class EditEntryDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None):
 		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle("Edit Entry")
 		self.setupUi()
 
 		self.entrySelectionBox.addItems(names)
+		self.comboBox.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.editButton, QtCore.SIGNAL("clicked()"), self.edit)
 		QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL("clicked()"), self.close)
-		
+		QtCore.QObject.connect(self.entrySelectionBox, QtCore.SIGNAL("currentIndexChanged()"), self.fillEntries)
+
 	def setupUi(self):
 		verticalLayoutWidget = QtGui.QWidget(self)
 		verticalLayout = QtGui.QVBoxLayout(verticalLayoutWidget)
@@ -273,6 +272,9 @@ class EditEntryDialog(QtGui.QDialog):
 		buttonLayout.addWidget(self.closeButton)
 		verticalLayout.addLayout(buttonLayout)
 		self.setLayout(verticalLayout)
+
+	def fillEntries(self):
+		return	
 
 	def edit(self):
 		return
