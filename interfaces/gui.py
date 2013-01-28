@@ -19,6 +19,11 @@ from PyQt4 import QtCore
 from interfaces.common import *
 import interfaces.qtGui
 
+dbfile = []
+host = ''
+port = 8500
+dbs = []
+
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
 		super(TableModel, self).__init__()
@@ -63,9 +68,9 @@ class TableModel(QtCore.QAbstractTableModel):
 	def rowCount(self, parent = QtCore.QModelIndex()):
 		return len(self.animeList)
 
-	def load_db(self, filename):
-		self.active_file = filename
-		self.db = Parser(filename)
+	def load_db(self, fl, db):
+		self.active_file = fl
+		self.db = db
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
 
@@ -277,7 +282,7 @@ def openFile():
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 	if filename != None:
 		model = TableModel()
-		model.load_db(filename)
+		model.load_db(filename, parser.Parser(filename))
 		ui.tableView.setModel(model)
 
 def deleteEntry():
@@ -339,8 +344,19 @@ def rebuildIds():
 def reloadTable():
 	global model
 	global ui
+	global dbs
+	global dbfile
+	global port
+	global host
 	filename = model.active_file
 	model = TableModel()
+	if host == '':
+		model.load_db(filename, parser.Parser(dbfile[0]))
+	else:
+		if password == '':
+			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+			sys.exit(1)
+		model.load_db(filename, parser.Parser(host=host, port=port, password=password))
 	model.load_db(filename)
 	ui.tableView.setModel(model)
 
@@ -354,6 +370,61 @@ https://github.com/HarHar/Futaam"""
 def main(argv):
 	global model
 	global ui
+	global dbs
+	global dbfile
+	global port
+	global host
+
+	i = 0
+	for x in argv:
+		if os.path.exists(x):
+			dbfile.append(x)
+		elif x == '--host':
+			if len(argv) <= i:
+				print colors.fail + 'Missing host' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing host' + colors.default
+				sys.exit(1)	
+			else:
+				host = argv[i+1]
+		elif x == '--port':
+			if len(argv) <= i:
+				print colors.fail + 'Missing port' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
+				print colors.fail + 'Missing port' + colors.default
+				sys.exit(1)	
+			else:
+				port = int(argv[i+1])
+		elif x == '--password':
+			if len(argv) <= i:
+				print colors.fail + 'Missing password' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing password' + colors.default
+				sys.exit(1)	
+			else:
+				password = argv[i+1]
+		i += 1	
+
+	if len(dbfile) == 0 and host == '':
+		print colors.fail + 'No database file specified' + colors.default
+		sys.exit(1)
+
+	if host == '':
+		dbs = []
+		for fn in dbfile:
+			dbs.append(parser.Parser(fn))
+		currentdb = 0
+	else:
+		if password == '':
+			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+			sys.exit(1)
+		dbs = []
+		dbs.append(parser.Parser(host=host, port=port, password=password))
+		currentdb = 0	
+
 	app = QtGui.QApplication(argv)
 	window = QtGui.QMainWindow()
 	ui = interfaces.qtGui.Ui_Futaam()
@@ -362,7 +433,9 @@ def main(argv):
 	model = TableModel()
 	if len(argv) == 0:
 		help()
-	model.load_db(argv[0])
+	if len(dbfile) == 0 and len(dbs) > 0:
+		dbfile = ['']
+	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), window.close)
