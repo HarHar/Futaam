@@ -357,7 +357,6 @@ def reloadTable():
 			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
 			sys.exit(1)
 		model.load_db(filename, parser.Parser(host=host, port=port, password=password))
-	model.load_db(filename)
 	ui.tableView.setModel(model)
 
 def displayAbout():
