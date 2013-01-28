@@ -222,6 +222,56 @@ class SwapEntryDialog(QtGui.QDialog):
 		doSwap(entry1, entry2)
 		self.done(0)
 
+class EditEntryDialog(QtGui.QDialog):
+	def __init__(self, parent=None, names=None, entries=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setupUi()
+
+		self.entrySelectionBox.addItems(names)
+		QtCore.QObject.connect(self.editButton, QtCore.SIGNAL("clicked()"), self.edit)
+		QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL("clicked()"), self.close)
+		
+	def setupUi(self):
+		verticalLayoutWidget = QtGui.QWidget(self)
+		verticalLayout = QtGui.QVBoxLayout(verticalLayoutWidget)
+		self.entrySelectionBox = QtGui.QComboBox()
+		verticalLayout.addWidget(self.entrySelectionBox)
+		horizontalLayout = QtGui.QHBoxLayout()
+		horizontalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+		self.label = QtGui.QLabel("Title:")
+		horizontalLayout.addWidget(self.label)
+		horizontalLayout_3 = QtGui.QHBoxLayout()
+		horizontalLayout.addLayout(horizontalLayout_3)
+		self.lineEdit = QtGui.QLineEdit(verticalLayoutWidget)
+		horizontalLayout.addWidget(self.lineEdit)
+		verticalLayout.addLayout(horizontalLayout)
+		horizontalLayout_5 = QtGui.QHBoxLayout()
+		self.label_3 = QtGui.QLabel("Status:")
+		horizontalLayout_5.addWidget(self.label_3)
+		self.comboBox = QtGui.QComboBox(verticalLayoutWidget)
+		horizontalLayout_5.addWidget(self.comboBox)
+		self.label_4 = QtGui.QLabel("Episodes Watched:")
+		horizontalLayout_5.addWidget(self.label_4)
+		self.spinBox = QtGui.QSpinBox(verticalLayoutWidget)
+		horizontalLayout_5.addWidget(self.spinBox)
+		verticalLayout.addLayout(horizontalLayout_5)
+		horizontalLayout_2 = QtGui.QHBoxLayout()
+		self.label_2 = QtGui.QLabel("Observations:")
+		horizontalLayout_2.addWidget(self.label_2)
+		self.lineEdit_2 = QtGui.QLineEdit(verticalLayoutWidget)
+		horizontalLayout_2.addWidget(self.lineEdit_2)
+		verticalLayout.addLayout(horizontalLayout_2)
+		self.closeButton = QtGui.QPushButton("Cancel")
+		self.editButton = QtGui.QPushButton("Edit")
+		buttonLayout = QtGui.QHBoxLayout()
+		buttonLayout.addWidget(self.editButton)
+		buttonLayout.addWidget(self.closeButton)
+		verticalLayout.addLayout(buttonLayout)
+		self.setLayout(verticalLayout)
+
+	def edit(self):
+		return
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -233,9 +283,8 @@ def openFile():
 def deleteEntry():
 	global model
 	global ui
-	animeNames = model.getAnimeNames()
 	
-	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=animeNames)
+	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames())
 	toDelete = dialog.exec_()
 	if toDelete == 0:
 		return
@@ -260,9 +309,14 @@ def addEntry():
 def swapEntries():
 	global model
 	global ui
-	animeNames = model.getAnimeNames()
 
-	dialog = SwapEntryDialog(names=animeNames, parent=ui.centralwidget)
+	dialog = SwapEntryDialog(names=model.getAnimeNames(), parent=ui.centralwidget)
+	dialog.exec_()
+
+def editEntry():
+	global modal
+	global ui
+	dialog = EditEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
 	dialog.exec_()
 
 def doSwap(index1, index2):
@@ -318,6 +372,7 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), addEntry)
 	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), swapEntries)
 	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
+	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), editEntry)
 
 	window.show()
 	exit(app.exec_())
