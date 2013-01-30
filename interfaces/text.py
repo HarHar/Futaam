@@ -220,8 +220,8 @@ def main(argv):
 			if entry == None: continue
 
 			#INTRO II
-			n_name = raw_input('Name: [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
-			n_genre = raw_input('Genre: [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
+			n_name = raw_input('<Name> [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
+			n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
 
 			#ZIGZAGGING
 			if entry['type'] == 'anime':
@@ -232,8 +232,8 @@ def main(argv):
 					of a friend of miine..
 				"""
 				while (n_status in ['w', 'c', 'q', 'h', 'd', '']) == False:
-					n_status = raw_input('Status: [W/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
-				n_lw = raw_input('Last episode watched: [' + entry['lastwatched'] + ']> ').replace('\n', '')
+					n_status = raw_input('<Status> [W/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
+				n_lw = raw_input('<Last episode watched> [' + entry['lastwatched'] + ']> ').replace('\n', '')
 			elif entry['type'] == 'manga':
 				n_status = """
 					BUT TABLES HAVE TURNED #yeah
@@ -242,12 +242,12 @@ def main(argv):
 					WAS THE KILLING KIIND
 				"""
 				while (n_status in ['r', 'c', 'q', 'h', 'd', '']) == False:
-					n_status = raw_input('Status: [R/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
+					n_status = raw_input('<Status> [R/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
 				if n_status == 'r': n_status = 'w'
-				n_lw = raw_input('Last page/chapter read: [' + entry['lastwatched'] + ']> ').replace('\n', '')
+				n_lw = raw_input('<Last page/chapter read> [' + entry['lastwatched'] + ']> ').replace('\n', '')
 
 			#EXTENDED SINGLE NOTE
-			n_obs = raw_input('Observations: [' + entry['obs'] + ']> ')
+			n_obs = raw_input('<Observations> [' + entry['obs'] + ']> ')
 
 			#BEGIN THE SOLO
 			if n_name == '': n_name = entry['name']
