@@ -22,6 +22,7 @@ import SocketServer
 import threading
 import json
 from interfaces.common import *
+import platform
 controlPort = 5124
 colors = utils.colors()
 
@@ -66,6 +67,9 @@ class IRCProtocol(irc.IRCClient):
 		global bot
 		global nick
 		self.nickname = nick
+		self.versionName = 'Futaam announce Bot'
+		self.versionNum = 'v0.1'
+		self.versionEnv = platform.platform()
 		bot = self
 		irc.IRCClient.connectionMade(self)
 
