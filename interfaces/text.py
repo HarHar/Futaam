@@ -214,6 +214,21 @@ def main(argv):
 				dbs[currentdb].dictionary['items'][x]['id'] = x
 			#######################
 			dbs[currentdb].save()
+		elif cmdsplit[0].lower() in ['info', 'i']:
+			entry = pickEntry(args, dbs[currentdb])
+			if entry == None: continue
+
+			if entry['type'] == 'anime':
+				t_label = 'Last watched'
+			else:
+				t_label = 'Last chapter/volume read'
+			toprint = {'Name': entry['name'], 'Genre': entry['genre'],
+			 'Observations': entry['obs'], t_label: entry['lastwatched'],
+			 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
+
+			for k in toprint:
+				print colors.bold + '<' + k + '>' + colors.default + ' ' + toprint[k]
+
 		elif cmdsplit[0].lower() in ['edit', 'e']:
 			#INTRO I
 			entry = pickEntry(args, dbs[currentdb])
