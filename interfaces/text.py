@@ -58,9 +58,12 @@ def main(argv):
 	host = ''
 	port = 8500
 	i = 0
+	ircn = False
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
+		elif x == '--ircnotify':
+			ircn = True
 		elif x == '-c' or x == '--create':
 			print colors.header + 'Creating database' + colors.default + '\n'
 			filename = raw_input('Path to new file> ')
@@ -123,7 +126,7 @@ def main(argv):
 	if host == '':
 		dbs = []
 		for fn in dbfile:
-			dbs.append(parser.Parser(fn))
+			dbs.append(parser.Parser(fn, ircHook=ircn))
 		currentdb = 0
 	else:
 		if password == '':
@@ -217,7 +220,7 @@ def main(argv):
 			if entry == None: continue
 
 			#INTRO II
-			n_name = raw_input('Name: [' + entry['name'].decode('utf8') + '] ').replace('\n', '')
+			n_name = raw_input('Name: [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
 			n_genre = raw_input('Genre: [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
 
 			#ZIGZAGGING

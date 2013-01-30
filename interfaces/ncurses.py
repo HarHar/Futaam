@@ -77,6 +77,7 @@ def main(argv):
 	host = ''
 	port = 8500
 	i = 0
+	ircn = False
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
@@ -107,6 +108,8 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				password = argv[i+1]
+		elif x == '--ircnotify':
+			ircn = True
 		i += 1	
 
 	if len(dbfile) == 0 and host == '':
@@ -116,14 +119,14 @@ def main(argv):
 	if host == '':
 		dbs = []
 		for fn in dbfile:
-			dbs.append(parser.Parser(fn))
+			dbs.append(parser.Parser(fn, ircHook=ircn))
 		currentdb = 0
 	else:
 		if password == '':
 			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
 			sys.exit(1)
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, password=password))
+		dbs.append(parser.Parser(host=host, port=port, password=password, ircHook=ircn))
 		currentdb = 0
 
 	screen = curses.initscr()

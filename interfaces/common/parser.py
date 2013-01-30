@@ -21,7 +21,10 @@ from StringIO import StringIO
 import socket
 from time import sleep
 import hashlib
- 
+import random
+import copy
+from interfaces.common import utils
+
 class SafeUnpickler(pickle.Unpickler):
     PICKLE_SAFE = {
         'copy_reg': set(['_reconstructor']),
@@ -62,10 +65,12 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class Parser(object):
-	def __init__(self, filename='', host='', port=8500, password=''):
+	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124):
 		self.host = host
 		self.port = port
 		self.password = password
+		self.ircHook = ircHook
+		self.ircControlPort = ircControlPort
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
@@ -80,7 +85,7 @@ class Parser(object):
 				rc = ''
 				while rc[-1:] != chr(4):
 					rc += self.sock.recv(4096)
-				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))
+				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))				
 				return
 			else:
 				raise Exception(rc)			
@@ -104,7 +109,21 @@ class Parser(object):
 				raise Exception('Invalid database type')
 		else:
 			raise Exception('File does not exists')
+		if ircHook:
+			self.tempdict = copy.deepcopy(self.dictionary)
+	def hash(self):
+		for entry in self.dictionary['items']:
+			if entry.get('hash') == None:
+				done = False
+				while done == False:
+					done = True
+					entry['hash'] = hashlib.sha256(str(random.randint(0, 9999999))).hexdigest()
+					for sub_entry in self.dictionary['items']: #may be unneficient but hash collision would suck
+						if sub_entry == entry: continue
+						if sub_entry.get('hash') == entry['hash']:
+							done = False
 	def save(self):
+		self.hash()
 		if self.host == '':
 			f = open(self.filename, 'w')
 			f.write('[' + self.dbtype + ']\n')
@@ -116,6 +135,39 @@ class Parser(object):
 			f.close()
 		else:
 			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)}) + chr(4)) #jsonception
+
+		if self.ircHook:
+			ts = socket.socket()
+			ts.connect(('localhost', self.ircControlPort))
+
+			messages = {'lastwatched': {'norm': 'Watched %difference% episode%diffplural% [%old% to %new%]', 'noint': 'Watched from episode %old% to %new%'}, 'status': {'norm': chr(3) + '%ocolor%%oldstatus%'+ chr(15) +' -> '+ chr(3) +'%ncolor%%newstatus%'}, 'obs': {'norm': '"%old%" --> "%new%'}}
+			ccolors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}
+
+			for new_entry in self.dictionary['items']:
+				for old_entry in self.tempdict['items']:
+					if new_entry['hash'] == old_entry['hash']:
+						for key in messages:
+							if new_entry[key] != old_entry[key]:
+								if new_entry[key].isdigit() and new_entry[key].isdigit():
+									smsg = messages[key]['norm'].replace('%difference%', str(int(new_entry[key]) - int(old_entry[key])))
+									smsg = smsg.replace('%diffplural%', '' if (int(new_entry[key]) - int(old_entry[key])) == 1 else 's')
+								else:
+									try:
+										smsg  = messages[key]['noint']
+									except KeyError:
+										smsg = messages[key]['norm']
+								smsg = smsg.replace('%ocolor%', ccolors[old_entry['status'].lower()])
+								smsg = smsg.replace('%ncolor%', ccolors[new_entry['status'].lower()])
+								smsg = smsg.replace('%old%', str(old_entry[key]))
+								smsg = smsg.replace('%new%', str(new_entry[key]))
+								smsg = smsg.replace('%oldstatus%', utils.translated_status[old_entry['type']][old_entry['status'].lower()])
+								smsg = smsg.replace('%newstatus%', utils.translated_status[new_entry['type']][new_entry['status'].lower()])
+								ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + chr(15) + chr(2) + ' -' + chr(3) + '2 ' + new_entry['name'] + chr(15) + '] ' + smsg}))
+								break
+
+			#ts.sendall(json.dumps({'action': 'msg', 'value': 'Something was changed on a database, don\'t ask what'}))
+			ts.close()
+		self.tempdict = copy.deepcopy(self.dictionary)
 	def reload(self):
 		if self.host != '': self.sock.close()
 		self.__init__(self.filename, self.host, self.port, self.password)

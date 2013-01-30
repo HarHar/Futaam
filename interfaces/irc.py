@@ -34,9 +34,12 @@ class controlSocket(SocketServer.BaseRequestHandler):
 				data = self.request.recv(4096).replace('\r', '').replace('\n', '')
 			except:
 				continue
-			dec = json.loads(data)
+			try:
+				dec = json.loads(data)
+			except:
+				continue
 			if dec.get('action') == 'msg':
-				bot._msg(str(dec['value']))
+				bot._msg(dec['value'])
 			elif dec.get('action') == 'join':
 				try:
 					bot.join(str(dec['value']))
@@ -56,9 +59,11 @@ def csStart():
 	os.kill(os.getpid(), 9)
 
 class IRCProtocol(irc.IRCClient):
-	nickname = "FutaBot"
+	nickname = "FutaBot-"
 	def connectionMade(self):
-		global bot 
+		global bot
+		global nick
+		self.nickname = nick
 		bot = self
 		irc.IRCClient.connectionMade(self)
 
@@ -72,12 +77,14 @@ class IRCProtocol(irc.IRCClient):
 		print 'USER=' + repr(user) + ' channel='+repr(channel) + ' msg='+repr(msg)
 
 	def _msg(self, msg):
-		self.msg(self.factory.channels, msg)
+		self.msg(self.factory.channel, str(msg.encode('utf8')))
 
 class IRCFactory(protocol.ClientFactory):
     protocol = IRCProtocol
-    
-    def __init__(self, channel):
+
+    def __init__(self, channel, nicky):
+    	global nick
+    	nick = nicky
         self.channel = channel
 
     def clientConnectionFailed(self, connector, reason):
@@ -91,6 +98,7 @@ class IRCFactory(protocol.ClientFactory):
 def main(argv):
 	host = ''
 	channel = ''
+	nickname = 'FutaBot'
 	port = 6667
 	i = 0
 	for arg in argv:
@@ -112,7 +120,7 @@ def main(argv):
 				exit()
 			else:
 				channel = argv[i+1]
-		if arg == '--port':
+		elif arg == '--port':
 			if len(argv) <= i:
 				print 'Missing port'
 				exit()
@@ -121,6 +129,15 @@ def main(argv):
 				exit()
 			else:
 				port = int(argv[i+1])
+		elif arg == '--nick' or arg == '--nickname':
+			if len(argv) <= i:
+				print 'Missing nick'
+				exit()
+			elif argv[i+1].startswith('--'):
+				print 'Missing nick'
+				exit()
+			else:
+				nickname = argv[i+1]			
 		i += 1
 	try:
 		socket.socket().connect(('localhost', controlPort))
@@ -142,7 +159,7 @@ def main(argv):
 			exit()
 
 		global fact
-		fact = IRCFactory(channel)
+		fact = IRCFactory(channel, nickname)
 		reactor.connectTCP(host, port, fact)
 		reactor.run()
 		os.kill(os.getpid(), 9) #otherwise the thread will make it hang :\
