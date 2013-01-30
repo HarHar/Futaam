@@ -78,146 +78,60 @@ class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
 		self.setWindowTitle("Add Entry")
-		self.setupUi()
-		self.setModal(True)
+		self.ui = uic.loadUi("./interfaces/ui/addDialog.ui", self)
+		self.ui.show()
 
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
+		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.add)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
-		QtCore.QObject.connect(self.selectCB, QtCore.SIGNAL("currentIndexChanged()"), self.animeSelected)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.addAnime)
-
-	def setupUi(self):
-		self.layout = QtGui.QGridLayout()
-
-		self.titleLabel = QtGui.QLabel("Title:")
-		self.titleLine = QtGui.QLineEdit()
-		self.titleLayout = QtGui.QHBoxLayout()
-		self.titleLayout.addWidget(self.titleLabel)
-		self.titleLayout.addWidget(self.titleLine)
-
-		self.typeLabel = QtGui.QLabel("Type:")
-		self.animeButton = QtGui.QRadioButton("Anime")
-		self.mangaButton = QtGui.QRadioButton("Manga")
-		self.typeLayout = QtGui.QHBoxLayout()
-		self.typeLayout.addWidget(self.typeLabel)
-		self.typeLayout.addWidget(self.animeButton)
-		self.typeLayout.addWidget(self.mangaButton)
-
-		self.selectLabel = QtGui.QLabel("Select Search Item:")
-		self.selectCB = QtGui.QComboBox()
-		self.selectLayout = QtGui.QHBoxLayout()
-		self.selectLayout.addWidget(self.selectLabel)
-		self.selectLayout.addWidget(self.selectCB)
-
-		self.statusLabel = QtGui.QLabel("Status:")
-		self.statusCB = QtGui.QComboBox()
-		self.statusCB.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
-		self.statusLayout = QtGui.QHBoxLayout()
-		self.statusLayout.addWidget(self.statusLabel)
-		self.statusLayout.addWidget(self.statusCB)
-
-		self.lwLabel = QtGui.QLabel("Episodes Watched/Chapters Read:")
-		self.lwLine = QtGui.QLineEdit()
-		self.lwLayout = QtGui.QHBoxLayout()
-		self.lwLayout.addWidget(self.lwLabel)
-		self.lwLayout.addWidget(self.lwLine)
-
-		self.obsLabel = QtGui.QLabel("Observations:")
-		self.obsLine = QtGui.QLineEdit()
-		self.obsLayout = QtGui.QHBoxLayout()
-		self.obsLayout.addWidget(self.obsLabel)
-		self.obsLayout.addWidget(self.obsLine)
-
-		self.pushButton = QtGui.QPushButton("Add Entry")
-		self.pushButton_2 = QtGui.QPushButton("Cancel")
-		self.buttonLayout = QtGui.QHBoxLayout()
-		self.buttonLayout.addWidget(self.pushButton)
-		self.buttonLayout.addWidget(self.pushButton_2)
-
-		self.layout.addItem(self.titleLayout)
-		self.layout.addItem(self.typeLayout)
-		self.layout.addItem(self.selectLayout)
-		self.layout.addItem(self.statusLayout)
-		self.layout.addItem(self.lwLayout)
-		self.layout.addItem(self.obsLayout)
-		self.layout.addItem(self.buttonLayout)
-		self.setLayout(self.layout)
+		QtCore.QObject.connect(self.resultSelect, QtCore.SIGNAL("currentIndexChanged()"), self.animeSelected)
 
 	def populateCB(self):
-		self.selectCB.clear()
+		self.resultSelect.clear()
 		title = self.titleLine.text()
-		if self.animeButton.isChecked() == True:
+		if self.ui.animeButton.isChecked() == True:
 			search_results = utils.MALWrapper.search(title, "anime")
 		else:
 			search_results = utils.MALWrapper.search(title, "manga")
 		for result in search_results:
-			self.selectCB.addItem(str(result["title"]))
+			self.resultSelect.addItem(str(result["title"]))
 		self.results = search_results
 
 	def animeSelected(self, index):
-		print "test"
-		print index
+		return
 
-	def addAnime(self):
+	def add(self):
 		return
 
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
-		self.setWindowTitle("Delete Entry")
-		self.setupUi()
-		self.setModal(True)
+		self.ui = uic.loadUi("./interfaces/ui/deleteDialog.ui", self)
+		self.ui.show()
 
-		self.comboBox.addItems(names)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.setReturnCode)
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
-		
-	def setupUi(self):
-		self.layout = QtGui.QHBoxLayout()
-		self.pushButton = QtGui.QPushButton("Delete")
-		self.pushButton_2 = QtGui.QPushButton("Cancel")
-		self.comboBox = QtGui.QComboBox()
-			
-		self.layout.addWidget(self.comboBox)
-		self.layout.addWidget(self.pushButton)
-		self.layout.addWidget(self.pushButton_2)
-		self.setLayout(self.layout)
+		self.selectBox.addItems(names)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.delete)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 
-	def setReturnCode(self):
-		# add one to the index since QDialog already uses the 0
-		# return code to signify normal closing
-		self.done(self.comboBox.currentIndex() + 1)
+	def delete(self):
+		doDelete(self.ui.selectBox.currentIndex())
+		self.done(0)
 
 class SwapEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
-		self.setWindowTitle("Swap Entries")
-		self.setupUi()
-		self.setModal(True)
-		self.model = model
-		self.ui = ui
+		self.ui = uic.loadUi("./interfaces/ui/swapDialog.ui", self)
+		self.ui.show()
 
-		self.entry1Box.addItems(names)
-		self.entry2Box.addItems(names)
-		QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), self.swap)
-		QtCore.QObject.connect(self.pushButton_2, QtCore.SIGNAL("clicked()"), self.close)
+		self.ui.selectBox1.addItems(names)
+		self.ui.selectBox2.addItems(names)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.swap)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 		
-	def setupUi(self):
-		self.layout = QtGui.QHBoxLayout()
-		self.pushButton = QtGui.QPushButton("Swap")
-		self.pushButton_2 = QtGui.QPushButton("Cancel")
-		self.entry1Box = QtGui.QComboBox()
-		self.entry2Box = QtGui.QComboBox()
-
-		self.layout.addWidget(self.entry1Box)
-		self.layout.addWidget(self.entry2Box)
-		self.layout.addWidget(self.pushButton)
-		self.layout.addWidget(self.pushButton_2)
-		self.setLayout(self.layout)
-
 	def swap(self):
-		entry1 = self.entry1Box.currentIndex()
-		entry2 = self.entry2Box.currentIndex()
+		entry1 = self.selectBox1.currentIndex()
+		entry2 = self.selectBox2.currentIndex()
 		if entry1 == entry2:
 			self.done(0)
 		doSwap(entry1, entry2)
@@ -226,52 +140,14 @@ class SwapEntryDialog(QtGui.QDialog):
 class EditEntryDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.setWindowTitle("Edit Entry")
-		self.setupUi()
+		self.ui = uic.loadUi("./interfaces/ui/editDialog.ui", self)
+		self.ui.show()
 
-		self.entrySelectionBox.addItems(names)
-		self.comboBox.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
-		QtCore.QObject.connect(self.editButton, QtCore.SIGNAL("clicked()"), self.edit)
-		QtCore.QObject.connect(self.closeButton, QtCore.SIGNAL("clicked()"), self.close)
-		QtCore.QObject.connect(self.entrySelectionBox, QtCore.SIGNAL("currentIndexChanged()"), self.fillEntries)
-
-	def setupUi(self):
-		verticalLayoutWidget = QtGui.QWidget(self)
-		verticalLayout = QtGui.QVBoxLayout(verticalLayoutWidget)
-		self.entrySelectionBox = QtGui.QComboBox()
-		verticalLayout.addWidget(self.entrySelectionBox)
-		horizontalLayout = QtGui.QHBoxLayout()
-		horizontalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
-		self.label = QtGui.QLabel("Title:")
-		horizontalLayout.addWidget(self.label)
-		horizontalLayout_3 = QtGui.QHBoxLayout()
-		horizontalLayout.addLayout(horizontalLayout_3)
-		self.lineEdit = QtGui.QLineEdit(verticalLayoutWidget)
-		horizontalLayout.addWidget(self.lineEdit)
-		verticalLayout.addLayout(horizontalLayout)
-		horizontalLayout_5 = QtGui.QHBoxLayout()
-		self.label_3 = QtGui.QLabel("Status:")
-		horizontalLayout_5.addWidget(self.label_3)
-		self.comboBox = QtGui.QComboBox(verticalLayoutWidget)
-		horizontalLayout_5.addWidget(self.comboBox)
-		self.label_4 = QtGui.QLabel("Episodes Watched:")
-		horizontalLayout_5.addWidget(self.label_4)
-		self.spinBox = QtGui.QSpinBox(verticalLayoutWidget)
-		horizontalLayout_5.addWidget(self.spinBox)
-		verticalLayout.addLayout(horizontalLayout_5)
-		horizontalLayout_2 = QtGui.QHBoxLayout()
-		self.label_2 = QtGui.QLabel("Observations:")
-		horizontalLayout_2.addWidget(self.label_2)
-		self.lineEdit_2 = QtGui.QLineEdit(verticalLayoutWidget)
-		horizontalLayout_2.addWidget(self.lineEdit_2)
-		verticalLayout.addLayout(horizontalLayout_2)
-		self.closeButton = QtGui.QPushButton("Cancel")
-		self.editButton = QtGui.QPushButton("Edit")
-		buttonLayout = QtGui.QHBoxLayout()
-		buttonLayout.addWidget(self.editButton)
-		buttonLayout.addWidget(self.closeButton)
-		verticalLayout.addLayout(buttonLayout)
-		self.setLayout(verticalLayout)
+		self.ui.entrySelect.addItems(names)
+		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.edit)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
+		QtCore.QObject.connect(self.entrySelect, QtCore.SIGNAL("currentIndexChanged()"), self.fillEntries)
 
 	def fillEntries(self):
 		return	
@@ -293,12 +169,10 @@ def deleteEntry():
 	
 	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames())
 	toDelete = dialog.exec_()
-	if toDelete == 0:
-		return
-	# see comment in DeleteEntryDialog.setReturnCode()
-	toDelete = toDelete - 1
+
+def doDelete(index):
 	for entry in model.db.dictionary['items']:
-		if entry['id'] == toDelete:
+		if entry['id'] == index:
 			model.db.dictionary['items'].remove(entry)
 			model.db.dictionary['count'] -= 1
 			model.db.save()
@@ -427,7 +301,7 @@ def main(argv):
 		currentdb = 0	
 
 	app = QtGui.QApplication(argv)
-	ui = uic.loadUi("./interfaces/gui.ui")
+	ui = uic.loadUi("./interfaces/ui/gui.ui")
 	ui.show()
 
 	model = TableModel()
