@@ -74,13 +74,10 @@ class IRCProtocol(irc.IRCClient):
 		irc.IRCClient.connectionMade(self)
 
 	def signedOn(self):
-		print 'Success! Connection established.'
 		self.join(self.factory.channel)
-		print 'Joined channel', self.factory.channel
 
 	def privmsg(self, user, channel, msg):
 		user = user.split('!', 1)[0]
-		print 'USER=' + repr(user) + ' channel='+repr(channel) + ' msg='+repr(msg)
 
 	def _msg(self, msg):
 		self.msg(self.factory.channel, str(msg.encode('utf8')))
