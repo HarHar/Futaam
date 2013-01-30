@@ -282,6 +282,7 @@ def main(argv):
 	global port
 	global host
 
+	ircn = False
 	i = 0
 	for x in argv:
 		if os.path.exists(x):
@@ -313,6 +314,8 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				password = argv[i+1]
+		elif x == '--ircnotify':
+			ircn = True
 		i += 1	
 
 	if len(dbfile) == 0 and host == '':
@@ -322,7 +325,7 @@ def main(argv):
 	if host == '':
 		dbs = []
 		for fn in dbfile:
-			dbs.append(parser.Parser(fn))
+			dbs.append(parser.Parser(fn, ircHook=ircn))
 		currentdb = 0
 	else:
 		if password == '':
