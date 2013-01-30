@@ -16,8 +16,8 @@
 """
 from PyQt4 import QtGui
 from PyQt4 import QtCore
+from PyQt4 import uic
 from interfaces.common import *
-import interfaces.qtGui
 
 dbfile = []
 host = ''
@@ -427,9 +427,8 @@ def main(argv):
 		currentdb = 0	
 
 	app = QtGui.QApplication(argv)
-	window = QtGui.QMainWindow()
-	ui = interfaces.qtGui.Ui_Futaam()
-	ui.setupUi(window)
+	ui = uic.loadUi("./interfaces/gui.ui")
+	ui.show()
 
 	model = TableModel()
 	if len(argv) == 0:
@@ -439,7 +438,7 @@ def main(argv):
 	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
 
-	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), window.close)
+	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), openFile)
 	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL("triggered()"), model.db.save)
 	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), deleteEntry)
@@ -448,7 +447,6 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
 	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), editEntry)
 
-	window.show()
 	exit(app.exec_())
 
 def help():
