@@ -21,7 +21,9 @@ import os
 import SocketServer
 import threading
 import json
+from interfaces.common import *
 controlPort = 5124
+colors = utils.colors()
 
 class controlSocket(SocketServer.BaseRequestHandler):
 	def setup(self):
@@ -163,6 +165,11 @@ def main(argv):
 		reactor.connectTCP(host, port, fact)
 		reactor.run()
 		os.kill(os.getpid(), 9) #otherwise the thread will make it hang :\
+	print 'IRC bot daemon already running'
+	print 'Choose another interface and use the argument --ircnotify'
 
 def help():
-	return 'Help page for irc interface'
+	ret = colors.bold + 'Interface parameters:' + colors.default + ' --host [irc server] --port [number] --channel [#chan] --nick [nick]'
+	ret += '\n\tThis will spawn a bot daemon, it will connect and join the specified channel,'
+	ret += '\n\tAfter that, use your favorite interface with the argument --ircnotify'
+	return ret
