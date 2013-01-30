@@ -140,6 +140,7 @@ class SwapEntryDialog(QtGui.QDialog):
 class EditEntryDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None):
 		QtGui.QDialog.__init__(self, parent)
+		self.entries = entries
 		self.ui = uic.loadUi("./interfaces/ui/editDialog.ui", self)
 		self.ui.show()
 
@@ -147,10 +148,12 @@ class EditEntryDialog(QtGui.QDialog):
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.edit)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
-		QtCore.QObject.connect(self.entrySelect, QtCore.SIGNAL("currentIndexChanged()"), self.fillEntries)
+		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("activated()"), self.fillEntries)
 
-	def fillEntries(self):
-		return	
+	def fillEntries(self, index):
+		self.index = index
+		self.currentEntry = entries[self.index]
+		titleLine.setText(self.currentEntry['name'])
 
 	def edit(self):
 		return
@@ -171,12 +174,9 @@ def deleteEntry():
 	toDelete = dialog.exec_()
 
 def doDelete(index):
-	for entry in model.db.dictionary['items']:
-		if entry['id'] == index:
-			model.db.dictionary['items'].remove(entry)
-			model.db.dictionary['count'] -= 1
-			model.db.save()
-			break
+	entry = model.db.dictionary['items'][index]
+	model.db.dictionary['items'].remove(entry)
+	model.db.dictionary['count'] -= 1
 	rebuildIds()
 	reloadTable()
 
@@ -208,7 +208,6 @@ def doSwap(index1, index2):
 	entry2 = model.db.dictionary['items'][index2]
 	model.db.dictionary['items'][index1] = entry2
 	model.db.dictionary['items'][index2] = entry1
-	model.db.save()
 	rebuildIds()
 	reloadTable()
 
@@ -216,6 +215,7 @@ def rebuildIds():
 	global model
 	for x in xrange(0, model.db.dictionary['count']):
 		model.db.dictionary['items'][x]['id'] = x
+	model.db.save()
 
 def reloadTable():
 	global model
