@@ -73,7 +73,19 @@ class TableModel(QtCore.QAbstractTableModel):
 		self.db = db
 		for entry in self.db.dictionary['items']:
 			self.animeList.append([entry["name"], entry["genre"], translated_status[entry['type'].lower()][entry["status"].lower()], entry["lastwatched"], entry["obs"]])
-
+	
+	def cbIndexToStatus(self, index):
+		if index == 0:
+			return 'w'
+		elif index == 1:
+			return 'q'
+		elif index == 2:
+			return 'd'
+		elif index == 3:
+			return 'c'
+		else:
+			return 'h'
+			
 class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
@@ -148,14 +160,21 @@ class EditEntryDialog(QtGui.QDialog):
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.edit)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
-		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("activated()"), self.fillEntries)
+		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.fillEntries)
+		self.fillEntries()
 
-	def fillEntries(self, index):
+	def fillEntries(self, index=0):
 		self.index = index
-		self.currentEntry = entries[self.index]
-		titleLine.setText(self.currentEntry['name'])
+		self.currentEntry = self.entries[self.index]
+		self.ui.titleLine.setText(self.currentEntry['name'])
+		self.ui.obsLine.setText(self.currentEntry['obs'])
+		self.ui.episodesSelect.setValue(int(self.currentEntry['lastwatched']))
+		self.ui.genreLine.setText(self.currentEntry['genre'])
 
 	def edit(self):
+		doEdit(self.index, self.ui.titleLine.text(), self.ui.obsLine.text(), 
+			self.ui.statusSelect.currentIndex(), self.ui.episodesSelect.value(),
+			self.ui.genreLine.text())
 		return
 
 def openFile():
@@ -174,6 +193,7 @@ def deleteEntry():
 	toDelete = dialog.exec_()
 
 def doDelete(index):
+	global model 
 	entry = model.db.dictionary['items'][index]
 	model.db.dictionary['items'].remove(entry)
 	model.db.dictionary['count'] -= 1
@@ -181,7 +201,6 @@ def doDelete(index):
 	reloadTable()
 
 def addEntry():
-	global model
 	global ui
 	
 	dialog = AddEntryDialog(parent=ui.centralwidget)
@@ -202,13 +221,26 @@ def editEntry():
 
 def doSwap(index1, index2):
 	global model
-	global ui
 
 	entry1 = model.db.dictionary['items'][index1]
 	entry2 = model.db.dictionary['items'][index2]
 	model.db.dictionary['items'][index1] = entry2
 	model.db.dictionary['items'][index2] = entry1
 	rebuildIds()
+	reloadTable()
+
+def doEdit(index, title, obs, status, eps, genre):
+	global model
+	entry = model.db.dictionary['items'][index]
+	# NOTE: The string we've gotten back from Qt
+	# functions are QStrings and need to be converted
+	# back into regular ones before we can save them
+	entry['name'] = str(title)
+	entry['obs'] = str(obs)
+	entry['lastwatched'] = str(eps)
+	entry['status']= model.cbIndexToStatus(status)
+	entry['genre'] = str(genre)
+	model.db.save()
 	reloadTable()
 
 def rebuildIds():
