@@ -186,14 +186,10 @@ def openFile():
 		ui.tableView.setModel(model)
 
 def deleteEntry():
-	global model
-	global ui
-	
 	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames())
 	toDelete = dialog.exec_()
 
 def doDelete(index):
-	global model 
 	entry = model.db.dictionary['items'][index]
 	model.db.dictionary['items'].remove(entry)
 	model.db.dictionary['count'] -= 1
@@ -201,27 +197,21 @@ def doDelete(index):
 	reloadTable()
 
 def addEntry():
-	global ui
-	
 	dialog = AddEntryDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
 def swapEntries():
-	global model
-	global ui
-
 	dialog = SwapEntryDialog(names=model.getAnimeNames(), parent=ui.centralwidget)
 	dialog.exec_()
 
 def editEntry():
-	global modal
-	global ui
 	dialog = EditEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
 	dialog.exec_()
 
-def doSwap(index1, index2):
-	global model
+def showInfoDialog():
+	return
 
+def doSwap(index1, index2):
 	entry1 = model.db.dictionary['items'][index1]
 	entry2 = model.db.dictionary['items'][index2]
 	model.db.dictionary['items'][index1] = entry2
@@ -230,7 +220,6 @@ def doSwap(index1, index2):
 	reloadTable()
 
 def doEdit(index, title, obs, status, eps, genre):
-	global model
 	entry = model.db.dictionary['items'][index]
 	# NOTE: The string we've gotten back from Qt
 	# functions are QStrings and need to be converted
@@ -244,18 +233,12 @@ def doEdit(index, title, obs, status, eps, genre):
 	reloadTable()
 
 def rebuildIds():
-	global model
 	for x in xrange(0, model.db.dictionary['count']):
 		model.db.dictionary['items'][x]['id'] = x
 	model.db.save()
 
 def reloadTable():
 	global model
-	global ui
-	global dbs
-	global dbfile
-	global port
-	global host
 	filename = model.active_file
 	model = TableModel()
 	if host == '':
@@ -268,7 +251,6 @@ def reloadTable():
 	ui.tableView.setModel(model)
 
 def displayAbout():
-	global ui
 	title = "Futaam"
 	aboutText = """A free and open source anime manager.
 https://github.com/HarHar/Futaam"""
@@ -355,6 +337,7 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), swapEntries)
 	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
 	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), editEntry)
+	QtCore.QObject.connect(ui.actionViewDetails, QtCore.SIGNAL("triggered()"), showInfoDialog)
 
 	exit(app.exec_())
 
