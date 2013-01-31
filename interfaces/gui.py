@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import tempfile
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
@@ -177,6 +178,51 @@ class EditEntryDialog(QtGui.QDialog):
 			self.ui.genreLine.text())
 		return
 
+class EntryInfoDialog(QtGui.QDialog):
+	def __init__(self, parent=None, names=None, entries=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.entries = entries
+		self.ui = uic.loadUi("./interfaces/ui/infoDialog.ui", self)
+		self.ui.show()
+
+		self.ui.entrySelect.addItems(names)
+		#self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
+		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.removeTempAndClose)
+		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.fillEntries)
+		self.fillEntries()
+
+	def removeTempAndClose(self):
+		try:
+			os.remove(".temp")
+		except:
+			pass
+		self.done(0)
+
+	def fillEntries(self, index=0):
+		self.index = index
+		self.currentEntry = self.entries[self.index]
+		details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
+
+		self.ui.episodeLine.setText(str(details['episodes']))
+		i = 0
+		genres = ""
+		for genre in details['genres']:
+			if i == 0:
+				genres = genre
+			else:
+				genres = genres + ", " + genre
+			i += 1
+		self.ui.genreLine.setText(genres)
+		self.ui.summaryText.setPlainText(utils.remove_html_tags(details['synopsis']))
+		
+		self.ui.pictureLabel.setText("")
+		if os.path.exists(".temp"):
+			os.remove(".temp")
+		x=open(".temp", "w")
+		x.write(urllib2.urlopen(details['image_url']).read())
+		x.close()
+		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='200' align='right' />")
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -209,7 +255,8 @@ def editEntry():
 	dialog.exec_()
 
 def showInfoDialog():
-	return
+	dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
+	dialog.exec_()
 
 def doSwap(index1, index2):
 	entry1 = model.db.dictionary['items'][index1]
