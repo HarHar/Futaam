@@ -86,7 +86,7 @@ class TableModel(QtCore.QAbstractTableModel):
 			return 'c'
 		else:
 			return 'h'
-			
+
 class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
@@ -186,7 +186,6 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
-		#self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.removeTempAndClose)
 		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.fillEntries)
 		self.fillEntries()
@@ -213,8 +212,17 @@ class EntryInfoDialog(QtGui.QDialog):
 				genres = genres + ", " + genre
 			i += 1
 		self.ui.genreLine.setText(genres)
+
 		self.ui.summaryText.setPlainText(utils.remove_html_tags(details['synopsis']))
-		
+		self.ui.dateLine.setText(details['start_date'][:10])
+
+		if details['type'] == u'Movie':
+			self.ui.typeLine.setText("Feature Film")
+		elif details['type'] == u'TV':
+			self.ui.typeLine.setText("TV Series")
+		else:
+			self.ui.typeLine.setText(details['type'])
+
 		self.ui.pictureLabel.setText("")
 		if os.path.exists(".temp"):
 			os.remove(".temp")
