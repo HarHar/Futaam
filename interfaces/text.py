@@ -300,7 +300,7 @@ def main(argv):
 				if which.isdigit():
 					if int(which) <= len(searchResults):
 						malanime = searchResults[int(which)]
-						deep = MAL.details(malanime['id'], 'anime')
+						deep = MAL.details(malanime['id'], am)
 						accepted = True
 
 			if which == 'n':
