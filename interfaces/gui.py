@@ -212,10 +212,11 @@ class EntryInfoDialog(QtGui.QDialog):
 				genres = genres + ", " + genre
 			i += 1
 		self.ui.genreLine.setText(genres)
-
+		self.ui.statusLine.setText(details['status'].title())
+		self.ui.malRank.setText(str(details['rank']))
 		self.ui.summaryText.setPlainText(utils.remove_html_tags(details['synopsis']))
 		self.ui.dateLine.setText(details['start_date'][:10])
-
+		self.ui.endDate.setText(details['end_date'][:10])
 		if details['type'] == u'Movie':
 			self.ui.typeLine.setText("Feature Film")
 		elif details['type'] == u'TV':
@@ -229,7 +230,7 @@ class EntryInfoDialog(QtGui.QDialog):
 		x=open(".temp", "w")
 		x.write(urllib2.urlopen(details['image_url']).read())
 		x.close()
-		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='200' align='right' />")
+		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='223' align='right' />")
 
 def openFile():
 	global model
