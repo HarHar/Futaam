@@ -318,7 +318,10 @@ def main(argv):
 			if status != 'w':
 				lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default).replace('\n', '')
 			else:
-				lastEp = str(malanime['episodes'])
+				if am == "anime":
+					lastEp = str(malanime['episodes'])
+				else:
+					lastEp = str(malanime['chapters'])
 
 			obs = raw_input(colors.bold + '<Observations> ' + colors.default).replace('\n', '')
 
