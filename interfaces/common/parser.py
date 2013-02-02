@@ -135,6 +135,8 @@ class Parser(object):
 			f.close()
 		else:
 			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)}) + chr(4)) #jsonception
+			sleep(0.5)
+			self.sock.sendall(json.dumps({'cmd': 'save'}) + chr(4))
 
 		if self.ircHook:
 			ts = socket.socket()
