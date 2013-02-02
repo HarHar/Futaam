@@ -145,9 +145,11 @@ class Parser(object):
 			messages = {'lastwatched': {'norm': 'Watched %difference% episode%diffplural% [%old% to %new%]', 'noint': 'Watched from episode %old% to %new%'}, 'status': {'norm': chr(3) + '%ocolor%%oldstatus%'+ chr(15) +' -> '+ chr(3) +'%ncolor%%newstatus%'}, 'obs': {'norm': 'Observations: "%old%" --> "%new%"'}}
 			ccolors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}
 
+			hashesMatched = []
 			for new_entry in self.dictionary['items']:
 				for old_entry in self.tempdict['items']:
 					if new_entry['hash'] == old_entry['hash']:
+						hashesMatched.append(new_entry['hash'])
 						for key in messages:
 							if new_entry[key] != old_entry[key]:
 								if new_entry[key].isdigit() and new_entry[key].isdigit():
@@ -166,6 +168,19 @@ class Parser(object):
 								smsg = smsg.replace('%newstatus%', utils.translated_status[new_entry['type']][new_entry['status'].lower()])
 								ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + chr(15) + chr(2) + ' -' + chr(3) + '2 ' + new_entry['name'] + chr(15) + '] ' + smsg}))
 								break
+
+			for entry in self.dictionary['items']:
+				if (entry['hash'] in hashesMatched) == False:
+					#New entry was added
+					smsg = 'New entry| ' + chr(2) + chr(3) + '02%name%' + chr(15) + ' - ' + chr(3) + '%ocolor%%status%' + chr(15)
+					smsg = smsg.replace('%ocolor%', ccolors[entry['status'].lower()])
+					smsg = smsg.replace('%name%', entry['name'])
+					smsg = smsg.replace('%status%', utils.translated_status[entry['type']][entry['status'].lower()])
+					ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + '] ' + chr(15) + smsg}))
+
+			for entry in self.tempdict['items']:
+				if (entry['hash'] in hashesMatched) == False:
+					#Entry was removed
 
 			#ts.sendall(json.dumps({'action': 'msg', 'value': 'Something was changed on a database, don\'t ask what'}))
 			ts.close()
