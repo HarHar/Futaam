@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import tempfile
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
@@ -29,7 +28,7 @@ class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self):
 		super(TableModel, self).__init__()
 		self.animeList = []
-		self.headers = ["Title","Genre","Status","Watched","Observations"]
+		self.headers = ["Title","Genres","Status","Watched","Observations"]
 		self.active_file = ""
 
 	def columnCount(self, parent = QtCore.QModelIndex()):
@@ -233,15 +232,10 @@ class EntryInfoDialog(QtGui.QDialog):
 		details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
 
 		self.ui.episodeLine.setText(str(details['episodes']))
-		i = 0
 		genres = ""
 		for genre in details['genres']:
-			if i == 0:
-				genres = genre
-			else:
-				genres = genres + ", " + genre
-			i += 1
-		self.ui.genreLine.setText(genres)
+			genres = genres + genre + '/'
+		self.ui.genreLine.setText(genres[:-1])
 		self.ui.statusLine.setText(details['status'].title())
 		self.ui.malRank.setText(str(details['rank']))
 		self.ui.summaryText.setPlainText(utils.remove_html_tags(details['synopsis']))
@@ -253,7 +247,6 @@ class EntryInfoDialog(QtGui.QDialog):
 			self.ui.typeLine.setText("TV Series")
 		else:
 			self.ui.typeLine.setText(details['type'])
-
 		self.ui.pictureLabel.setText("")
 		if os.path.exists(".temp"):
 			os.remove(".temp")
