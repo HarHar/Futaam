@@ -178,11 +178,27 @@ def main(argv):
 			print '\thelp or h \t\t - prints this'
 			print '\tquit or q \t\t - quits'
 			print '\tset_ps1 or sps1 \t - changes PS1'
+			print '\tdbtype or type \t - changes database type [json/pickle]'
 			print '\tswitchdb or sdb \t - changes working database when opened with multiple files'
 			print '\tadd or a \t\t - adds an entry'
 			print '\tdelete, del or d \t - deletes an entry with the given index'
 			print '\tedit or e \t\t - edits an entry'
 			print ''
+		elif cmdsplit[0].lower() in ['setdbtype', 'dbtype', 'type']:
+			if dbs[currentdb].host != '':
+				print colors.fail + 'Changing database type is not supported on remote databases' + colors.default
+				continue
+			if len(cmdsplit) == 1:
+				newtype = ''
+				while (newtype in ['json', 'pickle']) == False: newtype = raw_input(colors.bold + '<New database type>' + colors.default + ' [json/pickle] ').replace('\n', '').lower()
+			else:
+				if (cmdsplit[1].lower() in ['json', 'pickle']) == False:
+					print colors.warning + 'Invalid type. Use "json" or "pickle" as argument' + colors.default
+					continue
+				newtype = cmdsplit[1].lower()
+			dbs[currentdb].dbtype = newtype
+			dbs[currentdb].save()
+			print colors.green + 'Done' + colors.default
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
 				currentdb += 1
