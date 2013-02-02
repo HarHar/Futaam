@@ -171,7 +171,6 @@ class Parser(object):
 
 			for entry in self.dictionary['items']:
 				if (entry['hash'] in hashesMatched) == False:
-					#New entry was added
 					smsg = 'New entry| ' + chr(2) + chr(3) + '02%name%' + chr(15) + ' - ' + chr(3) + '%ocolor%%status%' + chr(15)
 					smsg = smsg.replace('%ocolor%', ccolors[entry['status'].lower()])
 					smsg = smsg.replace('%name%', entry['name'])
@@ -180,7 +179,9 @@ class Parser(object):
 
 			for entry in self.tempdict['items']:
 				if (entry['hash'] in hashesMatched) == False:
-					#Entry was removed
+					smsg = 'Removed ' + chr(2) + chr(3) + '02%name%' + chr(15)
+					smsg = smsg.replace('%name%', entry['name'])
+					ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + '] ' + chr(15) + smsg}))
 
 			#ts.sendall(json.dumps({'action': 'msg', 'value': 'Something was changed on a database, don\'t ask what'}))
 			ts.close()
