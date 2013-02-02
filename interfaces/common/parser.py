@@ -142,7 +142,7 @@ class Parser(object):
 			ts = socket.socket()
 			ts.connect(('localhost', self.ircControlPort))
 
-			messages = {'lastwatched': {'norm': 'Watched %difference% episode%diffplural% [%old% to %new%]', 'noint': 'Watched from episode %old% to %new%'}, 'status': {'norm': chr(3) + '%ocolor%%oldstatus%'+ chr(15) +' -> '+ chr(3) +'%ncolor%%newstatus%'}, 'obs': {'norm': '"%old%" --> "%new%'}}
+			messages = {'lastwatched': {'norm': 'Watched %difference% episode%diffplural% [%old% to %new%]', 'noint': 'Watched from episode %old% to %new%'}, 'status': {'norm': chr(3) + '%ocolor%%oldstatus%'+ chr(15) +' -> '+ chr(3) +'%ncolor%%newstatus%'}, 'obs': {'norm': 'Observations: "%old%" --> "%new%"'}}
 			ccolors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}
 
 			for new_entry in self.dictionary['items']:
