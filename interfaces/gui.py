@@ -93,17 +93,18 @@ class AddEntryDialog(QtGui.QDialog):
 		self.setWindowTitle("Add Entry")
 		self.ui = uic.loadUi("./interfaces/ui/addDialog.ui", self)
 		self.ui.show()
-
+		
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.add)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
-		QtCore.QObject.connect(self.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
-		QtCore.QObject.connect(self.resultSelect, QtCore.SIGNAL("currentIndexChanged()"), self.animeSelected)
+		QtCore.QObject.connect(self.ui.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
+		QtCore.QObject.connect(self.ui.animeButton, QtCore.SIGNAL("toggled()"), self.populateCB)
+		QtCore.QObject.connect(self.ui.resultSelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.resultChanged)
 
 	def populateCB(self):
 		self.resultSelect.clear()
-		title = self.titleLine.text()
-		if self.ui.animeButton.isChecked() == True:
+		title = self.ui.titleLine.text()
+		if self.ui.animeButton.isChecked():
 			search_results = utils.MALWrapper.search(title, "anime")
 		else:
 			search_results = utils.MALWrapper.search(title, "manga")
@@ -111,11 +112,41 @@ class AddEntryDialog(QtGui.QDialog):
 			self.resultSelect.addItem(str(result["title"]))
 		self.results = search_results
 
-	def animeSelected(self, index):
-		return
+	def resultChanged(self, index):
+		title = self.ui.titleLine.text()
+		if self.ui.animeButton.isChecked():
+			entryId = utils.MALWrapper.search(title, "anime")[index]['id']
+			self.result = utils.MALWrapper.details(entryId, "anime")
+		else:
+			entryId = utils.MALWrapper.search(title, "manga")[index]
+			self.result = utils.MALWrapper.details(entryId, "manga")
+		genres = ""
+		for genre in self.result['genres']:
+			genres = genres + genre + '/'
+		self.ui.genreLine.setText(genres[:-1])
+		if self.ui.animeButton.isChecked():
+			number = self.result['episodes']
+		else:
+			number = self.result['chapters']
+		self.ui.episodesBox.setValue(number)
 
 	def add(self):
-		return
+		result = self.results[self.ui.resultSelect.currentIndex()]
+		obs = self.ui.obsLine.text()
+		statusIndex = self.ui.statusSelect.currentIndex()
+		genres = self.ui.genreLine.text()
+		if statusIndex == 0:
+			if self.ui.animeButton.isChecked():
+				eps = result['episodes']
+				am = "anime"
+			else:
+				eps = result['chapters']
+				am = "manga"
+		else:
+			eps = episodesBox.values()
+			am = "anime"
+		doAdd(result, obs, statusIndex, eps, genres, am)
+		self.done(0)
 
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
@@ -176,7 +207,6 @@ class EditEntryDialog(QtGui.QDialog):
 		doEdit(self.index, self.ui.titleLine.text(), self.ui.obsLine.text(), 
 			self.ui.statusSelect.currentIndex(), self.ui.episodesSelect.value(),
 			self.ui.genreLine.text())
-		return
 
 class EntryInfoDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None):
@@ -254,6 +284,16 @@ def doDelete(index):
 def addEntry():
 	dialog = AddEntryDialog(parent=ui.centralwidget)
 	dialog.exec_()
+
+def doAdd(malInfo, obs, statusIndex, eps, genres, am):
+	status = model.cbIndexToStatus(statusIndex)
+	try:
+		model.db.dictionary['count'] += 1
+	except:
+		model.db.dictionary['count'] = 1
+	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 'aid': malInfo['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title'])), 'genre': str(genres), 'status': status, 'lastwatched': eps, 'obs': str(obs)})
+	rebuildIds()
+	reloadTable()
 
 def swapEntries():
 	dialog = SwapEntryDialog(names=model.getAnimeNames(), parent=ui.centralwidget)
@@ -398,5 +438,5 @@ def main(argv):
 	exit(app.exec_())
 
 def help():
-	print """USAGE: ./futaam.py --gui [DATABASE]"""
+	print """USAGE: ./futaam.py --gui [DATABASE] [Qt Options]"""
 	quit()
