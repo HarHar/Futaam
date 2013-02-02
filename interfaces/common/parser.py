@@ -171,7 +171,7 @@ class Parser(object):
 
 			for entry in self.dictionary['items']:
 				if (entry['hash'] in hashesMatched) == False:
-					smsg = 'New entry| ' + chr(2) + chr(3) + '02%name%' + chr(15) + ' - ' + chr(3) + '%ocolor%%status%' + chr(15)
+					smsg = 'Added ' + chr(2) + chr(3) + '02%name%' + chr(15) + ' (' + chr(3) + '%ocolor%%status%' + chr(15) + ')'
 					smsg = smsg.replace('%ocolor%', ccolors[entry['status'].lower()])
 					smsg = smsg.replace('%name%', entry['name'])
 					smsg = smsg.replace('%status%', utils.translated_status[entry['type']][entry['status'].lower()])
