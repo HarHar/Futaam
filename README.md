@@ -63,6 +63,6 @@ Usage:
 
 	futaam --gui /path/to/database/ [Qt options]
 
-Qt is pretty nifty in that it lets you pass arguements about how you want things to look through the command line. See this doc for more info about this.
+Qt is pretty nifty in that it lets you pass arguements about how you want things to look through the command line. See [this doc](http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html#QApplication) for more info about this.
 
 See ```/docs/GUI_Interface_Info.md``` for more information.
