@@ -24,11 +24,11 @@ Available interfaces:
   * web
   * remote
 
-Web interface
+Web Interface
 =====
 The web interface is maintened by [that4chanwolf](https://github.com/that4chanwolf) and is available [here](https://github.com/that4chanwolf/Futaam-Web)
 
-Remote interface
+Remote Interface
 ====
 The remote interface is for accessing your database via internet
 
@@ -44,7 +44,7 @@ For the client, there will be no change on the 'appearance' of Futaam
 
 Needless to say: replace the password/host, change the port number to your wish and the '--readonly' argument is optional
 
-IRC interface
+IRC Interface
 ====
 The IRC interface is a bot that runs as a daemon, and then when using any other interface with the argument '--ircnotify' will make the daemonized bot announce the changes made to the specified channel.
 
@@ -54,3 +54,15 @@ Usage:
     futaam /path/to/database --INTERFACENAME --ircnotify
     
 Note that the channel parameter must be enclosed by quotes or have the # escaped
+
+Graphical Interface
+====
+The GUI for Futaam uses the Qt toolkit to display the entires in the open database and has dialogs for adding, editing, deleting, and swapping entries and viewing additional information (fetched from MAL) about them.
+
+Usage:
+
+	futaam --gui /path/to/database/ [Qt options]
+
+Qt is pretty nifty in that it lets you pass arguements about how you want things to look through the command line. See this doc for more info about this.
+
+See ```/docs/GUI_Interface_Info.md``` for more information.
