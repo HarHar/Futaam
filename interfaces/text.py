@@ -178,11 +178,12 @@ def main(argv):
 			print '\thelp or h \t\t - prints this'
 			print '\tquit or q \t\t - quits'
 			print '\tset_ps1 or sps1 \t - changes PS1'
-			print '\tdbtype or type \t - changes database type [json/pickle]'
+			print '\tdbtype or type \t\t - changes database type [json/pickle]'
 			print '\tswitchdb or sdb \t - changes working database when opened with multiple files'
 			print '\tadd or a \t\t - adds an entry'
 			print '\tdelete, del or d \t - deletes an entry with the given index'
 			print '\tedit or e \t\t - edits an entry'
+			print '\tinfo or i\t\t - shows information on an entry'
 			print ''
 		elif cmdsplit[0].lower() in ['setdbtype', 'dbtype', 'type']:
 			if dbs[currentdb].host != '':
