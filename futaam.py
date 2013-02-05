@@ -40,7 +40,7 @@ def getInterface(folder):
 	from os.path import join
 	for root, dirs, files in os.walk(folder):
 		for f in files:
-			if f == "__init__.py" or f == "utils.py" or f == "parser.py" or f == "qtGui.py" or f == "qtGui.ui":
+			if f == "__init__.py" or f == "utils.py" or f == "parser.py":
 				continue
 			fullname = join(root, f)
 			if max(fullname.split('.')) == 'py' or max(fullname.split('.')) == 'js':

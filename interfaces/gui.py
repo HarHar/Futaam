@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import sys
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
@@ -357,6 +358,8 @@ def main(argv):
 	global dbfile
 	global port
 	global host
+	colors = utils.colors()
+	colors.enable()
 
 	ircn = False
 	i = 0
@@ -396,6 +399,7 @@ def main(argv):
 
 	if len(dbfile) == 0 and host == '':
 		print colors.fail + 'No database file specified' + colors.default
+		help()
 		sys.exit(1)
 
 	if host == '':
