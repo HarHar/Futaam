@@ -255,6 +255,13 @@ class EntryInfoDialog(QtGui.QDialog):
 		x.close()
 		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='223' align='right' />")
 
+class aboutDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = uic.loadUi("./interfaces/ui/aboutDialog.ui", self)
+		self.ui.show()
+		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.close)
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -340,10 +347,8 @@ def reloadTable():
 	ui.tableView.setModel(model)
 
 def displayAbout():
-	title = "Futaam"
-	aboutText = """A free and open source anime manager.
-https://github.com/HarHar/Futaam"""
-	QtGui.QMessageBox.about(ui.centralwidget, title, aboutText)
+	dialog = aboutDialog(parent=ui.centralwidget)
+	dialog.exec_()
 
 def main(argv):
 	global model
