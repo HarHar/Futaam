@@ -166,6 +166,11 @@ def main(argv):
 		redraw(True)
 		name = prompt('Name: ', 2)
 		searchResults = MAL.search(name, t)
+		if len(searchResults) == 0:
+			alert(t[0].upper() + t[1:].lower() + ' not found on MAL :\\') #this will be better handled on the future
+			redraw()
+			drawitems()
+			return
 		i = 0
 		for x in searchResults:
 			searchResults[i]['index'] = i
