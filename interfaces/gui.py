@@ -346,6 +346,7 @@ def reloadTable():
 			sys.exit(1)
 		model.load_db(filename, parser.Parser(host=host, port=port, password=password))
 	ui.tableView.setModel(model)
+	ui.tableView.resizeColumnsToContents()
 
 def displayAbout():
 	dialog = aboutDialog(parent=ui.centralwidget)
@@ -426,6 +427,7 @@ def main(argv):
 		dbfile = ['']
 	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
+	ui.tableView.resizeColumnsToContents()
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), openFile)
