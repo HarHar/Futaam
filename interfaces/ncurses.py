@@ -438,7 +438,7 @@ def main(argv):
 					t = 1
 					for field in fields:
 						screen.addstr(t, 27, field, curses.A_BOLD)
-						sizeleft = int(terminalsize[1]) - int(len(field) + len(fields[field])) - 28
+						sizeleft = int(terminalsize[1]) - int(len(str(field)) + len(str(fields[field]))) - 28
 						if sizeleft <= 3:
 							screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
 							t += 1
