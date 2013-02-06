@@ -152,7 +152,7 @@ class Parser(object):
 						hashesMatched.append(new_entry['hash'])
 						for key in messages:
 							if new_entry[key] != old_entry[key]:
-								if new_entry[key].isdigit() and new_entry[key].isdigit():
+								if str(new_entry[key]).isdigit() and str(old_entry[key]).isdigit():
 									smsg = messages[key]['norm'].replace('%difference%', str(int(new_entry[key]) - int(old_entry[key])))
 									smsg = smsg.replace('%diffplural%', '' if (int(new_entry[key]) - int(old_entry[key])) == 1 else 's')
 								else:
