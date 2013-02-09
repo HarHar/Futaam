@@ -57,7 +57,7 @@ setup(
 )
 if os.name == "nt":
 	print "Adding Futaam to your path"
-	path = "C:\Python" + cutDot(platform.python_version(), 2).rstrip('.') + "\Lib\site-packages\futaam.py"
+	path = "C:\\Python" + cutDot(platform.python_version(), 2).rstrip('.') + "\\Lib\\site-packages\\futaam.py"
 	os.popen("set PATH=%PATH%;" + path)
 else:
 	print "Putting a symlink to futaam.py in /usr/bin/"
