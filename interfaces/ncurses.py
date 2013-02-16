@@ -116,7 +116,7 @@ class if_ncurses(object):
 			
 			if x == curses.KEY_RESIZE: self.redraw(); self.drawitems(); continue
 
-			if x == ord('q') or x == ord('Q'):
+			if x == ord('q') or x == ord('Q') or x == 27:
 				curses.endwin()
 				sys.exit(0)
 			elif x == ord('S') or x == ord('s'):
@@ -157,8 +157,8 @@ class if_ncurses(object):
 				self.redraw()
 				self.drawitems()
 			else:
-				pass
-				#self.screen.addstr(10, 10, str(x))		
+				#pass
+				self.screen.addstr(10, 10, str(x))		
 	def get_terminal_size(self, fd=1):
 	    """
 	    Returns height and width of current terminal. First tries to get
