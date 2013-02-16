@@ -156,7 +156,7 @@ class if_ncurses(object):
 					continue
 				self.curitem -= 1
 				self.redraw()
-				self.drawitems()
+				self.drawitems(direction=1)
 			elif x == 338:
 				size = self.get_terminal_size()
 				itemsCount = len(self.dbs[self.currentdb].dictionary['items'])-1
@@ -492,7 +492,7 @@ class if_ncurses(object):
 			self.screen.addstr(terminalsize[0]-2, 1, self.footer)
 		self.screen.refresh()
 
-	def drawitems(self, noSidePanel=False):
+	def drawitems(self, noSidePanel=False, direction=0):
 		terminalsize = self.get_terminal_size()
 		if terminalsize[0] < 12 or terminalsize[1] < 46:
 			self.screen.keypad(0)
@@ -514,7 +514,10 @@ class if_ncurses(object):
 				break
 		else:
 			if self.curitem > (terminalsize[0]-5):
-				self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+				if direction == 0:
+					self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+				elif direction == 1: #UP
+					self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem:terminalsize[0]+self.curitem-5]
 			else:
 				self.showing = self.dbs[self.currentdb].dictionary['items'][:terminalsize[0]-4]
 
