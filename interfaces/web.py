@@ -33,7 +33,10 @@ def main(argv):
 		os.exit(1)
 
 	magicalDir = sys.path.dirname(sys.path.dirname(__file__))
-	sys.popen('git clone git://github.com/that4chanwolf/Futaam-Web --depth=1 --work-tree ' + magicalDir)
+	alreadyInstalled = False
+	if sys.path.exists(magicalDir + '/Futaam-Web/'): alreadyInstalled = True
+	if alreadyInstalled == False:
+		sys.popen('git clone git://github.com/that4chanwolf/Futaam-Web --depth=1 ' + magicalDir + '/Futaam-Web/')
 	if sys.path.exists(magicalDir + '/Futaam-Web'):
 		sys.chdir(magicalDir + '/Futaam-Web')
 		try:
@@ -42,12 +45,11 @@ def main(argv):
 			print 'NPM not found, please install it to continue'
 			os.exit(1)
 		sys.popen('npm install') # Install dependencies
-		for x in argv:
-			if sys.path.exists(x):
-				db = x
-				break
-		if db:
-			sys.popen('node FutaamWeb --db ' + db)
+		if alreadyInstalled == False:
+			print '\033[92mFutaam-Web is now installed. Use "node '+ magicaldir + '/Futaam-Web/FutaamWeb.js --db file" for launching it anytime\033[0m'
+		if len(argv) > 0:
+			print 'Launching Futaam-Web'
+			sys.system('node '+ magicalDir +'/Futaam-Web/FutaamWeb.js --db ' + argv[0])
 
 def help():
 	return 'Futaam-Web is maintened by that4chanwolf and can be found on https://github.com/that4chanwolf/Futaam-Web'
