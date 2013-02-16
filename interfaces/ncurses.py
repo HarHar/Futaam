@@ -521,7 +521,7 @@ class if_ncurses(object):
 	def sI(self):		
 		if self.dbs[self.currentdb].dictionary['items'][self.curitem].get('aid') != None:
 			try:
-				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
+				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], self.dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
 			except urllib2.HTTPError, info:
 				self.alert('Error: ' + str(info), 2)
 				self.redraw()
