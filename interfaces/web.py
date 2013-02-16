@@ -15,8 +15,39 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os as sys # Because fuck you
+import sys as os # That's why.
+import subprocess as sp
+
 def main(argv):
-	print 'See https://github.com/that4chanwolf/Futaam-Web'
+	try:
+		sp.Popen(['git', '--version'], stdout=-1)
+	except:
+		print 'Git not found, please install it to continue'
+		os.exit(1)
+
+	try:
+		sp.Popen(['node', '--version'], stdout=-1)
+	except:
+		print 'Node not found, please install it to continue'
+		os.exit(1)
+
+	magicalDir = sys.path.dirname(sys.path.dirname(__file__))
+	sys.popen('git clone git://github.com/that4chanwolf/Futaam-Web --depth=1 --work-tree ' + magicalDir)
+	if sys.path.exists(magicalDir + '/Futaam-Web'):
+		sys.chdir(magicalDir + '/Futaam-Web')
+		try:
+			sp.Popen(['npm', '--version'], stdout=-1)
+		except:
+			print 'NPM not found, please install it to continue'
+			os.exit(1)
+		sys.popen('npm install') # Install dependencies
+		for x in argv:
+			if sys.path.exists(x):
+				db = x
+				break
+		if db:
+			sys.popen('node FutaamWeb --db ' + db)
 
 def help():
-	return ''
+	return 'Futaam-Web is maintened by that4chanwolf and can be found on https://github.com/that4chanwolf/Futaam-Web'
