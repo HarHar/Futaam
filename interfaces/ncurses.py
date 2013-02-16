@@ -156,9 +156,37 @@ class if_ncurses(object):
 				self.curitem -= 1
 				self.redraw()
 				self.drawitems()
+			elif x == 338:
+				size = self.get_terminal_size()
+				itemsCount = len(self.dbs[self.currentdb].dictionary['items'])-1
+
+				page = size[0] - 4
+
+				target = self.curitem + page - 1
+
+				if target >= itemsCount:
+					target = itemsCount
+
+				self.curitem = target
+				self.redraw()
+				self.drawitems()
+			elif x == 339:
+				size = self.get_terminal_size()
+				itemsCount = len(self.dbs[self.currentdb].dictionary['items'])-1
+
+				page = size[0] - 4
+
+				target = self.curitem - page + 1
+
+				if target <= 0:
+					target = 0
+
+				self.curitem = target
+				self.redraw()
+				self.drawitems()				
 			else:
-				#pass
-				self.screen.addstr(10, 10, str(x))		
+				pass
+				#self.screen.addstr(10, 10, str(x))		
 	def get_terminal_size(self, fd=1):
 	    """
 	    Returns height and width of current terminal. First tries to get
