@@ -87,6 +87,7 @@ class if_ncurses(object):
 			self.dbs.append(parser.Parser(host=self.host, port=self.port, password=self.password, ircHook=self.ircn))
 			self.currentdb = 0
 
+		self.showing = []
 		self.screen = curses.initscr()
 		self.screen.keypad(1)
 		curses.cbreak()
@@ -501,11 +502,24 @@ class if_ncurses(object):
 		i = 0
 		y = 1
 		x = 2
-		if self.curitem > (terminalsize[0]-5):
-			showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+		#if self.curitem > (terminalsize[0]-5):
+		#	showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+		#else:
+		#	showing = self.dbs[self.currentdb].dictionary['items'][:terminalsize[0]-4]
+
+		##self.showing
+		for entry in self.showing:
+			if entry['id'] == self.curitem:
+				#it's on the list, don't do anything
+				break
 		else:
-			showing = self.dbs[self.currentdb].dictionary['items'][:terminalsize[0]-4]
-		for entry in showing:
+			if self.curitem > (terminalsize[0]-5):
+				self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+			else:
+				self.showing = self.dbs[self.currentdb].dictionary['items'][:terminalsize[0]-4]
+
+
+		for entry in self.showing:
 			if len(entry['name']) >= 23:
 				name = entry['name'][:20] + '...'
 			else:
