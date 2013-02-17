@@ -190,4 +190,4 @@ class MALWrapper(object):
 
 	@staticmethod
 	def getEpisodeNumber(id):
-		return MALWrapper.queryAnime(id, 'anime')['episodes']
+		return MALWrapper.details(id, 'anime')['episodes']
