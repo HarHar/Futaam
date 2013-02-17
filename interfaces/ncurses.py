@@ -47,7 +47,7 @@ class if_ncurses(object):
 					print colors.fail + 'Missing host' + colors.default
 					sys.exit(1)	
 				else:
-					host = argv[i+1]
+					self.host = argv[i+1]
 			elif x == '--port':
 				if len(argv) <= i:
 					print colors.fail + 'Missing port' + colors.default
