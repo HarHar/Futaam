@@ -187,7 +187,3 @@ class MALWrapper(object):
 			return (HTMLEntitiesToUnicode(remove_html_tags(jpname)), HTMLEntitiesToUnicode(remove_html_tags(summary)).rstrip('\n').lstrip('\n'), img)
 		else:
 			return (jpname, summary, img, name)
-
-	@staticmethod
-	def getEpisodeNumber(id):
-		return MALWrapper.details(id, 'anime')['episodes']
