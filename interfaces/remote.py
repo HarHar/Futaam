@@ -81,6 +81,7 @@ class rServer(SocketServer.BaseRequestHandler):
 
 				if cmd['cmd'] == 'pull':
 					res = {'cmd': cmd['cmd'], 'response': ''}
+					dbs[curdb].reload()
 					res['response'] = json.dumps(dbs[curdb].dictionary)
 					self.request.send(json.dumps(res) + chr(4))
 
