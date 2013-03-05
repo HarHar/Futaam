@@ -263,6 +263,30 @@ class aboutDialog(QtGui.QDialog):
 		self.ui.show()
 		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.close)
 
+class NewDbDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = uic.loadUi("./interfaces/ui/newDbDialog.ui", self)
+		self.ui.show()
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.makeNew)
+		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
+		QtCore.QObject.connect(self.ui.pathSelectButton, QtCore.SIGNAL("clicked()"), self.fileDialog)
+		
+	def fileDialog(self):
+		filename = QtGui.QFileDialog.getSaveFileName(parent=self, filter="Futaam Database (*.db);; All Files (*)")
+		self.ui.pathEdit.setText(filename)
+
+	def makeNew(self):
+		path = self.ui.pathEdit.text()
+		if self.ui.jsonButton.isChecked():
+			dbType = "json"
+		else:
+			dbType = "pickle"
+		title = self.ui.nameLineEdit.text()
+		des = self.ui.descriptionLineEdit.text()
+		parser.createDB(str(path), str(dbType), str(title), str(des))
+		self.close()
+
 def openFile():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -306,6 +330,10 @@ def editEntry():
 
 def showInfoDialog():
 	dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
+	dialog.exec_()
+
+def makeNewDb():
+	dialog = NewDbDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
 def doSwap(index1, index2):
@@ -427,7 +455,6 @@ def main(argv):
 		dbfile = ['']
 	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
-	ui.tableView.resizeColumnsToContents()
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), openFile)
@@ -438,6 +465,7 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
 	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), editEntry)
 	QtCore.QObject.connect(ui.actionViewDetails, QtCore.SIGNAL("triggered()"), showInfoDialog)
+	QtCore.QObject.connect(ui.actionNew, QtCore.SIGNAL("triggered()"), makeNewDb)
 
 	exit(app.exec_())
 
