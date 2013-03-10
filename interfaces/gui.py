@@ -87,7 +87,7 @@ class TableModel(QtCore.QAbstractTableModel):
 		else:
 			return 'h'
 
-	def rebuildIds():
+	def rebuildIds(self):
 		for x in xrange(0, self.db.dictionary['count']):
 			self.db.dictionary['items'][x]['id'] = x
 		self.db.save()
@@ -339,6 +339,7 @@ def doSwap(index1, index2):
 	model.db.dictionary['items'][index2] = entry1
 	model.rebuildIds()
 	reloadTable()
+	model.db.save()
 
 def doAdd(malInfo, obs, statusIndex, eps, genres, am):
 	status = model.cbIndexToStatus(statusIndex)
