@@ -108,7 +108,7 @@ class Parser(object):
 			else:
 				raise Exception('Invalid database type')
 		else:
-			raise Exception('File does not exists')
+			raise Exception('File does not exist')
 		if ircHook:
 			self.tempdict = copy.deepcopy(self.dictionary)
 	def hash(self):

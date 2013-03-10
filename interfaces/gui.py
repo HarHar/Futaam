@@ -87,6 +87,12 @@ class TableModel(QtCore.QAbstractTableModel):
 		else:
 			return 'h'
 
+	def rebuildIds():
+		for x in xrange(0, self.db.dictionary['count']):
+			self.db.dictionary['items'][x]['id'] = x
+		self.db.save()
+
+
 class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
@@ -287,7 +293,7 @@ class NewDbDialog(QtGui.QDialog):
 		parser.createDB(str(path), str(dbType), str(title), str(des))
 		self.close()
 
-def openFile():
+def showOpenDbDialog():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 	if filename != None:
@@ -295,36 +301,26 @@ def openFile():
 		model.load_db(filename, parser.Parser(filename))
 		ui.tableView.setModel(model)
 
-def deleteEntry():
+def showDeleteEntryDialog():
 	dialog = DeleteEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames())
 	toDelete = dialog.exec_()
 
-def doDelete(index):
-	entry = model.db.dictionary['items'][index]
-	model.db.dictionary['items'].remove(entry)
-	model.db.dictionary['count'] -= 1
-	rebuildIds()
-	reloadTable()
-
-def addEntry():
+def showAddEntryDialog():
 	dialog = AddEntryDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
-def doAdd(malInfo, obs, statusIndex, eps, genres, am):
-	status = model.cbIndexToStatus(statusIndex)
-	try:
-		model.db.dictionary['count'] += 1
-	except:
-		model.db.dictionary['count'] = 1
-	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 'aid': malInfo['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title'])), 'genre': str(genres), 'status': status, 'lastwatched': eps, 'obs': str(obs)})
-	rebuildIds()
-	reloadTable()
+def showAboutDialog():
+	dialog = aboutDialog(parent=ui.centralwidget)
+	dialog.exec_()
 
-def swapEntries():
+def showStatsDialog():
+	return
+
+def showSwapEntriesDialog():
 	dialog = SwapEntryDialog(names=model.getAnimeNames(), parent=ui.centralwidget)
 	dialog.exec_()
 
-def editEntry():
+def showEditEntryDialog():
 	dialog = EditEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
 	dialog.exec_()
 
@@ -332,7 +328,7 @@ def showInfoDialog():
 	dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
 	dialog.exec_()
 
-def makeNewDb():
+def showNewDbDialog():
 	dialog = NewDbDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
@@ -341,7 +337,24 @@ def doSwap(index1, index2):
 	entry2 = model.db.dictionary['items'][index2]
 	model.db.dictionary['items'][index1] = entry2
 	model.db.dictionary['items'][index2] = entry1
-	rebuildIds()
+	model.rebuildIds()
+	reloadTable()
+
+def doAdd(malInfo, obs, statusIndex, eps, genres, am):
+	status = model.cbIndexToStatus(statusIndex)
+	try:
+		model.db.dictionary['count'] += 1
+	except:
+		model.db.dictionary['count'] = 1
+	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 'aid': malInfo['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title'])), 'genre': str(genres), 'status': status, 'lastwatched': eps, 'obs': str(obs)})
+	model.rebuildIds()
+	reloadTable()
+
+def doDelete(index):
+	entry = model.db.dictionary['items'][index]
+	model.db.dictionary['items'].remove(entry)
+	model.db.dictionary['count'] -= 1
+	model.rebuildIds()
 	reloadTable()
 
 def doEdit(index, title, obs, status, eps, genre):
@@ -357,11 +370,6 @@ def doEdit(index, title, obs, status, eps, genre):
 	model.db.save()
 	reloadTable()
 
-def rebuildIds():
-	for x in xrange(0, model.db.dictionary['count']):
-		model.db.dictionary['items'][x]['id'] = x
-	model.db.save()
-
 def reloadTable():
 	global model
 	filename = model.active_file
@@ -376,9 +384,8 @@ def reloadTable():
 	ui.tableView.setModel(model)
 	ui.tableView.resizeColumnsToContents()
 
-def displayAbout():
-	dialog = aboutDialog(parent=ui.centralwidget)
-	dialog.exec_()
+def openReadme():
+	QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://github.com/HarHar/Futaam#futaam"))
 
 def main(argv):
 	global model
@@ -457,15 +464,17 @@ def main(argv):
 	ui.tableView.setModel(model)
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
-	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), openFile)
+	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), showOpenDbDialog)
 	QtCore.QObject.connect(ui.actionSave, QtCore.SIGNAL("triggered()"), model.db.save)
-	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), deleteEntry)
-	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), addEntry)
-	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), swapEntries)
-	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), displayAbout)
-	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), editEntry)
+	QtCore.QObject.connect(ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), showDeleteEntryDialog)
+	QtCore.QObject.connect(ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), showAddEntryDialog)
+	QtCore.QObject.connect(ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), showSwapEntriesDialog)
+	QtCore.QObject.connect(ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), showAboutDialog)
+	QtCore.QObject.connect(ui.actionEdit_Entry, QtCore.SIGNAL("triggered()"), showEditEntryDialog)
 	QtCore.QObject.connect(ui.actionViewDetails, QtCore.SIGNAL("triggered()"), showInfoDialog)
-	QtCore.QObject.connect(ui.actionNew, QtCore.SIGNAL("triggered()"), makeNewDb)
+	QtCore.QObject.connect(ui.actionNew, QtCore.SIGNAL("triggered()"), showNewDbDialog)
+	QtCore.QObject.connect(ui.actionStats, QtCore.SIGNAL("triggered()"), showStatsDialog)
+	QtCore.QObject.connect(ui.actionReadme, QtCore.SIGNAL("triggered()"), openReadme)
 
 	exit(app.exec_())
 
