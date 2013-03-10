@@ -535,15 +535,17 @@ class if_ncurses(object):
 					for field in fields:
 						self.screen.addstr(t, 27, field, curses.A_BOLD)
 						if isinstance(fields[field], basestring):
+							showstr = fields[field]
 							sizeleft = int(terminalsize[1]) - int(len(str(field)) + len(fields[field])) - 28
 						else:
+							showstr = str(fields[field])
 							sizeleft = int(terminalsize[1]) - int(len(str(field)) + len(str(fields[field]))) - 28
 						if sizeleft <= 3:
 							self.screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
 							t += 1
 							continue
 						fix = ' ' * sizeleft
-						self.screen.addstr(t, 27 + len(field), fields[field].encode('utf-8') + fix)
+						self.screen.addstr(t, 27 + len(field), showstr.encode('utf-8') + fix)
 						t += 1
 			else:
 				bold = 0
