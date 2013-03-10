@@ -57,6 +57,7 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
+    <addaction name="actionStats"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionQuit"/>
@@ -76,6 +77,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout_Futaam"/>
+    <addaction name="actionReadme"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -83,12 +85,12 @@
   </widget>
   <action name="actionOpen">
    <property name="text">
-    <string>Open</string>
+    <string>Open Database</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>Save Database</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -128,7 +130,17 @@
   </action>
   <action name="actionNew">
    <property name="text">
-    <string>New</string>
+    <string>New Database</string>
+   </property>
+  </action>
+  <action name="actionStats">
+   <property name="text">
+    <string>View Database Stats</string>
+   </property>
+  </action>
+  <action name="actionReadme">
+   <property name="text">
+    <string>View Readme</string>
    </property>
   </action>
  </widget>
