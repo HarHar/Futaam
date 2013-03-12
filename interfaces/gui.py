@@ -293,6 +293,39 @@ class NewDbDialog(QtGui.QDialog):
 		parser.createDB(str(path), str(dbType), str(title), str(des))
 		self.close()
 
+class DbStatsDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = uic.loadUi("./interfaces/ui/statsDialog.ui", self)
+		self.ui.show()
+
+		self.ui.dbNameLabel.setText(model.db.dictionary["name"])
+		self.ui.dbDescriptionLabel.setText(model.db.dictionary["description"])
+		self.ui.entryNumLabel.setText(str(model.db.dictionary["count"]))
+		numW = 0
+		numQ = 0
+		numH = 0
+		numD = 0
+		numC = 0
+		for entry in model.db.dictionary["items"]:
+			if entry["status"] == "w":
+				numW = numW + 1
+			elif entry["status"] == "q":
+				numQ = numQ + 1
+			elif entry["status"] == "d":
+				numD = numD + 1
+			elif entry["status"] == "h":
+				numH = numH + 1
+			elif entry["status"] == "c":
+				numC = numC + 1
+		self.ui.numWatchedLabel.setText(str(numW))
+		self.ui.numDroppedLabel.setText(str(numD))
+		self.ui.numQueuedLabel.setText(str(numQ))
+		self.ui.numOnHoldLabel.setText(str(numH))
+		self.ui.numCompletedLabel.setText(str(numC))
+
+		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.close)
+
 def showOpenDbDialog():
 	global model
 	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
@@ -314,7 +347,8 @@ def showAboutDialog():
 	dialog.exec_()
 
 def showStatsDialog():
-	return
+	dialog = DbStatsDialog(parent=ui.centralwidget)
+	dialog.exec_()
 
 def showSwapEntriesDialog():
 	dialog = SwapEntryDialog(names=model.getAnimeNames(), parent=ui.centralwidget)
@@ -463,6 +497,7 @@ def main(argv):
 		dbfile = ['']
 	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
+	reloadTable()
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), showOpenDbDialog)
