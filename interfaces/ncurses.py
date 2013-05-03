@@ -530,22 +530,22 @@ class if_ncurses(object):
 			if entry['id'] == self.curitem:
 				bold = curses.A_REVERSE
 				if noSidePanel == False:
-					fields = {'Title: ': entry['name'], 'Genre: ': entry['genre'], 'Status: ': translated_status[entry['type'].lower()][entry['status'].lower()], 'Last watched: ': entry['lastwatched'], 'Observations: ': entry['obs']}
+					fields = (('Title: ', entry['name']), ('Genre: ', entry['genre']), ('Status: ', translated_status[entry['type'].lower()][entry['status'].lower()]), ('Last watched: ', entry['lastwatched']), ('Observations: ', entry['obs']))
 					t = 1
 					for field in fields:
-						self.screen.addstr(t, 27, field, curses.A_BOLD)
-						if isinstance(fields[field], basestring):
-							showstr = fields[field]
-							sizeleft = int(terminalsize[1]) - int(len(str(field)) + len(fields[field])) - 28
+						self.screen.addstr(t, 27, field[0], curses.A_BOLD)
+						if isinstance(field[1], basestring):
+							showstr = field[1]
+							sizeleft = int(terminalsize[1]) - int(len(str(field[0])) + len(field[1])) - 28
 						else:
-							showstr = str(fields[field])
-							sizeleft = int(terminalsize[1]) - int(len(str(field)) + len(str(fields[field]))) - 28
+							showstr = str(field[1])
+							sizeleft = int(terminalsize[1]) - int(len(str(field[0])) + len(str(field[1]))) - 28
 						if sizeleft <= 3:
-							self.screen.addstr(t, 27 + len(field), fields[field][:sizeleft-3].encode('utf-8') + '...')
+							self.screen.addstr(t, 27 + len(field[0]), field[1][:sizeleft-3].encode('utf-8') + '...')
 							t += 1
 							continue
 						fix = ' ' * sizeleft
-						self.screen.addstr(t, 27 + len(field), showstr.encode('utf-8') + fix)
+						self.screen.addstr(t, 27 + len(field[0]), showstr.encode('utf-8') + fix)
 						t += 1
 			else:
 				bold = 0
