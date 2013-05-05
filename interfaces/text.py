@@ -156,7 +156,7 @@ def main(argv):
 			args = ''
 			for x in cmdsplit[1:]:
 				args += x + ' '
-			args = args[:-1]
+			args = args[:-1].replace('\n', '')
 		except (EOFError, KeyboardInterrupt):
 			print colors.green + 'Bye~' + colors.default
 			sys.exit(0)
@@ -184,6 +184,7 @@ def main(argv):
 			print '\tdelete, del or d \t - deletes an entry with the given index'
 			print '\tedit or e \t\t - edits an entry'
 			print '\tinfo or i\t\t - shows information on an entry'
+			print '\toinfo or o\t\t - shows online information on an entry (if given entry number) or name'
 			print ''
 		elif cmdsplit[0].lower() in ['setdbtype', 'dbtype', 'type']:
 			if dbs[currentdb].host != '':
@@ -297,6 +298,61 @@ def main(argv):
 			dbs[currentdb].save()
 			print colors.green + 'Done' + colors.default
 			continue
+		elif cmdsplit[0].lower() in ['o', 'oinfo']:
+			accepted = False
+			if args.isdigit():
+				if args >= 0 and len(dbs[currentdb].dictionary['items']) >= int(args):
+					eid = dbs[currentdb].dictionary['items'][int(args)]['aid']
+					etype = dbs[currentdb].dictionary['items'][int(args)]['type']
+					accepted = True
+				else:
+					print colors.fail + 'The entry '+ args +' is not on the list' + colors.default
+			else:
+				title = args
+
+				am = ''
+				while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
+
+				searchResults = MAL.search(title, am)
+				i = 0
+				for r in searchResults:
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+					i += 1
+				print colors.bold + '[A] ' + colors.default + 'Abort'
+				while accepted == False:
+					which = raw_input(colors.bold + 'Choose> ' + colors.default).replace('\n', '')
+					if which.lower() == 'a':
+						break
+					if which.isdigit():
+						if int(which) <= len(searchResults):
+							malanime = searchResults[int(which)]
+
+							eid = malanime['id']
+							etype = am
+							accepted = True
+
+			if accepted:
+				deep = MAL.details(eid, etype)
+
+				if etype == 'anime':
+					print colors.bold + 'Title: ' + colors.default + deep['title']
+					if deep['end_date'] != None:
+						print colors.bold + 'Year: ' + colors.default + deep['start_date'] + ' - ' + deep['end_date']
+					else:
+						print colors.bold + 'Year: ' + colors.default + deep['start_date'] + ' - ongoing'
+					print colors.bold + 'Type: ' + colors.default + deep['type']
+					print colors.bold + 'Classification: ' + colors.default + deep['classification']
+					print colors.bold + 'Episodes: ' + colors.default + str(deep['episodes'])
+					print colors.bold + 'Synopsis: ' + colors.default + utils.remove_html_tags(deep['synopsis'])
+				elif etype == 'manga':
+					print colors.bold + 'Title: ' + colors.default + deep['title']
+					print colors.bold + 'Type: ' + colors.default + str(round(deep['members_score']))
+					print colors.bold + 'Score: ' + colors.default + str(deep['chapters'])
+					print colors.bold + 'Volumes: ' + colors.default + str(deep['volumes'])
+					print colors.bold + 'Chapters: ' + colors.default + str(deep['chapters'])
+					print colors.bold + 'Synopsis: ' + colors.default + utils.HTMLEntitiesToUnicode(utils.remove_html_tags(deep['synopsis']))
+				print ''
+
 		elif cmdsplit[0].lower() in ['add', 'a']:
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default).replace('\n', '')
