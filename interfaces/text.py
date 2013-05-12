@@ -319,9 +319,9 @@ def main(argv):
 							i = 0
 							for group in groups:
 								if len(groups) > 1:
-									print colors.bold + '[' + str(i) + '] ' + colors.default + group[0].replace('[', '').replace(']', '') + ' - ' + group[1]
+									print colors.bold + '[' + str(i) + '] ' + colors.default + str(group[0].replace('[', '').replace(']', '')) + ' - ' + str(group[1])
 								else:
-									print colors.bold + '[' + str(i) + '] ' + colors.default + group[0].replace('[', '').replace(']', '')
+									print colors.bold + '[' + str(i) + '] ' + colors.default + str(group[0].replace('[', '').replace(']', ''))
 								i += 1
 							print '[C] Cancel'
 
