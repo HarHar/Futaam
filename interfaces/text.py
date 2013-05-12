@@ -303,15 +303,59 @@ def main(argv):
 		elif cmdsplit[0].lower() in ['n', 'nyaa']:
 			if args.isdigit():
 				if args >= 0 and len(dbs[currentdb].dictionary['items']) >= int(args):
-					title = dbs[currentdb].dictionary['items'][int(args)]['name']
+					term = dbs[currentdb].dictionary['items'][int(args)]['name']
+
+					if dbs[currentdb].dictionary['items'][int(args)]['type'].lower() == 'anime':
+						choice = ''
+						while (choice in ['y', 'n']) == False:
+							choice = raw_input(colors.bold + 'Do you want to choose a specific subbing group? [Y/n] ' + colors.default).lower()
+							if choice.replace('\n', '') == '': choice = 'y'
+						if choice == 'y':
+							print colors.header + 'Please wait...' + colors.default
+							groups = MAL.getGroupsList(dbs[currentdb].dictionary['items'][int(args)]['aid'], dbs[currentdb].dictionary['items'][int(args)]['name'])
+
+							print ''
+							i = 0
+							for group in groups:
+								if len(groups) > 1:
+									print colors.bold + '[' + str(i) + '] ' + colors.default + group[0].replace('[', '').replace(']', '') + ' - ' + group[1]
+								else:
+									print colors.bold + '[' + str(i) + '] ' + colors.default + group[0].replace('[', '').replace(']', '')
+								i += 1
+							print '[C] Cancel'
+
+							while True:
+								which = raw_input(colors.bold + 'Choose> ' + colors.default).replace('\n', '')
+								if which.lower() == 'c':
+									break
+
+								if which.isdigit():
+									if int(which) <= len(groups):
+										term = groups[int(which)][0] + ' ' + term
+										break
+
+						if dbs[currentdb].dictionary['items'][int(args)]['status'].lower() == 'c':
+							if dbs[currentdb].dictionary['items'][int(args)]['lastwatched'].isdigit():
+								choice = ''
+								while (choice in ['y', 'n']) == False:
+									choice = raw_input(colors.bold + 'Do you want to search for the next episode (' + str(int(dbs[currentdb].dictionary['items'][int(args)]['lastwatched']) + 1) + ')? [Y/n] ' + colors.default).lower()
+									if choice.replace('\n', '') == '': choice = 'y'
+
+								if choice == 'y':
+									x = str(int(dbs[currentdb].dictionary['items'][int(args)]['lastwatched']) + 1)
+									if len(str(x)) == 1:
+										x = '0' + x
+									#^^^ could go wrong
+									term = term + ' ' + x
+
 				else:
 					print colors.fail + 'The entry '+ args +' is not on the list' + colors.default
 					continue
 			else:
-				title = args
+				term = args
 
-			print colors.header + 'Searching nyaa.eu for "' + title + '"...' + colors.default
-			searchResults = nyaa.search(title)
+			print colors.header + 'Searching nyaa.eu for "' + term + '"...' + colors.default
+			searchResults = nyaa.search(term)
 			print ''
 
 			if len(searchResults) == 0:
@@ -343,7 +387,9 @@ def main(argv):
 				print colors.bold + '<URL> ' + colors.default + picked['url']
 
 				choice = ''
-				while (choice in ['y', 'n']) == False: choice = 'y'; choice = raw_input(colors.warning + 'Do you want to download this torrent? [Y/n] ' + colors.default).lower()
+				while (choice in ['y', 'n']) == False:
+					choice = raw_input(colors.warning + 'Do you want to download this torrent? [Y/n] ' + colors.default).lower()
+					if choice.replace('\n', '') == '': choice = 'y'
 
 				if choice == 'y':
 					metadata = urlopen(picked['url']).read()
