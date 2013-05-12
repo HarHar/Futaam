@@ -31,6 +31,7 @@ except:
 if PS1 == None: PS1 = '[%green%%N%default%]> '
 if PS1[-1:] != ' ': PS1 += ' '
 
+nyaa = utils.NyaaWrapper()
 MAL = utils.MALWrapper()
 colors = utils.colors()
 
@@ -185,6 +186,7 @@ def main(argv):
 			print '\tedit or e \t\t - edits an entry'
 			print '\tinfo or i\t\t - shows information on an entry'
 			print '\toinfo or o\t\t - shows online information on an entry (if given entry number) or name'
+			print '\tnyaa or n\t\t - searches nyaa.eu for torrent of an entry (if given entry number) or name'
 			print ''
 		elif cmdsplit[0].lower() in ['setdbtype', 'dbtype', 'type']:
 			if dbs[currentdb].host != '':
@@ -298,6 +300,68 @@ def main(argv):
 			dbs[currentdb].save()
 			print colors.green + 'Done' + colors.default
 			continue
+		elif cmdsplit[0].lower() in ['n', 'nyaa']:
+			if args.isdigit():
+				if args >= 0 and len(dbs[currentdb].dictionary['items']) >= int(args):
+					title = dbs[currentdb].dictionary['items'][int(args)]['name']
+				else:
+					print colors.fail + 'The entry '+ args +' is not on the list' + colors.default
+					continue
+			else:
+				title = args
+
+			print colors.header + 'Searching nyaa.eu for "' + title + '"...' + colors.default
+			searchResults = nyaa.search(title)
+			print ''
+
+			if len(searchResults) == 0:
+				print colors.fail + 'No results found' + colors.default
+				continue
+
+			i = 0
+			for r in searchResults[:15]:
+				print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				i += 1
+			print '[A] Abort'
+
+			ok = False
+			while ok == False: #Ugly I know
+				which = raw_input(colors.bold + 'Choose> ' + colors.default).replace('\n', '')
+				if which.lower() == 'a':
+					break
+
+				if which.isdigit():
+					if int(which) <= len(searchResults) and int(which) <= 15:
+						picked = searchResults[int(which)]
+						ok = True
+
+			if ok:
+				print ''
+				print colors.bold + '<Title> ' + colors.default + picked['title']
+				print colors.bold + '<Category> ' + colors.default + picked['category']
+				print colors.bold + '<Info> ' + colors.default + picked['description']
+				print colors.bold + '<URL> ' + colors.default + picked['url']
+
+				choice = ''
+				while (choice in ['y', 'n']) == False: choice = 'y'; choice = raw_input(colors.warning + 'Do you want to download this torrent? [Y/n] ' + colors.default).lower()
+
+				if choice == 'y':
+					metadata = urlopen(picked['url']).read()
+
+					while True:
+						filepath = raw_input(colors.bold + 'Save to> ' + colors.default).replace('\n', '')
+						try:
+							f = open(filepath, 'wb')
+							f.write(metadata)
+							f.close()
+						except Exception, e:
+							print colors.fail + 'Failed to save file' + colors.default
+							print colors.fail + 'Exception! ' + str(e) + colors.default
+							print 'Retrying...'
+							print ''
+							continue
+						break
+
 		elif cmdsplit[0].lower() in ['o', 'oinfo']:
 			accepted = False
 			if args.isdigit():
