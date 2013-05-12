@@ -19,6 +19,7 @@ import os
 import sys
 import ConfigParser
 import datetime
+import time
 
 PS1 = '[%N]> '
 configfile = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
@@ -386,12 +387,15 @@ def main(argv):
 				print colors.bold + '<Info> ' + colors.default + picked['description']
 				print colors.bold + '<URL> ' + colors.default + picked['url']
 
+				print ''
 				choice = ''
-				while (choice in ['y', 'n']) == False:
-					choice = raw_input(colors.warning + 'Do you want to download this torrent? [Y/n] ' + colors.default).lower()
-					if choice.replace('\n', '') == '': choice = 'y'
+				while (choice in ['t', 'd', 'n']) == False:
+					print colors.bold + '[T] ' + colors.default + 'Download .torrent file'
+					print colors.bold + '[D] ' + colors.default + 'Download all files (simple torrent client)'
+					print colors.bold + '[N] ' + colors.default + 'Do nothing'
+					choice = raw_input(colors.bold + 'Choose> ' + colors.default).lower()
 
-				if choice == 'y':
+				if choice == 't':
 					metadata = urlopen(picked['url']).read()
 
 					while True:
@@ -407,6 +411,35 @@ def main(argv):
 							print ''
 							continue
 						break
+
+				if choice == 'd':
+					try:
+						import libtorrent as lt 
+					except ImportError:
+						print colors.fail + 'libTorrent Python bindings not found!' + colors.default
+						print 'To install it check your distribution\'s package manager (python-libtorrent for Debian based ones) or compile libTorrent with the --enable-python-binding'
+						continue
+
+					print colors.header + 'Downloading to current folder...' + colors.default
+
+					ses = lt.session()
+					ses.listen_on(6881, 6891)
+					e = lt.bdecode(urlopen(picked['url']).read())
+					info = lt.torrent_info(e)
+					h = ses.add_torrent(info, "./")
+
+					while (not h.is_seed()):
+							s = h.status()
+
+							state_str = ['queued', 'checking', 'downloading metadata', \
+									'downloading', 'finished', 'seeding', 'allocating']
+							sys.stdout.write('\r\x1b[K%.2f%% complete (down: %.1f kb/s up: %.1f kB/s peers: %d) %s' % \
+									(s.progress * 100, s.download_rate / 1000, s.upload_rate / 1000, \
+									s.num_peers, state_str[s.state]))
+							sys.stdout.flush()
+
+							time.sleep(1)
+					print ''
 
 		elif cmdsplit[0].lower() in ['o', 'oinfo']:
 			accepted = False
