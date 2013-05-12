@@ -29,6 +29,13 @@ except:
 	print 'You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.'
 	exit()
 
+from byteformat import format as fmt
+import os, inspect
+from urllib2 import urlopen
+from urllib import quote
+from xml.dom import minidom
+
+
 anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watching', 'w': 'Watched', 'd': 'Dropped'}
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
 
@@ -68,6 +75,35 @@ def HTMLEntitiesToUnicode(text):
     """Converts HTML entities to unicode.  For example '&amp;' becomes '&'."""
     text = unicode(BeautifulStoneSoup(text, convertEntities=BeautifulStoneSoup.ALL_ENTITIES))
     return text
+
+class NyaaWrapper(object):
+	def search(self, term):
+		results = []
+
+		rss = minidom.parse(urlopen("http://www.nyaa.eu/?page=rss&term="+term))
+		items = rss.getElementsByTagName('item')
+
+		for item in items:
+			title = self.get_tag_value(item.getElementsByTagName('title')[0])
+			url = self.get_tag_value(item.getElementsByTagName('link')[0])
+			url = url.replace("&amp;", "&")
+			description = self.get_tag_value(item.getElementsByTagName('description')[0])
+			description = description.replace('<![CDATA[', '')
+			description = description.replace(']]>', '')
+			category = self.get_tag_value(item.getElementsByTagName('category')[0])
+			results.append({'title': title, 'url': url, 'description': description, 'category': category})
+		return results
+
+	def get_tag_value(self, node):
+		xml_str = node.toxml()
+		start = xml_str.find('>')
+		if start == -1:
+			return ''
+		end = xml_str.rfind('<')
+		if end < start:
+			return ''
+		return xml_str[start + 1:end]	
+
 
 class MALWrapper(object):
 	@staticmethod
