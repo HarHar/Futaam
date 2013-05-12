@@ -68,3 +68,7 @@ Usage:
 Qt is pretty nifty in that it lets you pass arguements about how you want things to look through the command line. See [this doc](http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html#QApplication) for more info about this.
 
 See ```/docs/GUI_Interface_Info.md``` for more information.
+
+Developers
+====
+This can be quite confusing for some, but there is a debugging interface (called "debug"), that loads a Futaam file, stores it on a variable called "dbs" and continuously reads raw input and executes it as Python code, that way you can see how the database works and what some functions do. Also you can use the debugging interface as a base for another interface if you'd like.
