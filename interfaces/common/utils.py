@@ -129,6 +129,31 @@ class MALWrapper(object):
 		dict = json.load(res)
 		return dict
 	@staticmethod
+	def getGroupsList(animeId, animeTitle):
+		"""Returns a list of tuples in the following form
+				[('GroupName', 'details'), ('GroupName', 'details'), ('GroupName', None)]
+		"""
+		url = 'http://myanimelist.net/anime/' + str(animeId) + '/' + animeTitle + '/characters' ##Anime only?
+		c = urllib2.urlopen(url).read().replace("'+'", '').replace("' + '", '')
+		bs = BeautifulSoup(c)
+
+		smalls = []
+		for div in bs.findAll('div'):
+			if div.get('class') == ['spaceit_pad']:
+				smalls.append(div.findAll('small'))
+
+		x = []
+		for tags in smalls:
+			if len(tags) != 0:
+				if tags[0].getText() == 'Main': continue
+
+			if len(tags) > 1:
+				x.append((tags[0].getText(), tags[1].getText()))
+			elif len(tags) == 1:
+				x.append((tags[0].getText(), None))
+
+		return x
+	@staticmethod
 	def getCharacterList(animeId, animeTitle, stype):
 		if not stype in ['anime', 'manga']:
 			raise TypeError('second parameter must be either "anime" or "manga"')
