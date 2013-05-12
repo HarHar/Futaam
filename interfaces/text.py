@@ -432,7 +432,7 @@ def main(argv):
 							s = h.status()
 
 							state_str = ['queued', 'checking', 'downloading metadata', \
-									'downloading', 'finished', 'seeding', 'allocating']
+									'downloading', 'finished', 'seeding', 'allocating', 'checking resume data']
 							sys.stdout.write('\r\x1b[K%.2f%% complete (down: %.1f kb/s up: %.1f kB/s peers: %d) %s' % \
 									(s.progress * 100, s.download_rate / 1000, s.upload_rate / 1000, \
 									s.num_peers, state_str[s.state]))
