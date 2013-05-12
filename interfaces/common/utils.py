@@ -79,6 +79,7 @@ def HTMLEntitiesToUnicode(text):
 class NyaaWrapper(object):
 	def search(self, term):
 		results = []
+		term = quote(term)
 
 		rss = minidom.parse(urlopen("http://www.nyaa.eu/?page=rss&term="+term))
 		items = rss.getElementsByTagName('item')
