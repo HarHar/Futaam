@@ -145,7 +145,7 @@ class MALWrapper(object):
 		x = []
 		for tags in smalls:
 			if len(tags) != 0:
-				if tags[0].getText() == 'Main': continue
+				if tags[0].getText().startswith('[') == False or tags[0].getText().endswith(']') == False: continue
 
 			if len(tags) > 1:
 				x.append((tags[0].getText(), tags[1].getText()))
