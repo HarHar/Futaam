@@ -14,6 +14,14 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+try:
+  import readline
+except ImportError:
+  print "Module readline unavailable."
+else:
+  import rlcompleter
+  readline.parse_and_bind("tab: complete")
+
 from interfaces.common import *
 import os
 import sys
