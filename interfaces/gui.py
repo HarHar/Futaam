@@ -64,6 +64,8 @@ class TableModel(QtCore.QAbstractTableModel):
 	def headerData(self, column, orientation, role = QtCore.Qt.DisplayRole):
 		if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
 			return QtCore.QVariant(self.headers[column])
+		if orientation == QtCore.Qt.Vertical and role == QtCore.Qt.DisplayRole:
+			return QtCore.QVariant(" ")
 		return QtCore.QVariant()
 
 	def rowCount(self, parent = QtCore.QModelIndex()):
@@ -422,6 +424,9 @@ def reloadTable():
 def openReadme():
 	QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://github.com/HarHar/Futaam#futaam"))
 
+def dragSwap(logicalIndex, originalIndex, newIndex):
+	doSwap(logicalIndex, newIndex)
+
 def main(argv):
 	global model
 	global ui
@@ -472,7 +477,6 @@ def main(argv):
 		print colors.fail + 'No database file specified' + colors.default
 		help()
 		sys.exit(1)
-
 	if host == '':
 		dbs = []
 		for fn in dbfile:
@@ -497,6 +501,8 @@ def main(argv):
 		dbfile = ['']
 	model.load_db(dbfile[0], dbs[0])
 	ui.tableView.setModel(model)
+	rowHeader = ui.tableView.verticalHeader()
+	rowHeader.setMovable(True)
 	reloadTable()
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
@@ -511,7 +517,7 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionNew, QtCore.SIGNAL("triggered()"), showNewDbDialog)
 	QtCore.QObject.connect(ui.actionStats, QtCore.SIGNAL("triggered()"), showStatsDialog)
 	QtCore.QObject.connect(ui.actionReadme, QtCore.SIGNAL("triggered()"), openReadme)
-
+	QtCore.QObject.connect(rowHeader, QtCore.SIGNAL("sectionMoved(int, int, int)"), dragSwap)
 	exit(app.exec_())
 
 def help():
