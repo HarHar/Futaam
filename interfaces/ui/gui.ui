@@ -55,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>960</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -63,7 +63,6 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionStats"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionQuit"/>
@@ -76,7 +75,6 @@
     <addaction name="actionDelete_Entry"/>
     <addaction name="actionEdit_Entry"/>
     <addaction name="actionSwap_Entries"/>
-    <addaction name="actionViewDetails"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -85,8 +83,16 @@
     <addaction name="actionAbout_Futaam"/>
     <addaction name="actionReadme"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionStats"/>
+    <addaction name="actionViewDetails"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
@@ -131,7 +137,7 @@
   </action>
   <action name="actionViewDetails">
    <property name="text">
-    <string>View Details</string>
+    <string>Entry Details</string>
    </property>
   </action>
   <action name="actionNew">
@@ -141,7 +147,7 @@
   </action>
   <action name="actionStats">
    <property name="text">
-    <string>View Database Stats</string>
+    <string>Database Stats</string>
    </property>
   </action>
   <action name="actionReadme">
