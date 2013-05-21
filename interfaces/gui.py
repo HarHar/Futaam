@@ -117,7 +117,7 @@ class AddEntryDialog(QtGui.QDialog):
 		else:
 			search_results = utils.MALWrapper.search(title, "manga")
 		for result in search_results:
-			self.resultSelect.addItem(str(result["title"]))
+			self.resultSelect.addItem(unicode(result["title"]))
 		self.results = search_results
 
 	def resultChanged(self, index):
@@ -151,7 +151,7 @@ class AddEntryDialog(QtGui.QDialog):
 				eps = result['chapters']
 				am = "manga"
 		else:
-			eps = episodesBox.values()
+			eps = self.ui.episodesBox.value()
 			am = "anime"
 		doAdd(result, obs, statusIndex, eps, genres, am)
 		self.done(0)
@@ -399,7 +399,7 @@ def doEdit(index, title, obs, status, eps, genre):
 	# NOTE: The string we've gotten back from Qt
 	# functions are QStrings and need to be converted
 	# back into regular ones before we can save them
-	entry['name'] = str(title)
+	entry['name'] = unicode(title)
 	entry['obs'] = str(obs)
 	entry['lastwatched'] = str(eps)
 	entry['status']= model.cbIndexToStatus(status)
