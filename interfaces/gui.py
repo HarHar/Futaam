@@ -112,6 +112,8 @@ class AddEntryDialog(QtGui.QDialog):
 	def populateCB(self):
 		self.resultSelect.clear()
 		title = self.ui.titleLine.text()
+		if title == "":
+			return
 		if self.ui.animeButton.isChecked():
 			search_results = utils.MALWrapper.search(title, "anime")
 		else:
