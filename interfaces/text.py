@@ -224,7 +224,7 @@ def main(argv):
 				print colors.warning + 'No entries found! Use "add" for adding one' + colors.default
 				continue
 			else:
-				for entry in dbs[currentdb].dictionary['items']:
+				for entry in sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id']):
 					rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
@@ -243,6 +243,35 @@ def main(argv):
 				dbs[currentdb].dictionary['items'][x]['id'] = x
 			#######################
 			dbs[currentdb].save()
+		elif cmdsplit[0].lower() in ['s', 'sort']:
+			if len(cmdsplit) != 4:
+				print 'Invalid number of arguments'
+				print 'Must be:'
+				print '	(s)ort [(s)wap/(m)ove] [index] [index]'
+				print ''
+				print 'When moving, first index should be "from entry" and second index should be "to entry"'
+				continue
+
+			if (cmdsplit[2].isdigit() == False) or (cmdsplit[3].isdigit() == False):
+				print colors.fail + 'Indexes must be digits' + colors.default
+				continue
+
+			if cmdsplit[1].lower() in ['swap', 's']:
+				#Change ids
+				dbs[currentdb].dictionary['items'][int(cmdsplit[2])]['id'] = int(cmdsplit[3])
+				dbs[currentdb].dictionary['items'][int(cmdsplit[3])]['id'] = int(cmdsplit[2])
+
+				#Re-sort
+				dbs[currentdb].dictionary['items'] = sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id'])
+
+				#Save
+				dbs[currentdb].save()
+			elif cmdsplit[1].lower() in ['move', 'm']:
+				raise NotImplementedError('be patient bitch')
+			else:
+				print colors.warning + 'Usage: (s)ort [(s)wap/(m)ove] [index] [index]' + colors.default
+				continue
+			
 		elif cmdsplit[0].lower() in ['info', 'i']:
 			entry = pickEntry(args, dbs[currentdb])
 			if entry == None: continue
