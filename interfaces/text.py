@@ -196,6 +196,7 @@ def main(argv):
 			print '\tinfo or i\t\t - shows information on an entry'
 			print '\toinfo or o\t\t - shows online information on an entry (if given entry number) or name'
 			print '\tnyaa or n\t\t - searches nyaa.eu for torrent of an entry (if given entry number) or name'
+			print '\tsort or s\t\t - swaps or moves entries around'
 			print ''
 		elif cmdsplit[0].lower() in ['setdbtype', 'dbtype', 'type']:
 			if dbs[currentdb].host != '':
