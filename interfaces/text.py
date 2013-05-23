@@ -257,7 +257,7 @@ def main(argv):
 				continue
 
 			if cmdsplit[1].lower() in ['swap', 's']:
-				#Change ids
+				#Swap ids
 				dbs[currentdb].dictionary['items'][int(cmdsplit[2])]['id'] = int(cmdsplit[3])
 				dbs[currentdb].dictionary['items'][int(cmdsplit[3])]['id'] = int(cmdsplit[2])
 
@@ -267,7 +267,18 @@ def main(argv):
 				#Save
 				dbs[currentdb].save()
 			elif cmdsplit[1].lower() in ['move', 'm']:
-				raise NotImplementedError('be patient bitch')
+				#Fool ids
+				dbs[currentdb].dictionary['items'][int(cmdsplit[2])]['id'] = float(str(int(cmdsplit[3])) + '.9')
+
+				#Re-sort
+				dbs[currentdb].dictionary['items'] = sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id'])
+
+				#Rebuild ids now that we have them in order
+				for x in xrange(0, dbs[currentdb].dictionary['count']):
+					dbs[currentdb].dictionary['items'][x]['id'] = x
+
+				#Save
+				dbs[currentdb].save()
 			else:
 				print colors.warning + 'Usage: (s)ort [(s)wap/(m)ove] [index] [index]' + colors.default
 				continue
