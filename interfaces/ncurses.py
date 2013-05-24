@@ -646,6 +646,7 @@ class if_ncurses(object):
 			self.screen.refresh()
 			utils.showImage(info['image_url'])
 			self.screen.border()
+			self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 
 
 	def drawinfo(self):
@@ -663,6 +664,7 @@ class if_ncurses(object):
 				info['synopsis'] = utils.remove_html_tags(info['synopsis'])
 				info['synopsis'] = info['synopsis'].replace('\n', ' | ')
 				self.screen.border()
+				self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 			except urllib2.HTTPError, info:
 				self.screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
 				return
