@@ -22,13 +22,57 @@ import threading
 from interfaces.common import *
 import locale
 import urllib2
-locale.setlocale(locale.LC_ALL,"")
 from time import sleep as sleep
 
+locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
 MAL = utils.MALWrapper()
 
 class if_ncurses(object):
+	##These functions must come first
+	def get_terminal_size(self, fd=1):
+	    """
+	    Returns height and width of current terminal. First tries to get
+	    size via termios.TIOCGWINSZ, then from environment. Defaults to 25
+	    lines x 80 columns if both methods fail.
+	    :param fd: file descriptor (default: 1=stdout)
+	    """
+	    try:
+	        import fcntl, termios, struct
+	        hw = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+	    except:
+	        try:
+	            hw = (os.environ['LINES'], os.environ['COLUMNS'])
+	        except:  
+	            hw = (25, 80)
+	 
+	    return hw
+
+	def get_terminal_height(self, fd=1):
+	    """
+	    Returns height of terminal if it is a tty, 999 otherwise
+	    :param fd: file descriptor (default: 1=stdout)
+	    """
+	    if os.isatty(fd):
+	        height = self.get_terminal_size(fd)[0]
+	    else:
+	        height = 999
+	 
+	    return height
+ 
+	def get_terminal_width(self, fd=1):
+	    """
+	    Returns width of terminal if it is a tty, 999 otherwise
+	 
+	    :param fd: file descriptor (default: 1=stdout)
+	    """
+	    if os.isatty(fd):
+	        width = self.get_terminal_size(fd)[1]
+	    else:
+	        width = 999
+	 
+	    return width
+
 	def __init__(self, argv):
 		self.curitem = 0
 		self.dbfile = []
@@ -88,6 +132,8 @@ class if_ncurses(object):
 			self.currentdb = 0
 
 		self.showing = []
+		self.range_min = 0
+		self.range_max = self.get_terminal_height()
 		self.screen = curses.initscr()
 		self.screen.keypad(1)
 		curses.cbreak()
@@ -184,52 +230,45 @@ class if_ncurses(object):
 
 				self.curitem = target
 				self.redraw()
-				self.drawitems()				
+				self.drawitems()
+			elif x == curses.KEY_F5:
+				#Move up
+				if self.curitem == 0:
+					continue
+
+				self.dbs[self.currentdb].dictionary['items'][self.curitem]['id'] = self.curitem - 1
+				self.dbs[self.currentdb].dictionary['items'][self.curitem - 1]['id'] = self.curitem
+				self.dbs[self.currentdb].dictionary['items'] = sorted(self.dbs[self.currentdb].dictionary['items'], key=lambda x: x['id'])
+				self.dbs[self.currentdb].save()
+
+				self.showing[self.curitem - self.range_min]['id'] = self.curitem - 1
+				self.showing[(self.curitem - self.range_min) - 1]['id'] = self.curitem
+				self.showing = sorted(self.showing, key=lambda x: x['id'])
+
+				self.curitem = self.curitem - 1
+				self.redraw()
+				self.drawitems()
+			elif x == curses.KEY_F6:
+				#Move down
+				if self.curitem == len(self.dbs[self.currentdb].dictionary['items']):
+					continue
+
+				self.dbs[self.currentdb].dictionary['items'][self.curitem]['id'] = self.curitem + 1
+				self.dbs[self.currentdb].dictionary['items'][self.curitem + 1]['id'] = self.curitem
+				self.dbs[self.currentdb].dictionary['items'] = sorted(self.dbs[self.currentdb].dictionary['items'], key=lambda x: x['id'])
+				self.dbs[self.currentdb].save()
+
+				self.showing[self.curitem - self.range_min]['id'] = self.curitem + 1
+				self.showing[(self.curitem - self.range_min) + 1]['id'] = self.curitem
+				self.showing = sorted(self.showing, key=lambda x: x['id'])
+
+				self.curitem = self.curitem + 1
+				self.redraw()
+				self.drawitems()
 			else:
 				pass
 				#self.screen.addstr(10, 10, str(x))		
-	def get_terminal_size(self, fd=1):
-	    """
-	    Returns height and width of current terminal. First tries to get
-	    size via termios.TIOCGWINSZ, then from environment. Defaults to 25
-	    lines x 80 columns if both methods fail.
-	    :param fd: file descriptor (default: 1=stdout)
-	    """
-	    try:
-	        import fcntl, termios, struct
-	        hw = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
-	    except:
-	        try:
-	            hw = (os.environ['LINES'], os.environ['COLUMNS'])
-	        except:  
-	            hw = (25, 80)
-	 
-	    return hw
 
-	def get_terminal_height(self, fd=1):
-	    """
-	    Returns height of terminal if it is a tty, 999 otherwise
-	    :param fd: file descriptor (default: 1=stdout)
-	    """
-	    if os.isatty(fd):
-	        height = get_terminal_size(fd)[0]
-	    else:
-	        height = 999
-	 
-	    return height
- 
-	def get_terminal_width(self, fd=1):
-	    """
-	    Returns width of terminal if it is a tty, 999 otherwise
-	 
-	    :param fd: file descriptor (default: 1=stdout)
-	    """
-	    if os.isatty(fd):
-	        width = get_terminal_size(fd)[1]
-	    else:
-	        width = 999
-	 
-	    return width
 	def addEntry(self):
 		self.redraw(True)
 		self.screen.addstr(2, 2, 'Press A for anime')
@@ -516,10 +555,16 @@ class if_ncurses(object):
 			if self.curitem > (terminalsize[0]-5):
 				if direction == 0:
 					self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem-terminalsize[0]+5:self.curitem+1]
+					self.range_min = self.curitem-terminalsize[0]+5
+					self.range_max = self.curitem+1
 				elif direction == 1: #UP
 					self.showing = self.dbs[self.currentdb].dictionary['items'][self.curitem:terminalsize[0]+self.curitem-5]
+					self.range_min = self.curitem
+					self.range_max = terminalsize[0]+self.curitem-5
 			else:
 				self.showing = self.dbs[self.currentdb].dictionary['items'][:terminalsize[0]-4]
+				self.range_min = 0
+				self.range_max = terminalsize[0]-4
 
 
 		for entry in self.showing:
