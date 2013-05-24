@@ -161,7 +161,7 @@ class if_ncurses(object):
 				curses.curs_set(1)
 				curses.endwin()
 			
-			if x == curses.KEY_RESIZE: self.redraw(); self.drawitems(); continue
+			if x == curses.KEY_RESIZE: self.showing = []; self.range_min = 0; self.range_max = 0; self.redraw(); self.drawitems(); continue
 
 			if x == ord('q') or x == ord('Q') or x == 27:
 				curses.endwin()
