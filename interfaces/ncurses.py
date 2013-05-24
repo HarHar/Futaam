@@ -146,7 +146,8 @@ class if_ncurses(object):
 		curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 		curses.init_pair(5, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
 
-		self.footer = '[Q]uit / [D]elete / [E]dit / [A]dd / [S]ynopsis / [I]mage'
+		#self.footer = '[Q]uit / [D]elete / [E]dit / [A]dd / [S]ynopsis / [I]mage'
+		self.footer = '[Q]uit / [H]elp'
 		self.f2 = self.footer
 
 		self.redraw()
@@ -166,6 +167,25 @@ class if_ncurses(object):
 			if x == ord('q') or x == ord('Q') or x == 27:
 				curses.endwin()
 				sys.exit(0)
+			if x == ord('h') or x == ord('H'):
+				if self.get_terminal_height() < 13:
+					self.alert('Screen too small')
+				else:
+					self.redraw(True)
+					self.screen.addstr(2, 1, '[Q]uit', curses.color_pair(4))
+					self.screen.addstr(3, 1, '[D]elete', curses.color_pair(4))
+					self.screen.addstr(4, 1, '[E]dit', curses.color_pair(4))
+					self.screen.addstr(5, 1, '[A]dd', curses.color_pair(4))
+					self.screen.addstr(6, 1, '[S]ynopsis', curses.color_pair(4))
+					self.screen.addstr(7, 1, '[I]mage', curses.color_pair(4))
+					self.screen.addstr(9, 1, '[F5] Move up', curses.color_pair(4))
+					self.screen.addstr(10, 1, '[F6] Move down', curses.color_pair(4))
+
+					self.screen.addstr(self.get_terminal_height() - 2, 1, 'Press any key to go back', curses.color_pair(4))
+					self.screen.getch()
+
+				self.redraw()
+				self.drawitems()
 			elif x == ord('S') or x == ord('s'):
 				self.drawinfo()
 				continue
