@@ -178,8 +178,8 @@ class if_ncurses(object):
 					self.screen.addstr(5, 1, '[A]dd', curses.color_pair(4))
 					self.screen.addstr(6, 1, '[S]ynopsis', curses.color_pair(4))
 					self.screen.addstr(7, 1, '[I]mage', curses.color_pair(4))
-					self.screen.addstr(9, 1, '[F5] Move up', curses.color_pair(4))
-					self.screen.addstr(10, 1, '[F6] Move down', curses.color_pair(4))
+					self.screen.addstr(9, 1, '[F5] Move highlighted entry up', curses.color_pair(4))
+					self.screen.addstr(10, 1, '[F6] Move highlighted entry down', curses.color_pair(4))
 
 					self.screen.addstr(self.get_terminal_height() - 2, 1, 'Press any key to go back', curses.color_pair(4))
 					self.screen.getch()
