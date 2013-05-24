@@ -270,7 +270,7 @@ class if_ncurses(object):
 				self.drawitems()
 			elif x == curses.KEY_F6:
 				#Move down
-				if self.curitem == len(self.dbs[self.currentdb].dictionary['items']):
+				if self.curitem >= len(self.dbs[self.currentdb].dictionary['items']) -1:
 					continue
 
 				self.dbs[self.currentdb].dictionary['items'][self.curitem]['id'] = self.curitem + 1
