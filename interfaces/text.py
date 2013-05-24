@@ -269,7 +269,7 @@ def main(argv):
 				dbs[currentdb].save()
 			elif cmdsplit[1].lower() in ['move', 'm']:
 				#Fool ids
-				dbs[currentdb].dictionary['items'][int(cmdsplit[2])]['id'] = float(str(int(cmdsplit[3])) + '.9')
+				dbs[currentdb].dictionary['items'][int(cmdsplit[2])]['id'] = float(str(int(cmdsplit[3])-1) + '.5')
 
 				#Re-sort
 				dbs[currentdb].dictionary['items'] = sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id'])

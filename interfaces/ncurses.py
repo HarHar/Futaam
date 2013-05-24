@@ -178,6 +178,7 @@ class if_ncurses(object):
 					self.screen.addstr(5, 1, '[A]dd', curses.color_pair(4))
 					self.screen.addstr(6, 1, '[S]ynopsis', curses.color_pair(4))
 					self.screen.addstr(7, 1, '[I]mage', curses.color_pair(4))
+					#purposefully skip one
 					self.screen.addstr(9, 1, '[F5] Move highlighted entry up', curses.color_pair(4))
 					self.screen.addstr(10, 1, '[F6] Move highlighted entry down', curses.color_pair(4))
 
@@ -549,7 +550,6 @@ class if_ncurses(object):
 				self.screen.addstr(line, 25, u'│'.encode('utf-8'))
 
 			self.screen.addstr(terminalsize[0]-2, 1, self.footer)
-		self.screen.refresh()
 
 	def drawitems(self, noSidePanel=False, direction=0):
 		terminalsize = self.get_terminal_size()
