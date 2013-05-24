@@ -633,7 +633,10 @@ class if_ncurses(object):
 	def sI(self):		
 		if self.dbs[self.currentdb].dictionary['items'][self.curitem].get('aid') != None:
 			try:
+				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching URL... Please wait', curses.color_pair(5))
+				self.screen.refresh()
 				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], self.dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
+				self.screen.border()
 			except urllib2.HTTPError, info:
 				self.alert('Error: ' + str(info), 2)
 				self.redraw()
@@ -642,6 +645,7 @@ class if_ncurses(object):
 			self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
 			self.screen.refresh()
 			utils.showImage(info['image_url'])
+			self.screen.border()
 
 
 	def drawinfo(self):
