@@ -652,6 +652,8 @@ class if_ncurses(object):
 		if self.dbs[self.currentdb].dictionary['items'][self.curitem].get('aid') != None:
 			try:
 				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], self.dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
+				info['synopsis'] = utils.remove_html_tags(info['synopsis'])
+				info['synopsis'] = info['synopsis'].replace('\n', ' | ')
 			except urllib2.HTTPError, info:
 				self.screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
 				return
