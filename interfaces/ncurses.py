@@ -639,6 +639,8 @@ class if_ncurses(object):
 				self.redraw()
 				self.drawitems()
 				return
+			self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
+			self.screen.refresh()
 			utils.showImage(info['image_url'])
 
 
@@ -651,9 +653,12 @@ class if_ncurses(object):
 		n = 0
 		if self.dbs[self.currentdb].dictionary['items'][self.curitem].get('aid') != None:
 			try:
+				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching synopsis... Please wait', curses.color_pair(5))
+				self.screen.refresh()
 				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], self.dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
 				info['synopsis'] = utils.remove_html_tags(info['synopsis'])
 				info['synopsis'] = info['synopsis'].replace('\n', ' | ')
+				self.screen.border()
 			except urllib2.HTTPError, info:
 				self.screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
 				return
