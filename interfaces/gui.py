@@ -249,9 +249,13 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.genreLine.setText(genres[:-1])
 		self.ui.statusLine.setText(details['status'].title())
 		self.ui.malRank.setText(str(details['rank']))
-		self.ui.summaryText.setPlainText(utils.remove_html_tags(details['synopsis']))
+		self.ui.summaryText.setPlainText(utils.HTMLEntitiesToUnicode(
+		utils.remove_html_tags(details['synopsis'])))
 		self.ui.dateLine.setText(details['start_date'][:10])
-		self.ui.endDate.setText(details['end_date'][:10])
+		if details['end_date'] == None:
+			self.ui.endDate.setText("Unknown")
+		else:
+			self.ui.endDate.setText(details['end_date'][:10])
 		if details['type'] == u'Movie':
 			self.ui.typeLine.setText("Feature Film")
 		elif details['type'] == u'TV':
