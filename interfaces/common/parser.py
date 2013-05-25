@@ -74,11 +74,9 @@ class Parser(object):
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
-			sleep(0.6)
 			self.sock.sendall(hashlib.sha256(password).hexdigest())
 			rc = self.sock.recv(1024)
 			if rc == 'OK':
-				sleep(1)
 				cmd = {'cmd': 'pull', 'args': ''}
 				self.sock.sendall(json.dumps(cmd) + chr(4))
 
@@ -135,7 +133,7 @@ class Parser(object):
 			f.close()
 		else:
 			self.sock.sendall(json.dumps({'cmd': 'push', 'args': json.dumps(self.dictionary)}) + chr(4)) #jsonception
-			sleep(0.5)
+			sleep(0.2)
 			self.sock.sendall(json.dumps({'cmd': 'save'}) + chr(4))
 
 		if self.ircHook:
