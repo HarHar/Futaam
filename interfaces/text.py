@@ -297,7 +297,7 @@ def main(argv):
 			 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
 
 			for k in toprint:
-				print colors.bold + '<' + k + '>' + colors.default + ' ' + str(toprint[k])
+				print colors.bold + '<' + k + '>' + colors.default + ' ' + unicode(toprint[k])
 
 		elif cmdsplit[0].lower() in ['edit', 'e']:
 			#INTRO I
