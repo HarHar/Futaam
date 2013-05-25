@@ -250,8 +250,12 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.statusLine.setText(details['status'].title())
 		self.ui.malRank.setText(str(details['rank']))
 		self.ui.summaryText.setPlainText(utils.HTMLEntitiesToUnicode(
-		utils.remove_html_tags(details['synopsis'])))
+			utils.remove_html_tags(details['synopsis'])))
 		self.ui.dateLine.setText(details['start_date'][:10])
+		if len(details['prequels']) == 0:
+			self.ui.parentStoryLine.setText("None")
+		else:
+			self.ui.parentStoryLine.setText(details['prequels'][0]['title'])
 		if details['end_date'] == None:
 			self.ui.endDate.setText("Unknown")
 		else:
@@ -265,7 +269,7 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.pictureLabel.setText("")
 		if os.path.exists(".temp"):
 			os.remove(".temp")
-		x=open(".temp", "w")
+		x = open(".temp", "w")
 		x.write(urllib2.urlopen(details['image_url']).read())
 		x.close()
 		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='223' align='right' />")

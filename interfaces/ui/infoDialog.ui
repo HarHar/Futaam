@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
-    <height>489</height>
+    <width>581</width>
+    <height>484</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <widget class="QPushButton" name="closeButton">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>480</x>
      <y>450</y>
      <width>88</width>
      <height>27</height>
@@ -40,7 +40,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>601</width>
+     <width>561</width>
      <height>431</height>
     </rect>
    </property>
@@ -256,6 +256,37 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Parent Story:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="parentStoryLine">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QLabel" name="label_3">
@@ -317,6 +348,8 @@
     </item>
    </layout>
   </widget>
+  <zorder>verticalLayoutWidget</zorder>
+  <zorder>closeButton</zorder>
  </widget>
  <resources/>
  <connections/>
