@@ -26,8 +26,8 @@ port = 8500
 dbs = []
 
 class TableModel(QtCore.QAbstractTableModel):
-	def __init__(self):
-		super(TableModel, self).__init__()
+	def __init__(self, parent=None):
+		QtCore.QAbstractTableModel.__init__(self, parent)
 		self.animeList = []
 		self.headers = ["Title","Genres","Status","Watched","Observations"]
 		self.active_file = ""
@@ -340,7 +340,7 @@ class DbStatsDialog(QtGui.QDialog):
 
 def showOpenDbDialog():
 	global model
-	filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
+	filename = QtGui.QFileDialog.getOpenFileName(ui.centralwidget, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 	if filename != None:
 		model = TableModel()
 		model.load_db(filename, parser.Parser(filename))
@@ -420,7 +420,7 @@ def doEdit(index, title, obs, status, eps, genre):
 def reloadTable():
 	global model
 	filename = model.active_file
-	model = TableModel()
+	model = TableModel(parent=ui.centralwidget)
 	if host == '':
 		model.load_db(filename, parser.Parser(dbfile[0]))
 	else:
@@ -465,7 +465,7 @@ def main(argv):
 			if len(argv) <= i:
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)
-			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
+			elif argv[i+1].startswith('--') or test[i+1].isdigit() == False:
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)	
 			else:
@@ -504,7 +504,7 @@ def main(argv):
 	ui = uic.loadUi("./interfaces/ui/gui.ui")
 	ui.show()
 
-	model = TableModel()
+	model = TableModel(parent=ui.centralwidget)
 	if len(argv) == 0:
 		help()
 	if len(dbfile) == 0 and len(dbs) > 0:
