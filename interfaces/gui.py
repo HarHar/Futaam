@@ -465,7 +465,7 @@ def main(argv):
 			if len(argv) <= i:
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)
-			elif argv[i+1].startswith('--') or test[i+1].isdigit() == False:
+			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
 				print colors.fail + 'Missing port' + colors.default
 				sys.exit(1)	
 			else:
