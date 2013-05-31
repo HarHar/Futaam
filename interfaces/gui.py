@@ -393,7 +393,11 @@ def doAdd(malInfo, obs, statusIndex, eps, genres, am):
 		model.db.dictionary['count'] += 1
 	except:
 		model.db.dictionary['count'] = 1
-	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 'aid': malInfo['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title'])), 'genre': str(genres), 'status': status, 'lastwatched': eps, 'obs': str(obs)})
+	title = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title']))
+	title = title.replace("&amp;", "&")
+	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 
+		'aid': malInfo['id'], 'name': title, 'genre': str(genres), 'status': status,
+		'lastwatched': eps, 'obs': str(obs)})
 	model.rebuildIds()
 	reloadTable()
 
