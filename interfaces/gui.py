@@ -219,16 +219,17 @@ class EditEntryDialog(QtGui.QDialog):
 			self.ui.genreLine.text())
 
 class EntryInfoDialog(QtGui.QDialog):
-	def __init__(self, parent=None, names=None, entries=None):
+	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
 		self.ui = uic.loadUi("./interfaces/ui/infoDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
+		self.ui.entrySelect.setCurrentIndex(index)
 		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.removeTempAndClose)
 		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.fillEntries)
-		self.fillEntries()
+		self.fillEntries(index)
 
 	def removeTempAndClose(self):
 		try:
@@ -372,6 +373,10 @@ def showEditEntryDialog():
 
 def showInfoDialog():
 	dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
+	dialog.exec_()
+
+def showInfoDialog_preselected(index):
+	dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'], index=index.row())
 	dialog.exec_()
 
 def showNewDbDialog():
@@ -531,6 +536,7 @@ def main(argv):
 	QtCore.QObject.connect(ui.actionNew, QtCore.SIGNAL("triggered()"), showNewDbDialog)
 	QtCore.QObject.connect(ui.actionStats, QtCore.SIGNAL("triggered()"), showStatsDialog)
 	QtCore.QObject.connect(ui.actionReadme, QtCore.SIGNAL("triggered()"), openReadme)
+	QtCore.QObject.connect(ui.tableView, QtCore.SIGNAL("doubleClicked(QModelIndex)"), showInfoDialog_preselected)
 	QtCore.QObject.connect(rowHeader, QtCore.SIGNAL("sectionMoved(int, int, int)"), dragSwap)
 	exit(app.exec_())
 
