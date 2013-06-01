@@ -273,7 +273,9 @@ class EntryInfoDialog(QtGui.QDialog):
 		x = open(".temp", "w")
 		x.write(urllib2.urlopen(details['image_url']).read())
 		x.close()
-		self.ui.pictureLabel.setText("<img src='.temp' width='175' height='223' align='right' />")
+		self.ui.pictureLabel.setText("<img src='.temp' width='225' height='350' align='right' />")
+		self.ui.pictureLabel.setScaledContents(True)
+
 
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
