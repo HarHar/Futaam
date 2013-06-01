@@ -441,6 +441,7 @@ def reloadTable():
 		model.load_db(filename, parser.Parser(host=host, port=port, password=password))
 	ui.tableView.setModel(model)
 	ui.tableView.resizeColumnsToContents()
+	ui.tableView.verticalHeader().setResizeMode(QtGui.QHeaderView.ResizeToContents)
 
 def openReadme():
 	QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://github.com/HarHar/Futaam#futaam"))
