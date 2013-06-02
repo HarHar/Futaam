@@ -94,6 +94,48 @@ class TableModel(QtCore.QAbstractTableModel):
 			self.db.dictionary['items'][x]['id'] = x
 		self.db.save()
 
+	def addEntry(self, malInfo, obs, statusIndex, eps, genres, am):
+		status = self.cbIndexToStatus(statusIndex)
+		try:
+			self.db.dictionary['count'] += 1
+		except:
+			self.db.dictionary['count'] = 1
+		title = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title']))
+		title = title.replace("&amp;", "&")
+		self.db.dictionary['items'].append({'id': self.db.dictionary['count'], 'type': am, 
+			'aid': malInfo['id'], 'name': title, 'genre': str(genres), 'status': status,
+			'lastwatched': eps, 'obs': str(obs)})
+		self.rebuildIds()
+		reloadTable()
+
+	def deleteEntry(self, index):
+		entry = self.db.dictionary['items'][index]
+		self.db.dictionary['items'].remove(entry)
+		self.db.dictionary['count'] -= 1
+		self.rebuildIds()
+		reloadTable()
+
+	def editEntry(self, index, title, obs, status, eps, genre):
+		entry = self.db.dictionary['items'][index]
+		# NOTE: The string we've gotten back from Qt
+		# functions are QStrings and need to be converted
+		# back into regular ones before we can save them
+		entry['name'] = unicode(title)
+		entry['obs'] = str(obs)
+		entry['lastwatched'] = str(eps)
+		entry['status']= model.cbIndexToStatus(status)
+		entry['genre'] = str(genre)
+		self.db.save()
+		reloadTable()
+
+	def swapEntries(self, index1, index2):
+		entry1 = self.db.dictionary['items'][index1]
+		entry2 = self.db.dictionary['items'][index2]
+		self.db.dictionary['items'][index1] = entry2
+		self.db.dictionary['items'][index2] = entry1
+		self.rebuildIds()
+		self.db.save()
+		reloadTable()
 
 class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
@@ -155,7 +197,7 @@ class AddEntryDialog(QtGui.QDialog):
 		else:
 			eps = self.ui.episodesBox.value()
 			am = "anime"
-		doAdd(result, obs, statusIndex, eps, genres, am)
+		model.addEntry(result, obs, statusIndex, eps, genres, am)
 		self.done(0)
 
 class DeleteEntryDialog(QtGui.QDialog):
@@ -169,7 +211,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 
 	def delete(self):
-		doDelete(self.ui.selectBox.currentIndex())
+		model.deleteEntry(self.ui.selectBox.currentIndex())
 		self.done(0)
 
 class SwapEntryDialog(QtGui.QDialog):
@@ -188,7 +230,7 @@ class SwapEntryDialog(QtGui.QDialog):
 		entry2 = self.selectBox2.currentIndex()
 		if entry1 == entry2:
 			self.done(0)
-		doSwap(entry1, entry2)
+		model.swapEntries(entry1, entry2)
 		self.done(0)
 
 class EditEntryDialog(QtGui.QDialog):
@@ -214,7 +256,7 @@ class EditEntryDialog(QtGui.QDialog):
 		self.ui.genreLine.setText(self.currentEntry['genre'])
 
 	def edit(self):
-		doEdit(self.index, self.ui.titleLine.text(), self.ui.obsLine.text(), 
+		model.editEntry(self.index, self.ui.titleLine.text(), self.ui.obsLine.text(), 
 			self.ui.statusSelect.currentIndex(), self.ui.episodesSelect.value(),
 			self.ui.genreLine.text())
 
@@ -385,49 +427,6 @@ def showNewDbDialog():
 	dialog = NewDbDialog(parent=ui.centralwidget)
 	dialog.exec_()
 
-def doSwap(index1, index2):
-	entry1 = model.db.dictionary['items'][index1]
-	entry2 = model.db.dictionary['items'][index2]
-	model.db.dictionary['items'][index1] = entry2
-	model.db.dictionary['items'][index2] = entry1
-	model.rebuildIds()
-	reloadTable()
-	model.db.save()
-
-def doAdd(malInfo, obs, statusIndex, eps, genres, am):
-	status = model.cbIndexToStatus(statusIndex)
-	try:
-		model.db.dictionary['count'] += 1
-	except:
-		model.db.dictionary['count'] = 1
-	title = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(malInfo['title']))
-	title = title.replace("&amp;", "&")
-	model.db.dictionary['items'].append({'id': model.db.dictionary['count'], 'type': am, 
-		'aid': malInfo['id'], 'name': title, 'genre': str(genres), 'status': status,
-		'lastwatched': eps, 'obs': str(obs)})
-	model.rebuildIds()
-	reloadTable()
-
-def doDelete(index):
-	entry = model.db.dictionary['items'][index]
-	model.db.dictionary['items'].remove(entry)
-	model.db.dictionary['count'] -= 1
-	model.rebuildIds()
-	reloadTable()
-
-def doEdit(index, title, obs, status, eps, genre):
-	entry = model.db.dictionary['items'][index]
-	# NOTE: The string we've gotten back from Qt
-	# functions are QStrings and need to be converted
-	# back into regular ones before we can save them
-	entry['name'] = unicode(title)
-	entry['obs'] = str(obs)
-	entry['lastwatched'] = str(eps)
-	entry['status']= model.cbIndexToStatus(status)
-	entry['genre'] = str(genre)
-	model.db.save()
-	reloadTable()
-
 def reloadTable():
 	global model
 	filename = model.active_file
@@ -447,7 +446,7 @@ def openReadme():
 	QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://github.com/HarHar/Futaam#futaam"))
 
 def dragSwap(logicalIndex, originalIndex, newIndex):
-	doSwap(logicalIndex, newIndex)
+	model.swapEntries(logicalIndex, newIndex)
 
 def main(argv):
 	global model
