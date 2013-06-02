@@ -159,12 +159,13 @@ class AddEntryDialog(QtGui.QDialog):
 		self.done(0)
 
 class DeleteEntryDialog(QtGui.QDialog):
-	def __init__(self, parent = None, names = []):
+	def __init__(self, parent = None, names = [], index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.ui = uic.loadUi("./interfaces/ui/deleteDialog.ui", self)
 		self.ui.show()
 
 		self.selectBox.addItems(names)
+		self.selectBox.setCurrentIndex(index)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.delete)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 
@@ -192,18 +193,19 @@ class SwapEntryDialog(QtGui.QDialog):
 		self.done(0)
 
 class EditEntryDialog(QtGui.QDialog):
-	def __init__(self, parent=None, names=None, entries=None):
+	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
 		self.ui = uic.loadUi("./interfaces/ui/editDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
+		self.ui.entrySelect.setCurrentIndex(index)
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.edit)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 		QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.fillEntries)
-		self.fillEntries()
+		self.fillEntries(index)
 
 	def fillEntries(self, index=0):
 		self.index = index
@@ -449,6 +451,24 @@ def openReadme():
 def dragSwap(logicalIndex, originalIndex, newIndex):
 	doSwap(logicalIndex, newIndex)
 
+def tableMenu(position):
+	menu = QtGui.QMenu()
+	infoAction = menu.addAction("Info")
+	editAction = menu.addAction("Edit")
+	deleteAction = menu.addAction("Delete")
+
+	action = menu.exec_(ui.tableView.mapToGlobal(position))
+	if action == infoAction:
+		dialog = EntryInfoDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'], index=ui.tableView.indexAt(position).row())
+		dialog.exec_()
+	elif action == editAction:
+		dialog = EditEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'], index=ui.tableView.indexAt(position).row())
+		dialog.exec_()
+	elif action == deleteAction:
+		doDelete(ui.tableView.indexAt(position).row)
+
+
+
 def main(argv):
 	global model
 	global ui
@@ -526,6 +546,8 @@ def main(argv):
 	rowHeader = ui.tableView.verticalHeader()
 	rowHeader.setMovable(True)
 	reloadTable()
+	ui.tableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+	ui.tableView.customContextMenuRequested.connect(tableMenu)
 
 	QtCore.QObject.connect(ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
 	QtCore.QObject.connect(ui.actionOpen, QtCore.SIGNAL("triggered()"), showOpenDbDialog)
