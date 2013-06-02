@@ -19,11 +19,16 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
 from interfaces.common import *
+import os, inspect
 
 dbfile = []
 host = ''
 port = 8500
 dbs = []
+
+def curDir():
+	""" HarHar -- nigerrigging since forever """
+	return os.path.dirname(inspect.getsourcefile(curDir)) + os.path.sep
 
 class TableModel(QtCore.QAbstractTableModel):
 	def __init__(self, parent=None):
@@ -141,7 +146,7 @@ class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
 		self.setWindowTitle("Add Entry")
-		self.ui = uic.loadUi("./interfaces/ui/addDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/addDialog.ui", self)
 		self.ui.show()
 		
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
@@ -203,7 +208,7 @@ class AddEntryDialog(QtGui.QDialog):
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = [], index=0):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi("./interfaces/ui/deleteDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/deleteDialog.ui", self)
 		self.ui.show()
 
 		self.selectBox.addItems(names)
@@ -218,7 +223,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 class SwapEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi("./interfaces/ui/swapDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/swapDialog.ui", self)
 		self.ui.show()
 
 		self.ui.selectBox1.addItems(names)
@@ -238,7 +243,7 @@ class EditEntryDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
-		self.ui = uic.loadUi("./interfaces/ui/editDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/editDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
@@ -266,7 +271,7 @@ class EntryInfoDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
-		self.ui = uic.loadUi("./interfaces/ui/infoDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/infoDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
@@ -324,14 +329,14 @@ class EntryInfoDialog(QtGui.QDialog):
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi("./interfaces/ui/aboutDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/aboutDialog.ui", self)
 		self.ui.show()
 		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.close)
 
 class NewDbDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi("./interfaces/ui/newDbDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/newDbDialog.ui", self)
 		self.ui.show()
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.makeNew)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
@@ -355,7 +360,7 @@ class NewDbDialog(QtGui.QDialog):
 class DbStatsDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi("./interfaces/ui/statsDialog.ui", self)
+		self.ui = uic.loadUi(curDir() + "ui/statsDialog.ui", self)
 		self.ui.show()
 
 		self.ui.dbNameLabel.setText(model.db.dictionary["name"])
@@ -532,7 +537,7 @@ def main(argv):
 		currentdb = 0	
 
 	app = QtGui.QApplication(argv)
-	ui = uic.loadUi("./interfaces/ui/gui.ui")
+	ui = uic.loadUi(curDir() + "ui/gui.ui")
 	ui.show()
 
 	model = TableModel(parent=ui.centralwidget)
