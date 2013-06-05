@@ -469,7 +469,7 @@ def tableMenu(position):
 		dialog = EditEntryDialog(parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'], index=ui.tableView.indexAt(position).row())
 		dialog.exec_()
 	elif action == deleteAction:
-		doDelete(ui.tableView.indexAt(position).row)
+		model.deleteEntry(ui.tableView.indexAt(position).row())
 
 
 
