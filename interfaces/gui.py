@@ -460,6 +460,7 @@ def tableMenu(position):
 	infoAction = menu.addAction("Info")
 	editAction = menu.addAction("Edit")
 	deleteAction = menu.addAction("Delete")
+	incrementAction = menu.addAction("Increment Progress")
 
 	action = menu.exec_(ui.tableView.mapToGlobal(position))
 	if action == infoAction:
@@ -470,7 +471,11 @@ def tableMenu(position):
 		dialog.exec_()
 	elif action == deleteAction:
 		model.deleteEntry(ui.tableView.indexAt(position).row())
-
+	elif action == incrementAction:
+		index = ui.tableView.indexAt(position).row()
+		entry = model.db.dictionary['items'][index]
+		newEps = unicode(int(entry['lastwatched']) + 1)
+		model.editEntry(index, entry['name'], entry['obs'], 3, newEps, entry['genre'])
 
 
 def main(argv):
