@@ -23,6 +23,7 @@ Available interfaces:
   * ncurses
   * web
   * remote
+  * irc
 
 Web Interface
 =====
