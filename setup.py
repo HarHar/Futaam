@@ -70,6 +70,17 @@ def get_subpackages():
 
 SUBPACKAGES = get_subpackages()
 
+def get_ui_files():
+	files = []
+	os.chdir("interfaces/ui/")
+	for fileName in os.listdir(os.getcwd()):
+		if fileName[-2:] == "ui":
+			files.append("interfaces/ui/"+fileName)
+	os.chdir("../../")
+	return files
+
+UI_FILES = get_ui_files() 
+
 setup(
     name=NAME,
     version=VERSION,
@@ -79,7 +90,8 @@ setup(
     license="GPL",
     url=URL,
     py_modules=[PACKAGE] + SUBPACKAGES,
-    classifiers=[
+    data_files=[("share/futaam/", UI_FILES)],
+	classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: End Users/Desktop",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

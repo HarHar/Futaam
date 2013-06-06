@@ -146,7 +146,7 @@ class AddEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None):
 		QtGui.QDialog.__init__(self, parent)
 		self.setWindowTitle("Add Entry")
-		self.ui = uic.loadUi(curDir() + "ui/addDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "addDialog.ui", self)
 		self.ui.show()
 		
 		self.ui.statusSelect.addItems(["Watched", "Queued", "Dropped", "Watching", "On Hold"])
@@ -208,7 +208,7 @@ class AddEntryDialog(QtGui.QDialog):
 class DeleteEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = [], index=0):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi(curDir() + "ui/deleteDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "deleteDialog.ui", self)
 		self.ui.show()
 
 		self.selectBox.addItems(names)
@@ -223,7 +223,7 @@ class DeleteEntryDialog(QtGui.QDialog):
 class SwapEntryDialog(QtGui.QDialog):
 	def __init__(self, parent = None, names = []):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi(curDir() + "ui/swapDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "swapDialog.ui", self)
 		self.ui.show()
 
 		self.ui.selectBox1.addItems(names)
@@ -243,7 +243,7 @@ class EditEntryDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
-		self.ui = uic.loadUi(curDir() + "ui/editDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "editDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
@@ -271,7 +271,7 @@ class EntryInfoDialog(QtGui.QDialog):
 	def __init__(self, parent=None, names=None, entries=None, index=0):
 		QtGui.QDialog.__init__(self, parent)
 		self.entries = entries
-		self.ui = uic.loadUi(curDir() + "ui/infoDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "infoDialog.ui", self)
 		self.ui.show()
 
 		self.ui.entrySelect.addItems(names)
@@ -329,14 +329,14 @@ class EntryInfoDialog(QtGui.QDialog):
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi(curDir() + "ui/aboutDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "aboutDialog.ui", self)
 		self.ui.show()
 		QtCore.QObject.connect(self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.close)
 
 class NewDbDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi(curDir() + "ui/newDbDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "newDbDialog.ui", self)
 		self.ui.show()
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.makeNew)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
@@ -360,7 +360,7 @@ class NewDbDialog(QtGui.QDialog):
 class DbStatsDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = uic.loadUi(curDir() + "ui/statsDialog.ui", self)
+		self.ui = uic.loadUi(uiPrefix + "statsDialog.ui", self)
 		self.ui.show()
 
 		self.ui.dbNameLabel.setText(model.db.dictionary["name"])
@@ -481,12 +481,18 @@ def tableMenu(position):
 def main(argv):
 	global model
 	global ui
+	global uiPrefix
 	global dbs
 	global dbfile
 	global port
 	global host
 	colors = utils.colors()
 	colors.enable()
+
+	if os.path.exists("/usr/share/futaam/"):
+		uiPrefix = "/usr/share/futaam/"
+	else:
+		uiPrefix = "/intefaces/ui/"
 
 	ircn = False
 	i = 0
@@ -542,7 +548,7 @@ def main(argv):
 		currentdb = 0	
 
 	app = QtGui.QApplication(argv)
-	ui = uic.loadUi(curDir() + "ui/gui.ui")
+	ui = uic.loadUi(uiPrefix + "gui.ui")
 	ui.show()
 
 	model = TableModel(parent=ui.centralwidget)
