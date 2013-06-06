@@ -492,7 +492,7 @@ def main(argv):
 	if os.path.exists("/usr/share/futaam/"):
 		uiPrefix = "/usr/share/futaam/"
 	else:
-		uiPrefix = "/intefaces/ui/"
+		uiPrefix = curDir() + "/ui/"
 
 	ircn = False
 	i = 0
