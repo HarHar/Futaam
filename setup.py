@@ -33,19 +33,9 @@ except ImportError, e:
 
 from distutils.core import setup
 import os
+import sys
 import stat
 import platform
-
-def cutDot(t, d):
-	out = ''
-	dc = 0
-	for l in t:
-		out += l
-		if l == '.':
-			dc += 1
-		if dc == d:
-			break
-	return out
 
 PACKAGE = "futaam"
 NAME = "Futaam"
@@ -81,6 +71,19 @@ def get_ui_files():
 
 UI_FILES = get_ui_files() 
 
+python_version = platform.python_version_tuple()
+python_version_string = str(python_version[0]) + "." + str(python_version[1])
+prefix = sys.prefix
+
+if python_version[0] >= 2 and python_version[1] >= 6:
+    ## Set file location prefix accordingly
+    prefix = '/usr/local'
+
+for arg in sys.argv:
+    if arg.startswith('--prefix='):
+        prefix = arg[9:]
+        prefix = os.path.expandvars(prefix)
+
 setup(
     name=NAME,
     version=VERSION,
@@ -90,7 +93,7 @@ setup(
     license="GPL",
     url=URL,
     py_modules=[PACKAGE] + SUBPACKAGES,
-    data_files=[("share/futaam/", UI_FILES)],
+    data_files=[(prefix + "/share/futaam/", UI_FILES)],
 	classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: End Users/Desktop",
@@ -99,15 +102,16 @@ setup(
         "Programming Language :: Python",
     ]
 )
+
 if os.name == "nt":
 	print "Adding Futaam to your path"
-	path = "C:\\Python" + cutDot(platform.python_version(), 2).rstrip('.') + "\\Lib\\site-packages\\futaam.py"
+	path = "C:\\Python" + python_version_string + "\\Lib\\site-packages\\futaam.py"
 	os.popen("set PATH=%PATH%;" + path)
 else:
 	print "Putting a symlink to futaam.py in /usr/bin/"
 	try:
-		os.symlink("/usr/lib/python"+ cutDot(platform.python_version(), 2).rstrip('.') +"/site-packages/futaam.py", "/usr/bin/futaam")
+		os.symlink("/usr/lib/python"+ python_version_string +"/site-packages/futaam.py", "/usr/bin/futaam")
 	except:
 		os.remove("/usr/bin/futaam")
-		os.symlink("/usr/lib/python"+ cutDot(platform.python_version(), 2).rstrip('.') +"/site-packages/futaam.py", "/usr/bin/futaam")
+		os.symlink("/usr/lib/python"+ python_version_string +"/site-packages/futaam.py", "/usr/bin/futaam")
 		os.popen("chmod +x /usr/bin/futaam")
