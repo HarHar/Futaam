@@ -491,7 +491,7 @@ def main(argv):
 
 	if os.path.exists("/usr/share/futaam/"):
 		uiPrefix = "/usr/share/futaam/"
-	if os.path.exists("/usr/local/share/futaam"):
+	elif os.path.exists("/usr/local/share/futaam"):
 		uiPrefix = "/usr/local/share/futaam/"
 	else:
 		uiPrefix = curDir() + "/ui/"
