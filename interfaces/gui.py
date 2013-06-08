@@ -489,11 +489,16 @@ def main(argv):
 	colors = utils.colors()
 	colors.enable()
 
-	if os.path.exists("/usr/share/futaam/"):
-		uiPrefix = "/usr/share/futaam/"
-	elif os.path.exists("/usr/local/share/futaam"):
-		uiPrefix = "/usr/local/share/futaam/"
+	uiPrefix = None
+	if os.name == "nt":
+		if os.path.exists(sys.prefix + "\\Scripts\\futaam"):
+			uiPrefix = sys.prefix + "\\Scripts\\futaam\\"
 	else:
+		if os.path.exists("/usr/share/futaam/"):
+			uiPrefix = "/usr/share/futaam/"
+		elif os.path.exists("/usr/local/share/futaam"):
+			uiPrefix = "/usr/local/share/futaam/"
+	if uiPrefix == None:
 		uiPrefix = curDir() + "/ui/"
 
 	ircn = False

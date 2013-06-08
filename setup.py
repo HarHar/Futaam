@@ -71,18 +71,15 @@ def get_ui_files():
 
 UI_FILES = get_ui_files() 
 
-python_version = platform.python_version_tuple()
-python_version_string = str(python_version[0]) + "." + str(python_version[1])
-prefix = sys.prefix
+python_version_string = str(platform.python_version[0]) + "." + str(platform.python_version[1])
 
-if python_version[0] >= 2 and python_version[1] >= 6:
-    ## Set file location prefix accordingly
-    prefix = '/usr/local'
-
-for arg in sys.argv:
-    if arg.startswith('--prefix='):
-        prefix = arg[9:]
-        prefix = os.path.expandvars(prefix)
+if os.name == "nt":
+	data_file_location = sys.prefix + "\\Scripts\\futaam"
+else:
+	if python_version[0] >= 2 and python_version[1] >= 6:
+    	data_file_location = sys.prefix + "/local/share/futaam"
+	else:
+		data_file_location = sys.prefix + "/share/futaam"
 
 setup(
     name=NAME,
@@ -93,7 +90,7 @@ setup(
     license="GPL",
     url=URL,
     py_modules=[PACKAGE] + SUBPACKAGES,
-    data_files=[(prefix + "/share/futaam/", UI_FILES)],
+    data_files=[(data_file_location, UI_FILES)],
 	classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: End Users/Desktop",
@@ -105,7 +102,7 @@ setup(
 
 if os.name == "nt":
 	print "Adding Futaam to your path"
-	path = "C:\\Python" + python_version_string + "\\Lib\\site-packages\\futaam.py"
+	path = sys.prefix + "\\Lib\\site-packages\\futaam.py"
 	os.popen("set PATH=%PATH%;" + path)
 else:
 	print "Putting a symlink to futaam.py in /usr/bin/"
