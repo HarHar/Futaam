@@ -229,7 +229,11 @@ def main(argv):
 					rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
-					print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
+					if os.name != 'nt':
+						print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
+					else:
+						print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'].encode('ascii', 'ignore') + colors.default
+
 		elif cmdsplit[0].lower() in ['d', 'del', 'delete']:
 			entry = pickEntry(args, dbs[currentdb])
 			if entry == None: continue
@@ -297,7 +301,10 @@ def main(argv):
 			 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
 
 			for k in toprint:
-				print colors.bold + '<' + k + '>' + colors.default + ' ' + unicode(toprint[k])
+				if os.name != 'nt':
+					print colors.bold + '<' + k + '>' + colors.default + ' ' + unicode(toprint[k])
+				else:
+					print colors.bold + '<' + k + '>' + colors.default + ' ' + toprint[k].encode('ascii', 'ignore')
 
 		elif cmdsplit[0].lower() in ['edit', 'e']:
 			#INTRO I
@@ -305,7 +312,10 @@ def main(argv):
 			if entry == None: continue
 
 			#INTRO II
-			n_name = raw_input('<Name> [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
+			if os.name != 'nt':
+				n_name = raw_input('<Name> [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
+			else:
+				n_name = raw_input('<Name> [' + entry['name'].encode('ascii', 'ignore') + '] ').replace('\n', '')
 			n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
 
 			#ZIGZAGGING
@@ -414,7 +424,10 @@ def main(argv):
 
 			i = 0
 			for r in searchResults[:15]:
-				print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				if os.name != 'nt':
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				else:
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title'].encode('ascii', 'ignore')
 				i += 1
 			print '[A] Abort'
 
@@ -431,6 +444,9 @@ def main(argv):
 
 			if ok:
 				print ''
+				if os.name == 'nt':
+					for key in picked:
+						picked[key] == picked[key].encode('ascii', 'ignore')
 				print colors.bold + '<Title> ' + colors.default + picked['title']
 				print colors.bold + '<Category> ' + colors.default + picked['category']
 				print colors.bold + '<Info> ' + colors.default + picked['description']
@@ -506,6 +522,10 @@ def main(argv):
 				while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
 
 				searchResults = MAL.search(title, am)
+				if os.name == 'nt':
+					for result in searchResults:
+						for key in result:
+							result[key] = result[key].encode('ascii', 'ignore')
 				i = 0
 				for r in searchResults:
 					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
@@ -525,6 +545,9 @@ def main(argv):
 
 			if accepted:
 				deep = MAL.details(eid, etype)
+				if os.name == 'nt':
+					for key in deep:
+						deep[key] = deep[key].encode('ascii', 'ignore')
 
 				if etype == 'anime':
 					print colors.bold + 'Title: ' + colors.default + deep['title']
@@ -554,7 +577,10 @@ def main(argv):
 			searchResults = MAL.search(title, am)
 			i = 0
 			for r in searchResults:
-				print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				if os.name != 'nt':
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+				else:
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title'].encode('ascii', 'ignore')
 				i += 1
 			print colors.bold + '[N] ' + colors.default + 'None of the above'
 			accepted = False
