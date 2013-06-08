@@ -501,6 +501,15 @@ def main(argv):
 	if uiPrefix == None:
 		uiPrefix = curDir() + "/ui/"
 
+	app = QtGui.QApplication(argv)
+
+	for x in argv:
+		if os.path.exists(x):
+			break
+	else:
+		filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
+		if filename != None: argv.append(filename)
+
 	ircn = False
 	i = 0
 	for x in argv:
@@ -552,9 +561,8 @@ def main(argv):
 			sys.exit(1)
 		dbs = []
 		dbs.append(parser.Parser(host=host, port=port, password=password))
-		currentdb = 0	
+		currentdb = 0
 
-	app = QtGui.QApplication(argv)
 	ui = uic.loadUi(uiPrefix + "gui.ui")
 	ui.show()
 
