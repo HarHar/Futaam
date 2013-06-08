@@ -69,6 +69,7 @@ class colors():
         self.warning = ''
         self.fail = ''
         self.default = ''
+        self.bold = ''
 
 def remove_html_tags(data):
     p = re.compile(r'<.*?>')
