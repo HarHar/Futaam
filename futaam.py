@@ -92,7 +92,11 @@ for arg in sys.argv[1:]:
 	else:
 		arguments.append(arg)
 
-if interface == None: interface = 'text'
+if interface == None:
+	if os.name != 'nt':
+		interface = 'text'
+	else:
+		interface = 'gui'
 
 if os.path.exists(os.path.join(path, 'interfaces/') + interface + '.py'):
 	load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
