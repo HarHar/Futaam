@@ -52,6 +52,9 @@ class colors():
     def __init__(self):
         self.enable()
     def enable(self):
+    	if os.name == 'nt':
+    		self.disable()
+    		return
         self.header = '\033[95m'
         self.blue = '\033[94m'
         self.green = '\033[92m'
