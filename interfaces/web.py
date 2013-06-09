@@ -20,36 +20,70 @@ import sys
 import subprocess as sp
 
 def main(argv):
-	try:
-		sp.Popen(['git', '--version'], stdout=-1)
-	except:
-		print 'Git not found, please install it to continue'
-		sys.exit(1)
-
-	try:
-		sp.Popen(['node', '--version'], stdout=-1)
-	except:
-		print 'Node not found, please install it to continue'
-		sys.exit(1)
-
-	magicalDir = os.path.dirname(sys.path.dirname(__file__))
+	curDir = os.path.dirname(__file__)
 	alreadyInstalled = False
-	if os.path.exists(magicalDir + '/Futaam-Web/'): alreadyInstalled = True
-	if alreadyInstalled == False:
-		os.popen('git clone git://github.com/that4chanwolf/Futaam-Web --depth=1 ' + magicalDir + '/Futaam-Web/')
-	if os.path.exists(magicalDir + '/Futaam-Web'):
-		os.chdir(magicalDir + '/Futaam-Web')
+	
+	if os.name == 'nt':
+		gitPath = raw_input("Enter path to git executable: ")
+		try:
+			sp.Popen([gitPath, "--version"], stdout = -1)
+		except:
+			print "Git not found, please install it to continue"
+			sys.exit(1)
+		nodePath = raw_input("Enter path to node.js executable: ")
+		try:
+			sp.Popen([nodePath, "--version"], stdout = -1)
+		except:
+			print "Node not found, please install it continue"
+			sys.exit(1)
+		npmPath = raw_input("Enter path to npm executable: ")
+		try:
+			sp.Popen([nodePath, "--version"], stdout = -1)
+		except:
+			print "NPM not found, please install it continue"
+			sys.exit(1)
+
+		if os.path.exists(curDir + '\\Futaam-Web')
+			alreadyInstalled = True
+		if alreadyInstalled == False:
+			os.popen(gitPath + " clone git://github.com/that4chanwolf/Futaam-Web --depth=1" + curDir + "\\Futaam-Web")
+		if os.path.exists(curDir + "\\Futaam-Web")
+			os.chdir(curDir + '\\Futaam-Web')
+			os.popen(npmPath + ' install') # Install dependencies
+			if alreadyInstalled == False:
+				print 'Futaam-Web is now installed. Use "node ' + curDir + '\\Futaam-Web\\FutaamWeb.js --db     file" for launching it anytime'
+			if len(argv) > 0:
+				print 'Launching Futaam-Web'
+				os.system(nodePath + " " + curDir +'\\Futaam-Web\\FutaamWeb.js --db ' + argv[0])
+	else:
+		try:
+			sp.Popen(['git', '--version'], stdout=-1)
+		except:
+			print 'Git not found, please install it to continue'
+			sys.exit(1)
+		try:
+			sp.Popen(['node', '--version'], stdout=-1)
+		except:
+			print 'Node not found, please install it to continue'
+			sys.exit(1)
 		try:
 			sp.Popen(['npm', '--version'], stdout=-1)
 		except:
 			print 'NPM not found, please install it to continue'
 			sys.exit(1)
-		os.popen('npm install') # Install dependencies
+
+		if os.path.exists(curDir + '/Futaam-Web/'):
+			alreadyInstalled = True
 		if alreadyInstalled == False:
-			print '\033[92mFutaam-Web is now installed. Use "node '+ magicaldir + '/Futaam-Web/FutaamWeb.js --db file" for launching it anytime\033[0m'
-		if len(argv) > 0:
-			print 'Launching Futaam-Web'
-			os.system('node '+ magicalDir +'/Futaam-Web/FutaamWeb.js --db ' + argv[0])
+			os.popen(' clone git://github.com/that4chanwolf/Futaam-Web --depth=1 ' + curDir + '/Futaam-Web/')
+		if os.path.exists(curDir + '/Futaam-Web'):
+			os.chdir(curDir + '/Futaam-Web')
+			os.popen('npm install') # Install dependencies
+			if alreadyInstalled == False:
+				print '\033[92mFutaam-Web is now installed. Use "node '+ curDir + '/Futaam-Web/FutaamWeb.js --db file" for launching it anytime\033[0m'
+			if len(argv) > 0:
+				print 'Launching Futaam-Web'
+				os.system('node '+ curDir +'/Futaam-Web/FutaamWeb.js --db ' + argv[0])
 
 def help():
 	return 'Futaam-Web is maintened by that4chanwolf and can be found on https://github.com/that4chanwolf/Futaam-Web'
