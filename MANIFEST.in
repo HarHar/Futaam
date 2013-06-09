@@ -1,0 +1,12 @@
+include README.md
+include interfaces/ui/aboutDialog.ui
+include interfaces/ui/addDialog.ui
+include interfaces/ui/deleteDialog.ui
+include interfaces/ui/editDialog.ui
+include interfaces/ui/gui.ui
+include interfaces/ui/infoDialog.ui
+include interfaces/ui/newDbDialog.ui
+include interfaces/ui/statsDialog.ui
+include interfaces/ui/swapDialog.ui
+include docs/GUI_Interface_Info.md
+include docs/protocol

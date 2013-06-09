@@ -71,13 +71,14 @@ def get_ui_files():
 
 UI_FILES = get_ui_files() 
 
-python_version_string = str(platform.python_version[0]) + "." + str(platform.python_version[1])
+python_version = platform.python_version_tuple()
+python_version_string = str(python_version[0]) + "." + str(python_version[1])
 
 if os.name == "nt":
 	data_file_location = sys.prefix + "\\Scripts\\futaam"
 else:
 	if python_version[0] >= 2 and python_version[1] >= 6:
-    	data_file_location = sys.prefix + "/local/share/futaam"
+		data_file_location = sys.prefix + "/local/share/futaam"
 	else:
 		data_file_location = sys.prefix + "/share/futaam"
 
@@ -99,6 +100,9 @@ setup(
         "Programming Language :: Python",
     ]
 )
+
+if sys.argv[1] == "sdist":
+	sys.exit(0)
 
 if os.name == "nt":
 	print "Adding Futaam to your path"
