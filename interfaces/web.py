@@ -38,7 +38,7 @@ def main(argv):
 			sys.exit(1)
 		npmPath = raw_input("Enter path to npm executable: ")
 		try:
-			sp.Popen([nodePath, "--version"], stdout = -1)
+			sp.Popen([npmPath, "--version"], stdout = -1)
 		except:
 			print "NPM not found, please install it continue"
 			sys.exit(1)
