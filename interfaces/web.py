@@ -43,7 +43,7 @@ def main(argv):
 			print "NPM not found, please install it continue"
 			sys.exit(1)
 
-		if os.path.exists(curDir + '\\Futaam-Web')
+		if os.path.exists(curDir + '\\Futaam-Web'):
 			alreadyInstalled = True
 		if alreadyInstalled == False:
 			os.popen(gitPath + " clone git://github.com/that4chanwolf/Futaam-Web --depth=1" + curDir + "\\Futaam-Web")
