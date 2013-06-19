@@ -29,7 +29,6 @@ except:
 	print 'You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.'
 	exit()
 
-from byteformat import format as fmt
 import os, inspect
 from urllib2 import urlopen
 from urllib import quote
