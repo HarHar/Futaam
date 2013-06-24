@@ -64,6 +64,13 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 		f.write(json.dumps(tmp))
 	f.close()
 
+class entryType(object):
+	def __init__(self, name):
+		self.name = name
+	def getStatus(self):
+		""" Example of result: {'w': 'watching', 'd': 'dropped', (...)} """
+		return {}
+
 class Parser(object):
 	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124):
 		self.host = host
@@ -197,3 +204,4 @@ class Parser(object):
 			while rc[-1:] != chr(4):
 				rc += self.sock.recv(4096)
 			self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))
+

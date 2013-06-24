@@ -42,6 +42,7 @@ if PS1[-1:] != ' ': PS1 += ' '
 
 nyaa = utils.NyaaWrapper()
 MAL = utils.MALWrapper()
+vndb = utils.VNDB('Futaam', '0.1')
 colors = utils.colors()
 
 def pickEntry(index, db):
@@ -226,7 +227,11 @@ def main(argv):
 				continue
 			else:
 				for entry in sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id']):
-					rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
+					if entry['type'].lower() in ['anime', 'manga']:
+						rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
+					elif entry['type'].lower() == 'vn':
+						rcolors = {'d': colors.fail, 'c': colors.blue, 'p': colors.green, 'h': colors.warning, 'q': colors.header}
+						
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
 					if os.name != 'nt':
@@ -292,13 +297,17 @@ def main(argv):
 			entry = pickEntry(args, dbs[currentdb])
 			if entry == None: continue
 
-			if entry['type'] == 'anime':
-				t_label = 'Last watched'
-			else:
-				t_label = 'Last chapter/volume read'
-			toprint = {'Name': entry['name'], 'Genre': entry['genre'],
-			 'Observations': entry['obs'], t_label: entry['lastwatched'],
-			 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
+			if entry['type'].lower() in ['anime', 'manga']:
+				if entry['type'].lower() == 'anime':
+					t_label = 'Last watched'
+				else:
+					t_label = 'Last chapter/volume read'
+				toprint = {'Name': entry['name'], 'Genre': entry['genre'],
+				 'Observations': entry['obs'], t_label: entry['lastwatched'],
+				 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
+			elif entry['type'].lower() == 'vn':
+				toprint = {'Name': entry['name'], 'Genre': entry['genre'],
+				 'Observations': entry['obs'], 'Status': utils.translated_status[entry['type']][entry['status'].lower()]}
 
 			for k in toprint:
 				if os.name != 'nt':
@@ -318,7 +327,10 @@ def main(argv):
 				n_name = raw_input('<Name> [' + entry['name'].encode('ascii', 'ignore') + '] ').replace('\n', '')
 			n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
 
+
 			#ZIGZAGGING
+			n_lw = None
+			n_status = None
 			if entry['type'] == 'anime':
 				n_status = """
 					There was a time,
@@ -349,10 +361,11 @@ def main(argv):
 			dbs[currentdb].dictionary['items'][int(args)]['name'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_name))
 			if n_genre == '': n_genre = entry['genre']
 			dbs[currentdb].dictionary['items'][int(args)]['genre'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_genre))
-			if n_status == '': n_status = entry['status']
-			dbs[currentdb].dictionary['items'][int(args)]['status'] = n_status
-			if n_lw == '': n_lw = entry['lastwatched']
-			dbs[currentdb].dictionary['items'][int(args)]['lastwatched'] = n_lw
+			if n_status != None:
+				if n_status == '': n_status = entry['status']
+				dbs[currentdb].dictionary['items'][int(args)]['status'] = n_status
+				if n_lw == '': n_lw = entry['lastwatched']
+				dbs[currentdb].dictionary['items'][int(args)]['lastwatched'] = n_lw
 			if n_obs == '': n_obs = entry['obs']
 			dbs[currentdb].dictionary['items'][int(args)]['obs'] = n_obs
 
@@ -519,9 +532,12 @@ def main(argv):
 				title = args
 
 				am = ''
-				while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
+				while (am in ['anime', 'manga', 'vn']) == False: am = raw_input(colors.bold + '<Anime, Manga or VN> ' + colors.default).lower()
 
-				searchResults = MAL.search(title, am)
+				if am in ['anime', 'manga']:
+					searchResults = MAL.search(title, am)
+				elif am == 'vn':
+					searchResults = vndb.get('vn', 'basic', '(title~"' + title + '")', '')['items']
 				if os.name == 'nt':
 					for result in searchResults:
 						for key in result:
@@ -544,7 +560,11 @@ def main(argv):
 							accepted = True
 
 			if accepted:
-				deep = MAL.details(eid, etype)
+				if etype in ['anime', 'manga']:
+					deep = MAL.details(eid, etype)
+				elif etype == 'vn':
+					deep = vndb.get('vn', 'basic,details', '(id='+ str(eid) + ')', '')['items'][0]
+
 				if os.name == 'nt':
 					for key in deep:
 						deep[key] = deep[key].encode('ascii', 'ignore')
@@ -566,6 +586,23 @@ def main(argv):
 					print colors.bold + 'Volumes: ' + colors.default + str(deep['volumes'])
 					print colors.bold + 'Chapters: ' + colors.default + str(deep['chapters'])
 					print colors.bold + 'Synopsis: ' + colors.default + utils.HTMLEntitiesToUnicode(utils.remove_html_tags(deep['synopsis']))
+				elif etype == 'vn':
+					if len(deep['aliases']) == 0:
+						print colors.bold + 'Title: ' + colors.default + deep['title']
+					else:
+						print colors.bold + 'Title: ' + colors.default + deep['title'] + ' [' + deep['aliases'].replace('\n', '/') + ']'
+						platforms = []
+					for platform in deep['platforms']:
+						names = {'lin': 'Linux', 'mac': 'Mac', 'win': 'Windows'}
+						if platform in names:
+							platform = names[platform]
+						else: platform = platform[0].upper() + platform[1:]
+						platforms.append(platform)
+					print colors.bold + 'Platforms: ' + colors.default + ('/'.join(platforms))
+					print colors.bold + 'Released: ' + colors.default + deep['released']
+					print colors.bold + 'Languages: ' + colors.default + ('/'.join(deep['languages']))
+					print colors.bold + 'Description: ' + colors.default + deep['description']
+
 				print ''
 
 		elif cmdsplit[0].lower() in ['add', 'a']:
@@ -574,7 +611,10 @@ def main(argv):
 			am = ''
 			while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
 
-			searchResults = MAL.search(title, am)
+			if am in ['anime', 'manga']:
+				searchResults = MAL.search(title, am)
+			elif am == 'vn':
+				searchResults = vndb.get('vn', 'basic', '(title~"' + title + '")', '')['items']
 			i = 0
 			for r in searchResults:
 				if os.name != 'nt':
@@ -591,7 +631,10 @@ def main(argv):
 				if which.isdigit():
 					if int(which) <= len(searchResults):
 						malanime = searchResults[int(which)]
-						deep = MAL.details(malanime['id'], am)
+						if am in ['anime', 'manga']:
+							deep = MAL.details(malanime['id'], am)
+						elif am == 'vn':
+							deep = vndb.get('vn', 'basic,details', '(id='+ str(eid) + ')', '')['items'][0]
 						accepted = True
 
 			if which == 'n':
