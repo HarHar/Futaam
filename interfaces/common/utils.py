@@ -39,7 +39,7 @@ import time
 
 anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watching', 'w': 'Watched', 'd': 'Dropped'}
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
-vn_translated_status = {'q': 'To play', 'p': 'Playing', 'h': 'On hold', 'd': 'Dropped'}
+vn_translated_status = {'q': 'To play', 'p': 'Playing', 'h': 'On hold', 'd': 'Dropped', 'w': 'Played'}
 
 translated_status = {'anime': anime_translated_status, 'manga': manga_translated_status, 'vn': vn_translated_status}
 

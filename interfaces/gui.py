@@ -27,7 +27,6 @@ port = 8500
 dbs = []
 
 def curDir():
-	""" HarHar -- nigerrigging since forever """
 	return os.path.dirname(inspect.getsourcefile(curDir)) + os.path.sep
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -153,7 +152,8 @@ class AddEntryDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("accepted()"), self.add)
 		QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
 		QtCore.QObject.connect(self.ui.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
-		QtCore.QObject.connect(self.ui.animeButton, QtCore.SIGNAL("toggled()"), self.populateCB)
+		QtCore.QObject.connect(self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"), self.populateCB)
+		QtCore.QObject.connect(self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"), self.populateCB)
 		QtCore.QObject.connect(self.ui.resultSelect, QtCore.SIGNAL("currentIndexChanged(int)"), self.resultChanged)
 
 	def populateCB(self):
@@ -163,8 +163,13 @@ class AddEntryDialog(QtGui.QDialog):
 			return
 		if self.ui.animeButton.isChecked():
 			search_results = utils.MALWrapper.search(title, "anime")
-		else:
+		elif self.ui.mangaButton.isChecked():
 			search_results = utils.MALWrapper.search(title, "manga")
+		elif self.ui.vnButton.isChecked():
+			self.vndb = utils.VNDB("Futaam", "0.1")
+			search_results = self.vndb.get('vn', 'basic', '(title~"' + title + '")', '')['items']
+		else:
+			search_results = []
 		for result in search_results:
 			self.resultSelect.addItem(unicode(result["title"]))
 		self.results = search_results
@@ -172,19 +177,27 @@ class AddEntryDialog(QtGui.QDialog):
 	def resultChanged(self, index):
 		title = self.ui.titleLine.text()
 		if self.ui.animeButton.isChecked():
-			entryId = utils.MALWrapper.search(title, "anime")[index]['id']
+			entryId = self.results[index]['id']
 			self.result = utils.MALWrapper.details(entryId, "anime")
-		else:
-			entryId = utils.MALWrapper.search(title, "manga")[index]
+		elif self.ui.animeButton.isChecked():
+			entryId = self.results[index]['id']
 			self.result = utils.MALWrapper.details(entryId, "manga")
+		#VNDB doesn't have genre info and epsidoes 
+		#are a silly concept for VNs
+		else:
+			self.ui.genreLine.setText("")
+			self.ui.episodesBox.setValue(0)
+			return
 		genres = ""
 		for genre in self.result['genres']:
 			genres = genres + genre + '/'
 		self.ui.genreLine.setText(genres[:-1])
 		if self.ui.animeButton.isChecked():
 			number = self.result['episodes']
-		else:
+		elif self.ui.mangaButton.isChecked():
 			number = self.result['chapters']
+		else:
+			number = 0
 		self.ui.episodesBox.setValue(number)
 
 	def add(self):
@@ -192,16 +205,21 @@ class AddEntryDialog(QtGui.QDialog):
 		obs = self.ui.obsLine.text()
 		statusIndex = self.ui.statusSelect.currentIndex()
 		genres = self.ui.genreLine.text()
+		if self.ui.animeButton.isChecked():
+			am = "anime"
+		if self.ui.mangaButton.isChecked():
+			am = "manga"
+		else:
+			am = "vn"
 		if statusIndex == 0:
 			if self.ui.animeButton.isChecked():
 				eps = result['episodes']
-				am = "anime"
-			else:
+			elif self.ui.mangaButton.isChecked():
 				eps = result['chapters']
-				am = "manga"
+			else:
+				eps = 1
 		else:
 			eps = self.ui.episodesBox.value()
-			am = "anime"
 		model.addEntry(result, obs, statusIndex, eps, genres, am)
 		self.done(0)
 
@@ -273,6 +291,7 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.entries = entries
 		self.ui = uic.loadUi(uiPrefix + "infoDialog.ui", self)
 		self.ui.show()
+		self.showingVN = False
 
 		self.ui.entrySelect.addItems(names)
 		self.ui.entrySelect.setCurrentIndex(index)
@@ -290,8 +309,14 @@ class EntryInfoDialog(QtGui.QDialog):
 	def fillEntries(self, index=0):
 		self.index = index
 		self.currentEntry = self.entries[self.index]
-		details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
-
+		if self.currentEntry["am"] != "vn": 
+			details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
+		else:
+			vndb = utils.VNDB("Futaam", "0.1")
+			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
+			+ ")", "")["items"][0] 
+		if showingVN == True:
+			pass	
 		self.ui.episodeLine.setText(str(details['episodes']))
 		genres = ""
 		for genre in details['genres']:
@@ -325,6 +350,11 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.pictureLabel.setText("<img src='.temp' width='225' height='350' align='right' />")
 		self.ui.pictureLabel.setScaledContents(True)
 
+	def toggleVnFields():
+		if self.showingVN == True:
+			self.ui.episodeLine.hide()
+		else:
+			pass	
 
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
