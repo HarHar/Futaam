@@ -309,13 +309,13 @@ class EntryInfoDialog(QtGui.QDialog):
 	def fillEntries(self, index=0):
 		self.index = index
 		self.currentEntry = self.entries[self.index]
-		if self.currentEntry["am"] != "vn": 
+		if self.currentEntry["type"] != "vn": 
 			details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
 		else:
 			vndb = utils.VNDB("Futaam", "0.1")
 			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
 			+ ")", "")["items"][0] 
-		if showingVN == True:
+		if self.showingVN == True:
 			pass	
 		self.ui.episodeLine.setText(str(details['episodes']))
 		genres = ""
