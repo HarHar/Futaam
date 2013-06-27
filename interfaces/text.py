@@ -241,7 +241,7 @@ def main(argv):
 			if entry == None: continue
 			confirm = ''
 			while (confirm in ['y', 'n']) == False:
-				confirm = raw_input(colors.warning + 'Are you sure? [y/n] ').lower()
+				confirm = raw_input(colors.warning + 'Are you sure? [y/n] ' + colors.default).lower()
 			dbs[currentdb].dictionary['items'].remove(entry)
 			dbs[currentdb].dictionary['count'] -= 1
 
