@@ -315,37 +315,40 @@ class EntryInfoDialog(QtGui.QDialog):
 			vndb = utils.VNDB("Futaam", "0.1")
 			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
 			+ ")", "")["items"][0] 
-		if self.showingVN == True:
-			pass	
-		self.ui.episodeLine.setText(str(details['episodes']))
-		genres = ""
-		for genre in details['genres']:
-			genres = genres + genre + '/'
-		self.ui.genreLine.setText(genres[:-1])
-		self.ui.statusLine.setText(details['status'].title())
-		self.ui.malRank.setText(str(details['rank']))
+		if self.currentEntry['type'] != 'vn':
+			self.ui.episodeLine.setText(str(details['episodes']))
+			genres = ""
+			for genre in details['genres']:
+				genres = genres + genre + '/'
+			self.ui.genreLine.setText(genres[:-1])
+			self.ui.statusLine.setText(details['status'].title())
+			self.ui.malRank.setText(str(details['rank']))
+		syn_key = 'synopsis' if self.currentEntry['type'] != 'vn' else 'description'
 		self.ui.summaryText.setPlainText(utils.HTMLEntitiesToUnicode(
-			utils.remove_html_tags(details['synopsis'])))
-		self.ui.dateLine.setText(details['start_date'][:10])
-		if len(details['prequels']) == 0:
-			self.ui.parentStoryLine.setText("None")
-		else:
-			self.ui.parentStoryLine.setText(details['prequels'][0]['title'])
-		if details['end_date'] == None:
-			self.ui.endDate.setText("Unknown")
-		else:
-			self.ui.endDate.setText(details['end_date'][:10])
-		if details['type'] == u'Movie':
-			self.ui.typeLine.setText("Feature Film")
-		elif details['type'] == u'TV':
-			self.ui.typeLine.setText("TV Series")
-		else:
-			self.ui.typeLine.setText(details['type'])
+			utils.remove_html_tags(details[syn_key])))
+		date = details['start_date'][:10] if self.currentEntry['type'] != 'vn' else details['released']
+		#self.ui.dateLine.setText()
+		if self.currentEntry['type'] != 'vn':
+			if len(details['prequels']) == 0:
+				self.ui.parentStoryLine.setText("None")
+			else:
+				self.ui.parentStoryLine.setText(details['prequels'][0]['title'])
+			if details['end_date'] == None:
+				self.ui.endDate.setText("Unknown")
+			else:
+				self.ui.endDate.setText(details['end_date'][:10])
+			if details['type'] == u'Movie':
+				self.ui.typeLine.setText("Feature Film")
+			elif details['type'] == u'TV':
+				self.ui.typeLine.setText("TV Series")
+			else:
+				self.ui.typeLine.setText(details['type'])
 		self.ui.pictureLabel.setText("")
 		if os.path.exists(".temp"):
 			os.remove(".temp")
 		x = open(".temp", "w")
-		x.write(urllib2.urlopen(details['image_url']).read())
+		img_key = '_url' if self.currentEntry['type'] != 'vn' else ''
+		x.write(urllib2.urlopen(details['image' + img_key]).read())
 		x.close()
 		self.ui.pictureLabel.setText("<img src='.temp' width='225' height='350' align='right' />")
 		self.ui.pictureLabel.setScaledContents(True)
