@@ -196,6 +196,7 @@ def main(argv):
 			print '\tedit or e \t\t - edits an entry'
 			print '\tinfo or i\t\t - shows information on an entry'
 			print '\toinfo or o\t\t - shows online information on an entry (if given entry number) or name'
+			print '\tpicture, pic, image, img - shows an image of the entry or name'
 			print '\tnyaa or n\t\t - searches nyaa.eu for torrent of an entry (if given entry number) or name'
 			print '\tsort or s\t\t - swaps or moves entries around'
 			print ''
@@ -250,6 +251,54 @@ def main(argv):
 				dbs[currentdb].dictionary['items'][x]['id'] = x
 			#######################
 			dbs[currentdb].save()
+		elif cmdsplit[0].lower() in ['image', 'img', 'picture', 'pic', 'pix']:
+			accepted = False
+			if args.isdigit():
+				if args >= 0 and len(dbs[currentdb].dictionary['items']) >= int(args):
+					eid = dbs[currentdb].dictionary['items'][int(args)]['aid']
+					etype = dbs[currentdb].dictionary['items'][int(args)]['type']
+					accepted = True
+				else:
+					print colors.fail + 'The entry '+ args +' is not on the list' + colors.default
+			else:
+				title = args
+
+				am = ''
+				while (am in ['anime', 'manga', 'vn']) == False: am = raw_input(colors.bold + '<Anime, Manga or VN> ' + colors.default).lower()
+
+				if am in ['anime', 'manga']:
+					searchResults = MAL.search(title, am)
+				elif am == 'vn':
+					searchResults = vndb.get('vn', 'basic', '(title~"' + title + '")', '')['items']
+				if os.name == 'nt':
+					for result in searchResults:
+						for key in result:
+							result[key] = result[key].encode('ascii', 'ignore')
+				i = 0
+				for r in searchResults:
+					print colors.bold + '[' + str(i) + '] ' + colors.default + r['title']
+					i += 1
+				print colors.bold + '[A] ' + colors.default + 'Abort'
+				while accepted == False:
+					which = raw_input(colors.bold + 'Choose> ' + colors.default).replace('\n', '')
+					if which.lower() == 'a':
+						break
+					if which.isdigit():
+						if int(which) <= len(searchResults):
+							malanime = searchResults[int(which)]
+
+							eid = malanime['id']
+							etype = am
+							accepted = True
+
+			if accepted:
+				if etype in ['anime', 'manga']:
+					deep = MAL.details(eid, etype)
+				elif etype == 'vn':
+					deep = vndb.get('vn', 'basic,details', '(id='+ str(eid) + ')', '')['items'][0]
+
+				print colors.header + 'Fetching image, please stand by...' + colors.default
+				utils.showImage(deep[('image_url' if etype != 'vn' else 'image')])
 		elif cmdsplit[0].lower() in ['s', 'sort']:
 			if len(cmdsplit) != 4:
 				print 'Invalid number of arguments'
