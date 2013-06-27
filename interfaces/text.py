@@ -227,10 +227,7 @@ def main(argv):
 				continue
 			else:
 				for entry in sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id']):
-					if entry['type'].lower() in ['anime', 'manga']:
-						rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
-					elif entry['type'].lower() == 'vn':
-						rcolors = {'d': colors.fail, 'c': colors.blue, 'p': colors.green, 'h': colors.warning, 'q': colors.header}
+					rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
 						
 					if entry['status'].lower() in rcolors:
 						sys.stdout.write(rcolors[entry['status'].lower()])
@@ -325,7 +322,9 @@ def main(argv):
 				n_name = raw_input('<Name> [' + entry['name'].encode('utf8') + '] ').replace('\n', '')
 			else:
 				n_name = raw_input('<Name> [' + entry['name'].encode('ascii', 'ignore') + '] ').replace('\n', '')
-			n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
+
+			if entry['type'].lower() != 'vn':
+				n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
 
 
 			#ZIGZAGGING
@@ -352,6 +351,12 @@ def main(argv):
 					n_status = raw_input('<Status> [R/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
 				if n_status == 'r': n_status = 'w'
 				n_lw = raw_input('<Last page/chapter read> [' + entry['lastwatched'] + ']> ').replace('\n', '')
+			elif entry['type'] == 'vn':
+				n_status = "This is a dummy text, there are many like it, but this one is mine.\n"
+				while (n_status in ['p', 'c', 'q', 'h', 'd', '']) == False:
+					n_status = raw_input('<Status> [P/C/Q/H/D] [' + entry['status'].upper() + '] ').replace('\n', '').lower()
+				if n_status == 'p': n_status = 'w'
+				n_lw = ''
 
 			#EXTENDED SINGLE NOTE
 			n_obs = raw_input('<Observations> [' + entry['obs'] + ']> ')
@@ -609,7 +614,7 @@ def main(argv):
 			title = ''
 			while title == '': title = raw_input(colors.bold + '<Title> ' + colors.default).replace('\n', '')
 			am = ''
-			while (am in ['anime', 'manga']) == False: am = raw_input(colors.bold + '<Anime or Manga> ' + colors.default).lower()
+			while (am in ['anime', 'manga', 'vn']) == False: am = raw_input(colors.bold + '<Anime, Manga or VN> ' + colors.default).lower()
 
 			if am in ['anime', 'manga']:
 				searchResults = MAL.search(title, am)
@@ -630,32 +635,36 @@ def main(argv):
 					accepted = True
 				if which.isdigit():
 					if int(which) <= len(searchResults):
-						malanime = searchResults[int(which)]
+						search_picked = searchResults[int(which)]
 						if am in ['anime', 'manga']:
-							deep = MAL.details(malanime['id'], am)
+							deep = MAL.details(search_picked['id'], am)
 						elif am == 'vn':
-							deep = vndb.get('vn', 'basic,details', '(id='+ str(eid) + ')', '')['items'][0]
+							deep = vndb.get('vn', 'basic,details', '(id='+ str(search_picked['id']) + ')', '')['items'][0]
 						accepted = True
 
+			genre = ''
 			if which == 'n':
 				genre = raw_input(colors.bold + '<Genre> ' + colors.default).replace('\n', '')
-			else:
+			elif am != 'vn':
 				g = ''
 				for genre in deep['genres']:
 					g = g + genre + '/'
 				genre = g[:-1]
-				title = deep['title']
+				
+			if which != 'n': title = deep['title']
 
 			status = ''
 			while (status in ['c', 'w', 'h', 'q', 'd']) == False: status = raw_input(colors.bold + '<Status> ' + colors.default + colors.header + '[C/W/H/Q/D] ' + colors.default).lower()[0]
 
-			if status != 'w':
+			if status != 'w' and am != 'vn':
 				lastEp = raw_input(colors.bold + '<Last episode watched> ' + colors.default).replace('\n', '')
 			else:
 				if am == "anime":
-					lastEp = str(malanime['episodes'])
+					lastEp = str(search_picked['episodes'])
+				elif am == "manga":
+					lastEp = str(search_picked['chapters'])
 				else:
-					lastEp = str(malanime['chapters'])
+					lastEp = ''
 
 			obs = raw_input(colors.bold + '<Observations> ' + colors.default).replace('\n', '')
 
@@ -663,7 +672,7 @@ def main(argv):
 				dbs[currentdb].dictionary['count'] += 1
 			except:
 				dbs[currentdb].dictionary['count'] = 1
-			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': malanime['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': status, 'lastwatched': lastEp, 'obs': obs})
+			dbs[currentdb].dictionary['items'].append({'id': dbs[currentdb].dictionary['count'], 'type': am, 'aid': search_picked['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': status, 'lastwatched': lastEp, 'obs': obs})
 			for x in xrange(0, dbs[currentdb].dictionary['count']):
 				dbs[currentdb].dictionary['items'][x]['id'] = x			
 			dbs[currentdb].save()
