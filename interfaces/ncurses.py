@@ -683,7 +683,11 @@ class if_ncurses(object):
 					t += workwidth
 
 def main(argv):
-	obj = if_ncurses(argv)
+	try:
+		obj = if_ncurses(argv)
+	except:
+		curses.endwin()
+		raise
 
 def help():
 	return 'No particular arguments for this interface... Sorry to disappoint'
