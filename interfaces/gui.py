@@ -177,10 +177,10 @@ class AddEntryDialog(QtGui.QDialog):
 	def resultChanged(self, index):
 		title = self.ui.titleLine.text()
 		if self.ui.animeButton.isChecked():
-			entryId = self.results[index]['id']
+			entryId = utils.MALWrapper.search(title, "anime")[index]['id']	
 			self.result = utils.MALWrapper.details(entryId, "anime")
 		elif self.ui.animeButton.isChecked():
-			entryId = self.results[index]['id']
+			entryId = utils.MALWrapper.search(title, "manga")[index]['id']	
 			self.result = utils.MALWrapper.details(entryId, "manga")
 		#VNDB doesn't have genre info and epsidoes 
 		#are a silly concept for VNs
@@ -207,10 +207,11 @@ class AddEntryDialog(QtGui.QDialog):
 		genres = self.ui.genreLine.text()
 		if self.ui.animeButton.isChecked():
 			am = "anime"
-		if self.ui.mangaButton.isChecked():
+		elif self.ui.mangaButton.isChecked():
 			am = "manga"
 		else:
 			am = "vn"
+
 		if statusIndex == 0:
 			if self.ui.animeButton.isChecked():
 				eps = result['episodes']
@@ -311,10 +312,14 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.currentEntry = self.entries[self.index]
 		if self.currentEntry["type"] != "vn": 
 			details = MALWrapper.details(self.currentEntry['aid'], self.currentEntry['type'])
+			self.showingVN = False
 		else:
 			vndb = utils.VNDB("Futaam", "0.1")
 			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
-			+ ")", "")["items"][0] 
+			+ ")", "")["items"][0]
+			self.showingVN = True
+		self.toggleVnFields()
+
 		if self.currentEntry['type'] != 'vn':
 			self.ui.episodeLine.setText(str(details['episodes']))
 			genres = ""
@@ -328,7 +333,10 @@ class EntryInfoDialog(QtGui.QDialog):
 			utils.remove_html_tags(details[syn_key])))
 		date = details['start_date'][:10] if self.currentEntry['type'] != 'vn' else details['released']
 		#self.ui.dateLine.setText()
-		if self.currentEntry['type'] != 'vn':
+		
+		if self.currentEntry['type'] == 'vn':
+			self.ui.typeLine.setText("Visual Novel")
+		else:
 			if len(details['prequels']) == 0:
 				self.ui.parentStoryLine.setText("None")
 			else:
@@ -353,11 +361,21 @@ class EntryInfoDialog(QtGui.QDialog):
 		self.ui.pictureLabel.setText("<img src='.temp' width='225' height='350' align='right' />")
 		self.ui.pictureLabel.setScaledContents(True)
 
-	def toggleVnFields():
+	def toggleVnFields(self):
 		if self.showingVN == True:
-			self.ui.episodeLine.hide()
+			self.ui.label_11.hide()
+			self.ui.parentStoryLine.hide()
+			self.ui.label_3.hide()
+			self.ui.malRank.hide()
+			self.ui.genreLine.hide()
+			self.ui.label_6.hide()
 		else:
-			pass	
+			self.ui.label_11.show()
+			self.ui.parentStoryLine.show()
+			self.ui.label_3.show()
+			self.ui.malRank.show()
+			self.ui.genreLine.show()
+			self.ui.label_6.show()
 
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
