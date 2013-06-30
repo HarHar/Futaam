@@ -365,7 +365,10 @@ class if_ncurses(object):
 						continue
 					x = chr(x)
 				if x.lower() == 'w':
-					lastEp = str(malanime['episodes'])
+					if t == 'anime':
+						lastEp = str(malanime['episodes'])
+					else:
+						lastEp = str(malanime['chapters'])
 				elif x.lower() == 'q':
 					lastEp = ''
 					pass
