@@ -318,6 +318,8 @@ class EntryInfoDialog(QtGui.QDialog):
 			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
 			+ ")", "")["items"][0]
 			self.showingVN = True
+			self.ui.releaseDateLine.setText(details["released"])
+			self.ui.platformsLine.setText(", ".join(details["platforms"]))
 		self.toggleVnFields()
 
 		if self.currentEntry['type'] != 'vn':
@@ -351,6 +353,7 @@ class EntryInfoDialog(QtGui.QDialog):
 				self.ui.typeLine.setText("TV Series")
 			else:
 				self.ui.typeLine.setText(details['type'])
+
 		self.ui.pictureLabel.setText("")
 		if os.path.exists(".temp"):
 			os.remove(".temp")
@@ -363,19 +366,47 @@ class EntryInfoDialog(QtGui.QDialog):
 
 	def toggleVnFields(self):
 		if self.showingVN == True:
+			# turn off anime/manga fields
 			self.ui.label_11.hide()
 			self.ui.parentStoryLine.hide()
 			self.ui.label_3.hide()
 			self.ui.malRank.hide()
 			self.ui.genreLine.hide()
 			self.ui.label_6.hide()
+			self.ui.label_7.hide()
+			self.ui.dateLine.hide()
+			self.ui.label_9.hide()
+			self.ui.endDate.hide()
+			self.ui.label_5.hide()
+			self.ui.statusLine.hide()
+			self.ui.label_4.hide()
+			self.ui.episodeLine.hide()
+			# show VN fields
+			self.ui.label_14.show()
+			self.ui.platformsLine.show()
+			self.ui.label_10.show()
+			self.ui.releaseDateLine.show()
 		else:
+			# show anime/manga fields
 			self.ui.label_11.show()
 			self.ui.parentStoryLine.show()
 			self.ui.label_3.show()
 			self.ui.malRank.show()
 			self.ui.genreLine.show()
 			self.ui.label_6.show()
+			self.ui.label_7.hide()
+			self.ui.dateLine.show()
+			self.ui.label_9.show()
+			self.ui.endDate.show()
+			self.ui.label_5.show()
+			self.ui.statusLine.show()
+			self.ui.label_4.show()
+			self.ui.episodeLine.show()
+			# hide VN fields 
+			self.ui.label_14.hide()
+			self.ui.platformsLine.hide()
+			self.ui.label_10.hide()
+			self.releaseDateLine.hide()
 
 class aboutDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
