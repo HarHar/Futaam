@@ -27,6 +27,7 @@ from time import sleep as sleep
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
 MAL = utils.MALWrapper()
+vndb = utils.VNDB('Futaam', '0.1')
 
 class if_ncurses(object):
 	##These functions must come first
@@ -598,8 +599,16 @@ class if_ncurses(object):
 			if entry['id'] == self.curitem:
 				bold = curses.A_REVERSE
 				if noSidePanel == False:
-					fields = (('Title: ', entry['name']), ('Genre: ', entry['genre']), ('Status: ', translated_status[entry['type'].lower()][entry['status'].lower()]), ('Last watched: ', entry['lastwatched']), ('Observations: ', entry['obs']))
+					if entry['type'] == 'anime':
+						fields = (('Title: ', entry['name']), ('Genre: ', entry['genre']), ('Status: ', translated_status[entry['type'].lower()][entry['status'].lower()]), ('Last watched: ', entry['lastwatched']), ('Observations: ', entry['obs']))
+					elif entry['type'] == 'manga':
+						fields = (('Title: ', entry['name']), ('Genre: ', entry['genre']), ('Status: ', translated_status[entry['type'].lower()][entry['status'].lower()]), ('Last chapter/volume read: ', entry['lastwatched']), ('Observations: ', entry['obs']))
+					elif entry['type'] == 'vn':
+						fields = (('Title: ', entry['name']), ('Status: ', translated_status[entry['type'].lower()][entry['status'].lower()]), ('Observations: ', entry['obs']))
 					t = 1
+					out = {'anime': 'Anime', 'manga': 'Manga', 'vn': 'VN'}[entry['type']]
+					self.screen.addstr(terminalsize[0]-1, terminalsize[1]-len(out)-1, out, {'anime': curses.color_pair(3), 'manga': curses.color_pair(2), 'vn': curses.color_pair(5)}[entry['type']] + curses.A_REVERSE)
+					del out
 					for field in fields:
 						self.screen.addstr(t, 27, field[0], curses.A_BOLD)
 						if isinstance(field[1], basestring):
