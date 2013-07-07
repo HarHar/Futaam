@@ -643,11 +643,15 @@ class if_ncurses(object):
 			i += 1
 
 	def sI(self):		
-		if self.dbs[self.currentdb].dictionary['items'][self.curitem].get('aid') != None:
+		entry = self.dbs[self.currentdb].dictionary['items'][self.curitem]
+		if entry.get('aid') != None:
 			try:
 				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching URL... Please wait', curses.color_pair(5))
 				self.screen.refresh()
-				info = MAL.details(self.dbs[self.currentdb].dictionary['items'][self.curitem]['aid'], self.dbs[self.currentdb].dictionary['items'][self.curitem]['type'])
+				if entry['type'] in ['anime', 'manga']:
+					info = MAL.details(entry['aid'], entry['type'])
+				elif entry['type'] == 'vn':
+					info = vndb.get('vn', 'basic,details', '(id='+ str(entry['aid']) + ')', '')['items'][0]
 				self.screen.border()
 			except urllib2.HTTPError, info:
 				self.alert('Error: ' + str(info), 2)
@@ -656,7 +660,7 @@ class if_ncurses(object):
 				return
 			self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
 			self.screen.refresh()
-			utils.showImage(info['image_url'])
+			utils.showImage(info['image' + {'anime': '_url', 'manga': '_url', 'vn': ''}[entry['type']]])
 			self.screen.border()
 			self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 
