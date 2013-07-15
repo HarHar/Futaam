@@ -168,6 +168,7 @@ class AddEntryDialog(QtGui.QDialog):
 		elif self.ui.vnButton.isChecked():
 			self.vndb = utils.VNDB("Futaam", "0.1")
 			search_results = self.vndb.get('vn', 'basic', '(title~"' + title + '")', '')['items']
+			self.vndb.close()
 		else:
 			search_results = []
 		for result in search_results:
@@ -317,6 +318,7 @@ class EntryInfoDialog(QtGui.QDialog):
 			vndb = utils.VNDB("Futaam", "0.1")
 			details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid']) 
 			+ ")", "")["items"][0]
+			vndb.close()
 			self.showingVN = True
 			self.ui.releaseDateLine.setText(details["released"])
 			self.ui.platformsLine.setText(", ".join(details["platforms"]))
