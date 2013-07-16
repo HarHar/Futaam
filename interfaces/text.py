@@ -87,6 +87,10 @@ def main(argv):
 					sys.exit(1)
 				else:
 					hooks.append(parser.availableHooks[argv[i+1]]())
+		elif x == '--list-hooks':
+			for hook in parser.availableHooks:
+				print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
+			sys.exit(0)
 		elif x == '-c' or x == '--create':
 			print colors.header + 'Creating database' + colors.default + '\n'
 			filename = raw_input('Path to new file> ')
