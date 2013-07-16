@@ -21,7 +21,7 @@ from StringIO import StringIO
 import socket
 from time import sleep
 import hashlib
-import random
+import time
 import copy
 from interfaces.common import utils
 
@@ -119,14 +119,7 @@ class Parser(object):
 	def hash(self):
 		for entry in self.dictionary['items']:
 			if entry.get('hash') == None:
-				done = False
-				while done == False:
-					done = True
-					entry['hash'] = hashlib.sha256(str(random.randint(0, 9999999))).hexdigest()
-					for sub_entry in self.dictionary['items']: #may be unneficient but hash collision would suck
-						if sub_entry == entry: continue
-						if sub_entry.get('hash') == entry['hash']:
-							done = False
+				entry['hash'] = hashlib.sha256(entry['name'] + str(time.time())).hexdigest()
 	def save(self):
 		self.hash()
 		if self.host == '':
