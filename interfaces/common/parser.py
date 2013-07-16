@@ -65,8 +65,6 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class printHook(object):
-	def __init__(self, parser):
-		self.parser = parser
 	def added(self, entry):
 		print('[print hook] new entry added ({0})'.format(entry['name']))
 	def removed(self, entry):
@@ -79,10 +77,9 @@ class Parser(object):
 		self.host = host
 		self.port = port
 		self.password = password
-		self.hooks = []
-		for hook in hooks:
-			self.hook.append(hook())
-		#self.hooks = [printHook(self)]
+		self.hooks = hooks
+		for hook in self.hooks:
+			hook.parser = self
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
