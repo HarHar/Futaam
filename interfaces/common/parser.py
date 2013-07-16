@@ -64,13 +64,25 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 		f.write(json.dumps(tmp))
 	f.close()
 
+class printHook(object):
+	def __init__(self, parser):
+		self.parser = parser
+	def added(self, entry):
+		print('[print hook] new entry added ({0})'.format(entry['name']))
+	def removed(self, entry):
+		print('[print hook] entry removed ({0})'.format(entry['name']))
+	def propertyChanged(self, oldEntry, newEntry, propertyName):
+		print('[print hook] "{0}" property changed on entry "{1}" ({2} -> {3})'.format(propertyName, newEntry['name'], oldEntry[propertyName], newEntry[propertyName]))
+
 class Parser(object):
-	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124):
+	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124, hooks=[]): #leaving ircHook here only for a bit
 		self.host = host
 		self.port = port
 		self.password = password
-		self.ircHook = ircHook
-		self.ircControlPort = ircControlPort
+		self.hooks = []
+		for hook in hooks:
+			self.hook.append(hook())
+		#self.hooks = [printHook(self)]
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
@@ -86,7 +98,7 @@ class Parser(object):
 				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))				
 				return
 			else:
-				raise Exception(rc)			
+				raise Exception(rc)
 		if os.path.exists(filename):
 			self.filename = filename
 			f = open(filename, 'r')
@@ -107,7 +119,7 @@ class Parser(object):
 				raise Exception('Invalid database type')
 		else:
 			raise Exception('File does not exist')
-		if ircHook:
+		if len(self.hooks) != 0:
 			self.tempdict = copy.deepcopy(self.dictionary)
 	def hash(self):
 		for entry in self.dictionary['items']:
@@ -129,53 +141,28 @@ class Parser(object):
 			sleep(0.2)
 			self.sock.sendall(json.dumps({'cmd': 'save'}) + chr(4))
 
-		if self.ircHook:
-			ts = socket.socket()
-			ts.connect(('localhost', self.ircControlPort))
-
-			messages = {'lastwatched': {'norm': 'Watched %difference% episode%diffplural% [%old% to %new%]', 'noint': 'Watched from episode %old% to %new%'}, 'status': {'norm': chr(3) + '%ocolor%%oldstatus%'+ chr(15) +' -> '+ chr(3) +'%ncolor%%newstatus%'}, 'obs': {'norm': 'Observations: "%old%" --> "%new%"'}}
-			ccolors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}
+		if len(self.hooks) != 0:
+			keys = ['lastwatched', 'status', 'obs', 'name']
 
 			hashesMatched = []
-			for new_entry in self.dictionary['items']:
-				for old_entry in self.tempdict['items']:
-					if new_entry['hash'] == old_entry['hash']:
-						hashesMatched.append(new_entry['hash'])
-						for key in messages:
-							if new_entry[key] != old_entry[key]:
-								if str(new_entry[key]).isdigit() and str(old_entry[key]).isdigit():
-									smsg = messages[key]['norm'].replace('%difference%', str(int(new_entry[key]) - int(old_entry[key])))
-									smsg = smsg.replace('%diffplural%', '' if (int(new_entry[key]) - int(old_entry[key])) == 1 else 's')
-								else:
-									try:
-										smsg  = messages[key]['noint']
-									except KeyError:
-										smsg = messages[key]['norm']
-								smsg = smsg.replace('%ocolor%', ccolors[old_entry['status'].lower()])
-								smsg = smsg.replace('%ncolor%', ccolors[new_entry['status'].lower()])
-								smsg = smsg.replace('%old%', str(old_entry[key]))
-								smsg = smsg.replace('%new%', str(new_entry[key]))
-								smsg = smsg.replace('%oldstatus%', utils.translated_status[old_entry['type']][old_entry['status'].lower()])
-								smsg = smsg.replace('%newstatus%', utils.translated_status[new_entry['type']][new_entry['status'].lower()])
-								ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + chr(15) + chr(2) + ' -' + chr(3) + '2 ' + new_entry['name'] + chr(15) + '] ' + smsg}))
-								break
+			for newEntry in self.dictionary['items']:
+				for oldEntry in self.tempdict['items']:
+					if newEntry['hash'] == oldEntry['hash']:
+						hashesMatched.append(newEntry['hash'])
+						for key in keys:
+							if newEntry[key] != oldEntry[key]:
+								for hook in self.hooks:
+									hook.propertyChanged(oldEntry, newEntry, key)
 
 			for entry in self.dictionary['items']:
 				if (entry['hash'] in hashesMatched) == False:
-					smsg = 'Added ' + chr(2) + chr(3) + '02%name%' + chr(15) + ' (' + chr(3) + '%ocolor%%status%' + chr(15) + ')'
-					smsg = smsg.replace('%ocolor%', ccolors[entry['status'].lower()])
-					smsg = smsg.replace('%name%', entry['name'])
-					smsg = smsg.replace('%status%', utils.translated_status[entry['type']][entry['status'].lower()])
-					ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + '] ' + chr(15) + smsg}))
+					for hook in self.hooks:
+						hook.added(entry)
 
 			for entry in self.tempdict['items']:
 				if (entry['hash'] in hashesMatched) == False:
-					smsg = 'Removed ' + chr(2) + chr(3) + '02%name%' + chr(15)
-					smsg = smsg.replace('%name%', entry['name'])
-					ts.sendall(json.dumps({'action': 'msg', 'value': chr(2) + '[' + self.dictionary['name'] + '] ' + chr(15) + smsg}))
-
-			#ts.sendall(json.dumps({'action': 'msg', 'value': 'Something was changed on a database, don\'t ask what'}))
-			ts.close()
+					for hook in self.hooks:
+						hook.removed(entry)
 		self.tempdict = copy.deepcopy(self.dictionary)
 	def reload(self):
 		if self.host != '': self.sock.close()
