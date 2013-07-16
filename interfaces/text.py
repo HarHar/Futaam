@@ -69,12 +69,24 @@ def main(argv):
 	host = ''
 	port = 8500
 	i = 0
+	hooks = []
 	ircn = False
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
-		elif x == '--ircnotify':
-			ircn = True
+		elif x == '--hook':
+			if len(argv) <= i:
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			else:
+				if not (argv[i+1] in parser.availableHooks):
+					print colors.fail + 'Hook not available' + colors.default
+					sys.exit(1)
+				else:
+					hooks.append(parser.availableHooks[argv[i+1]]())
 		elif x == '-c' or x == '--create':
 			print colors.header + 'Creating database' + colors.default + '\n'
 			filename = raw_input('Path to new file> ')
@@ -137,7 +149,7 @@ def main(argv):
 	if host == '':
 		dbs = []
 		for fn in dbfile:
-			dbs.append(parser.Parser(fn, ircHook=ircn))
+			dbs.append(parser.Parser(fn, hooks=hooks))
 		currentdb = 0
 	else:
 		if password == '':
