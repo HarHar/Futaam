@@ -47,7 +47,7 @@ def main(argv):
 			alreadyInstalled = True
 		if alreadyInstalled == False:
 			os.popen(gitPath + " clone git://github.com/that4chanwolf/Futaam-Web --depth=1" + curDir + "\\Futaam-Web")
-		if os.path.exists(curDir + "\\Futaam-Web")
+		if os.path.exists(curDir + "\\Futaam-Web"):
 			os.chdir(curDir + '\\Futaam-Web')
 			os.popen(npmPath + ' install') # Install dependencies
 			if alreadyInstalled == False:
