@@ -67,13 +67,48 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 class printHook(object):
 	def added(self, entry):
 		print('[print hook] new entry added ({0})'.format(entry['name']))
+
 	def removed(self, entry):
 		print('[print hook] entry removed ({0})'.format(entry['name']))
+
 	def propertyChanged(self, oldEntry, newEntry, propertyName):
 		print('[print hook] "{0}" property changed on entry "{1}" ({2} -> {3})'.format(propertyName, newEntry['name'], oldEntry[propertyName], newEntry[propertyName]))
 
+class IRCHook(object):
+	def __init__(self, port=5124):
+		self.port = port
+		self.statusColors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}
+
+	def msg(self, msg):
+		socket = socket.socket()
+		socket.connect(('localhost', self.port))
+		socket.send(json.dumps({'action': 'msg', 'value': msg}))
+		time.sleep(0.1)
+		socket.close()
+
+	def added(self, entry):
+		self.msg('Added {0}{2}{3} ({1}{4}{3})'.format('\x02', '\x03' + self.statusColors[entry['status']], entry['name'], '\x15', utils.translated_status[entry['type']][entry['status'].lower()]))
+
+	def removed(self, entry):
+		self.msg('Removed {0}{1}'.format('\x02', entry['name']))
+
+	def propertyChanged(self, oldEntry, newEntry, propertyName):
+		if propertyName == 'obs':
+			self.msg('[{0}] Observation: "{1}" --> "{2}"'.format(newEntry['name'], oldEntry[propertyName], newEntry[propertyName]))
+		elif propertyName == 'status':
+			self.msg('[{0}] {1} -> {2}'.format(newEntry['name'], '\x03' + self.statusColors[oldEntry['status']] + utils.translated_status[entry['type']][oldEntry['status'].lower()] + '\x15', '\x03' + self.statusColors[newEntry['status']] + utils.translated_status[entry['type']][newEntry['status'].lower()] + '\x15'))
+		elif propertyName == 'lastwatched':
+			action = 'Watched ' if entry['type'] == 'anime' else 'Read ' if entry['type'] == 'manga' else 'Played ' if entry['type'] == 'vn' else ''
+			thing = 'episodes' if entry['type'] == 'anime' else 'chapters' if entry['type'] == 'manga' else ''
+			if newEntry['lastwatched'].isdigit() and oldEntry['lastwatched'].isdigit():
+				self.msg('[{0}] {1}from {2} to {3} ({4} {3} {5})'.format(newEntry['name'], action, oldEntry['lastwatched'], newEntry['lastwatched'], action.lower(), thing))
+			else:
+				self.msg('[{0}] {1}from {2} to {3}'.format(newEntry['name'], action, oldEntry['lastwatched'], newEntry['lastwatched']))
+
+availableHooks = {'printHook': printHook, 'irc': ircHook}
+
 class Parser(object):
-	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124, hooks=[]): #leaving ircHook here only for a bit
+	def __init__(self, filename='', host='', port=8500, password='', hooks=[]): #leaving ircHook here only for a bit
 		self.host = host
 		self.port = port
 		self.password = password
