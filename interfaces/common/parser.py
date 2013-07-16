@@ -64,13 +64,6 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 		f.write(json.dumps(tmp))
 	f.close()
 
-class entryType(object):
-	def __init__(self, name):
-		self.name = name
-	def getStatus(self):
-		""" Example of result: {'w': 'watching', 'd': 'dropped', (...)} """
-		return {}
-
 class Parser(object):
 	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124):
 		self.host = host
