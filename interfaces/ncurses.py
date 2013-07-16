@@ -80,7 +80,7 @@ class if_ncurses(object):
 		self.host = ''
 		self.port = 8500
 		i = 0
-		self.ircn = False
+		self.hooks = []
 		for x in argv:
 			if os.path.exists(x):
 				self.dbfile.append(x)
@@ -111,8 +111,23 @@ class if_ncurses(object):
 					sys.exit(1)	
 				else:
 					self.password = argv[i+1]
-			elif x == '--ircnotify':
-				self.ircn = True
+			elif x == '--hook':
+				if len(argv) <= i:
+					print colors.fail + 'Missing hook name' + colors.default
+					sys.exit(1)
+				elif argv[i+1].startswith('--'):
+					print colors.fail + 'Missing hook name' + colors.default
+					sys.exit(1)
+				else:
+					if not (argv[i+1] in parser.availableHooks):
+						print colors.fail + 'Hook not available' + colors.default
+						sys.exit(1)
+					else:
+						self.hooks.append(parser.availableHooks[argv[i+1]]())
+			elif x == '--list-hooks':
+				for hook in parser.availableHooks:
+					print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
+				sys.exit(0)
 			i += 1	
 
 		if len(self.dbfile) == 0 and self.host == '':
@@ -122,14 +137,14 @@ class if_ncurses(object):
 		if self.host == '':
 			self.dbs = []
 			for fn in self.dbfile:
-				self.dbs.append(parser.Parser(fn, ircHook=self.ircn))
+				self.dbs.append(parser.Parser(fn, hooks=self.hooks))
 			self.currentdb = 0
 		else:
 			if self.password == '':
 				print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
 				sys.exit(1)
 			self.dbs = []
-			self.dbs.append(parser.Parser(host=self.host, port=self.port, password=self.password, ircHook=self.ircn))
+			self.dbs.append(parser.Parser(host=self.host, port=self.port, password=self.password, hooks=self.hooks))
 			self.currentdb = 0
 
 		self.showing = []

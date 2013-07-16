@@ -70,7 +70,6 @@ def main(argv):
 	port = 8500
 	i = 0
 	hooks = []
-	ircn = False
 	for x in argv:
 		if os.path.exists(x):
 			dbfile.append(x)
@@ -160,7 +159,7 @@ def main(argv):
 			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
 			sys.exit(1)
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, password=password))
+		dbs.append(parser.Parser(host=host, port=port, password=password, hooks=hooks))
 		currentdb = 0
 
 	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'

@@ -65,7 +65,7 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f.close()
 
 class printHook(object):
-	""" Example hook that prints the changes made """
+	"""Example hook that prints the changes made"""
 	def added(self, entry):
 		print('[print hook] new entry added ({0})'.format(entry['name']))
 
@@ -76,7 +76,7 @@ class printHook(object):
 		print('[print hook] "{0}" property changed on entry "{1}" ({2} -> {3})'.format(propertyName, newEntry['name'], oldEntry[propertyName], newEntry[propertyName]))
 
 class IRCHook(object):
-	""" Hook that announces the changes on the database on a IRC channel; note: you must first start the "irc" interface """
+	"""Hook that announces the changes on the database on a IRC channel; note: you must first start the "irc" interface"""
 	def __init__(self, port=5124):
 		self.port = port
 		self.statusColors = {'w': '3', 'd': '4', 'q': '6', 'c': '2', 'h': '7'}

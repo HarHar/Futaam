@@ -594,7 +594,7 @@ def main(argv):
 		filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 		if filename != None: argv.append(filename)
 
-	ircn = False
+	hooks = []
 	i = 0
 	for x in argv:
 		if os.path.exists(x):
@@ -626,8 +626,23 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				password = argv[i+1]
-		elif x == '--ircnotify':
-			ircn = True
+		elif x == '--hook':
+			if len(argv) <= i:
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			else:
+				if not (argv[i+1] in parser.availableHooks):
+					print colors.fail + 'Hook not available' + colors.default
+					sys.exit(1)
+				else:
+					hooks.append(parser.availableHooks[argv[i+1]]())
+		elif x == '--list-hooks':
+			for hook in parser.availableHooks:
+				print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
+			sys.exit(0)
 		i += 1	
 
 	if len(dbfile) == 0 and host == '':
@@ -637,14 +652,14 @@ def main(argv):
 	if host == '':
 		dbs = []
 		for fn in dbfile:
-			dbs.append(parser.Parser(fn, ircHook=ircn))
+			dbs.append(parser.Parser(fn, hooks=hooks))
 		currentdb = 0
 	else:
 		if password == '':
 			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
 			sys.exit(1)
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, password=password))
+		dbs.append(parser.Parser(host=host, port=port, password=password, hooks=hooks))
 		currentdb = 0
 
 	ui = uic.loadUi(uiPrefix + "gui.ui")

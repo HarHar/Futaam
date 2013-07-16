@@ -23,6 +23,13 @@
 
 	The variables you'll most likely want to use is 'dbs'
 """
+try:
+  import readline
+except ImportError:
+  print "Module readline unavailable."
+else:
+  import rlcompleter
+  readline.parse_and_bind("tab: complete")
 
 import os
 import sys
@@ -84,5 +91,8 @@ def main(argv):
 		dbs.append(parser.Parser(host=host, port=port, password=password))
 		currentdb = 0
 
+	#dbs[0].dictionary['items'][120]['id'] = 120
+	#dbs[0].dictionary['items'][127]['id'] = 127
+	#dbs[0].save()
 	while True:
-		exec raw_input('>>> ')
+		exec 'print(repr(' + raw_input('>>> ') + '))'

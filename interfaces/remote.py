@@ -140,7 +140,7 @@ def main(argv):
 	global readonly
 	files = []
 
-	ircn = False
+	hooks = []
 	i = 0
 	for arg in argv:
 		if os.path.exists(arg):
@@ -165,15 +165,30 @@ def main(argv):
 				port = int(argv[i+1])
 		elif arg in ['--readonly', '-ro']:
 			readonly = True
-		elif arg in ['--ircnotify']:
-			ircn = True
+		elif x == '--hook':
+			if len(argv) <= i:
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				print colors.fail + 'Missing hook name' + colors.default
+				sys.exit(1)
+			else:
+				if not (argv[i+1] in parser.availableHooks):
+					print colors.fail + 'Hook not available' + colors.default
+					sys.exit(1)
+				else:
+					hooks.append(parser.availableHooks[argv[i+1]]())
+		elif x == '--list-hooks':
+			for hook in parser.availableHooks:
+				print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
+			sys.exit(0)
 		i += 1
 	if files == [] or password == '':
 		nprint(colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]')
 		sys.exit(1)
 	else:
 		for fn in files:
-			dbs.append(parser.Parser(fn, ircHook=ircn))
+			dbs.append(parser.Parser(fn, hooks=hooks))
 
 		nprint('[INFO] Listening on port ' + str(port))
 		rserver = SocketServer.ThreadingTCPServer(('', port), rServer)
