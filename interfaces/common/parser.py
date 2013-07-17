@@ -110,7 +110,7 @@ class IRCHook(object):
 availableHooks = {'printHook': printHook, 'irc': IRCHook}
 
 class Parser(object):
-	def __init__(self, filename='', host='', port=8500, password='', ircHook=False, ircControlPort=5124, hooks=[]): #leaving ircHook here only for a bit
+	def __init__(self, filename='', host='', port=8500, password='', hooks=[]):
 		self.host = host
 		self.port = port
 		self.password = password
