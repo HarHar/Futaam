@@ -49,12 +49,12 @@ Needless to say: replace the password/host, change the port number to your wish 
 
 IRC Interface
 ====
-The IRC interface is a bot that runs as a daemon, and then when using any other interface with the argument '--ircnotify' will make the daemonized bot announce the changes made to the specified channel.
+The IRC interface is a bot that runs as a daemon, and then when using any other interface with the irc hook will make the daemonized bot announce the changes made to the specified channel.
 
 Usage:
 
     futaam --irc --host irc.server.net --port 6667 --nick MyNick --channel "#anime"
-    futaam /path/to/database --INTERFACENAME --ircnotify
+    futaam /path/to/database --INTERFACENAME --hook irc
     
 Note that the channel parameter must be enclosed by quotes or have the # escaped
 
@@ -69,6 +69,14 @@ Usage:
 Qt is pretty nifty in that it lets you pass arguements about how you want things to look through the command line. See [this doc](http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html#QApplication) for more info about this.
 
 See ```/docs/GUI_Interface_Info.md``` for more information.
+
+Hooks
+====
+Hooks are used for announcing changes made to another place (IRC for instance)
+Usage:
+
+    futaam --hook HOOKNAME --INTERFACENAME /path/to/database 
+    futaam --hook irc --ncurses /home/john/animu.db
 
 Developers
 ====
