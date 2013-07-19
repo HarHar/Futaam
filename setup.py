@@ -31,7 +31,10 @@ except ImportError, e:
     requirement_set.prepare_files(finder, force_root_egg_info=False, bundle=False)
     requirement_set.install(install_options, global_options)
 
-from distutils.core import setup
+from distutils.core import setup, Command
+from unittest import TextTestRunner, TestLoader
+from glob import glob
+from os.path import splitext, basename, join as pjoin, walk
 import os
 import sys
 import stat
@@ -44,6 +47,29 @@ AUTHOR = "HarHar"
 AUTHOR_EMAIL = "harhar-captain@live.com"
 URL = "https://github.com/HarHar/Futaam"
 VERSION = "0.1"
+
+
+class TestCommand(Command):
+	user_options = [ ]
+
+	def initialize_options(self):
+		self._dir = os.getcwd()
+
+	def finalize_options(self):
+		pass
+
+	def run(self):
+		testfiles = [ ]
+		for t in glob(pjoin(self._dir, 'tests', '*.py')):
+			if not t.endswith('__init__.py'):
+				testfiles.append('.'.join(
+				['tests', splitext(basename(t))[0]])
+			)
+
+		tests = TestLoader().loadTestsFromNames(testfiles)
+		t = TextTestRunner(verbosity = 1)
+		t.run(tests)
+		sys.quit()
 
 def get_subpackages():
 	packs = []
@@ -98,7 +124,8 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-    ]
+    ],
+	cmdclass = {"test": TestCommand}
 )
 
 if sys.argv[1] == "sdist":
