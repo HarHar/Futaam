@@ -165,7 +165,7 @@ def main(argv):
 				nprint(colors.fail + 'Missing username' + colors.default)
 				sys.exit(1)	
 			else:
-				username = hashlib.sha256(argv[i+1]).hexdigest()				
+				username = argv[i+1]
 		elif arg in ['--port']:
 			if len(argv) <= i:
 				nprint(colors.fail + 'Missing port' + colors.default)
