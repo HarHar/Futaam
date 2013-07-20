@@ -100,5 +100,5 @@ if interface == None:
 
 if os.path.exists(os.path.join(path, 'interfaces/') + interface + '.py'):
 	load(os.path.join(path, 'interfaces/') + interface + '.py').main(arguments)
-elif os.path.join(path, 'interfaces/') + interface + '.js':
+elif os.path.exists(os.path.join(path, 'interfaces/') + interface + '.js'):
 	subprocess.Popen(['node', os.path.join(path, 'interfaces/') + interface + '.js'] + arguments)
