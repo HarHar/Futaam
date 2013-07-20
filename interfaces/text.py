@@ -28,6 +28,7 @@ import sys
 import ConfigParser
 import datetime
 import time
+import getpass
 
 PS1 = '[%N]> '
 configfile = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
@@ -67,6 +68,8 @@ def main(argv):
 
 	dbfile = []
 	host = ''
+	password = ''
+	username = ''
 	port = 8500
 	i = 0
 	hooks = []
@@ -134,15 +137,15 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				port = int(argv[i+1])
-		elif x == '--password':
+		elif x == '--username':
 			if len(argv) <= i:
-				print colors.fail + 'Missing password' + colors.default
+				print colors.fail + 'Missing username' + colors.default
 				sys.exit(1)
 			elif argv[i+1].startswith('--'):
-				print colors.fail + 'Missing password' + colors.default
+				print colors.fail + 'Missing username' + colors.default
 				sys.exit(1)	
 			else:
-				password = argv[i+1]
+				username = argv[i+1]
 		i += 1	
 	if len(dbfile) == 0 and host == '':
 		print colors.fail + 'No database specified' + colors.default
@@ -155,11 +158,12 @@ def main(argv):
 			dbs.append(parser.Parser(fn, hooks=hooks))
 		currentdb = 0
 	else:
-		if password == '':
-			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+		if username == '':
+			print colors.fail + 'Missing username! ' + colors.default + 'Use "--username [user]"'
 			sys.exit(1)
+		password = getpass.getpass('Password for ' + username + '@' + host + ': ')
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, password=password, hooks=hooks))
+		dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
 		currentdb = 0
 
 	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'

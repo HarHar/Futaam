@@ -85,7 +85,7 @@ class IRCHook(object):
 availableHooks = {'printHook': printHook, 'irc': IRCHook}
 
 class Parser(object):
-	def __init__(self, filename='', host='', port=8500, password='', hooks=[]):
+	def __init__(self, filename='', host='', port=8500, password='', username='', hooks=[]):
 		self.host = host
 		self.port = port
 		self.password = password
@@ -95,7 +95,7 @@ class Parser(object):
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
-			self.sock.sendall(hashlib.sha256(password).hexdigest())
+			self.sock.sendall(hashlib.sha256(username).hexdigest() + '/' + hashlib.sha256(password).hexdigest())
 			rc = self.sock.recv(1024)
 			if rc == 'OK':
 				cmd = {'cmd': 'pull', 'args': ''}

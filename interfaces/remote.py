@@ -25,6 +25,7 @@ from StringIO import StringIO
 
 port = 8500
 password = ''
+username = ''
 dbs = []
 curdb = 0
 readonly = False
@@ -38,15 +39,16 @@ def nprint(s):
 class rServer(SocketServer.BaseRequestHandler):
 	def setup(self):
 		global password
+		global username
 		nprint('[INFO] ' + repr(self.client_address) + ' connected')
 
 		try:
-			hashed_pass = self.request.recv(4096).strip('\n').strip('\r')
+			login = self.request.recv(4096).strip('\n').strip('\r')
 		except:
 			nprint('[INFO] '+ repr(self.client_addess) + ' has disconnected')
 			return
 
-		if hashed_pass != password:
+		if login != username + '/' + password:
 			self.request.send('305 NOT AUTHORIZED')
 			nprint('[INFO] ' + repr(self.client_address) + ' has sent an invalid password and is now disconnected')
 			self.request.close()
@@ -138,6 +140,7 @@ def main(argv):
 	global password
 	global dbs
 	global readonly
+	global username
 	files = []
 
 	hooks = []
@@ -154,6 +157,15 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				password = hashlib.sha256(argv[i+1]).hexdigest()
+		elif arg in ['--user', '--username']:
+			if len(argv) <= i:
+				nprint(colors.fail + 'Missing username' + colors.default)
+				sys.exit(1)
+			elif argv[i+1].startswith('--'):
+				nprint(colors.fail + 'Missing username' + colors.default)
+				sys.exit(1)	
+			else:
+				username = hashlib.sha256(argv[i+1]).hexdigest()				
 		elif arg in ['--port']:
 			if len(argv) <= i:
 				nprint(colors.fail + 'Missing port' + colors.default)
@@ -165,7 +177,7 @@ def main(argv):
 				port = int(argv[i+1])
 		elif arg in ['--readonly', '-ro']:
 			readonly = True
-		elif x == '--hook':
+		elif arg == '--hook':
 			if len(argv) <= i:
 				print colors.fail + 'Missing hook name' + colors.default
 				sys.exit(1)
@@ -178,13 +190,13 @@ def main(argv):
 					sys.exit(1)
 				else:
 					hooks.append(parser.availableHooks[argv[i+1]]())
-		elif x == '--list-hooks':
+		elif arg == '--list-hooks':
 			for hook in parser.availableHooks:
 				print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
 			sys.exit(0)
 		i += 1
 	if files == [] or password == '':
-		nprint(colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number]')
+		nprint(colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --username [user] --password [pass] --port [number]')
 		sys.exit(1)
 	else:
 		for fn in files:

@@ -20,6 +20,7 @@ from PyQt4 import QtCore
 from PyQt4 import uic
 from interfaces.common import *
 import os, inspect
+import getpass
 
 dbfile = []
 host = ''
@@ -594,6 +595,8 @@ def main(argv):
 		filename = QtGui.QFileDialog.getOpenFileName(None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
 		if filename != None: argv.append(filename)
 
+	password = ''
+	username = ''
 	hooks = []
 	i = 0
 	for x in argv:
@@ -617,15 +620,15 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				port = int(argv[i+1])
-		elif x == '--password':
+		elif x == '--username':
 			if len(argv) <= i:
-				print colors.fail + 'Missing password' + colors.default
+				print colors.fail + 'Missing username' + colors.default
 				sys.exit(1)
 			elif argv[i+1].startswith('--'):
-				print colors.fail + 'Missing password' + colors.default
+				print colors.fail + 'Missing username' + colors.default
 				sys.exit(1)	
 			else:
-				password = argv[i+1]
+				username = argv[i+1]
 		elif x == '--hook':
 			if len(argv) <= i:
 				print colors.fail + 'Missing hook name' + colors.default
@@ -655,11 +658,12 @@ def main(argv):
 			dbs.append(parser.Parser(fn, hooks=hooks))
 		currentdb = 0
 	else:
-		if password == '':
-			print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+		if username == '':
+			print colors.fail + 'Missing username! ' + colors.default + 'Use "--username [user]"'
 			sys.exit(1)
+		password = getpass.getpass('Password for ' + username + '@' + host + ': ')
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, password=password, hooks=hooks))
+		dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
 		currentdb = 0
 
 	ui = uic.loadUi(uiPrefix + "gui.ui")

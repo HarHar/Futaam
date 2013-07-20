@@ -23,6 +23,7 @@ from interfaces.common import *
 import locale
 import urllib2
 from time import sleep as sleep
+import getpass
 
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
@@ -80,6 +81,8 @@ class if_ncurses(object):
 		self.host = ''
 		self.port = 8500
 		i = 0
+		self.password = ''
+		self.username = ''
 		self.hooks = []
 		for x in argv:
 			if os.path.exists(x):
@@ -102,15 +105,15 @@ class if_ncurses(object):
 					sys.exit(1)	
 				else:
 					self.port = int(argv[i+1])
-			elif x == '--password':
+			elif x == '--username':
 				if len(argv) <= i:
-					print colors.fail + 'Missing password' + colors.default
+					print colors.fail + 'Missing username' + colors.default
 					sys.exit(1)
 				elif argv[i+1].startswith('--'):
-					print colors.fail + 'Missing password' + colors.default
+					print colors.fail + 'Missing username' + colors.default
 					sys.exit(1)	
 				else:
-					self.password = argv[i+1]
+					self.username = argv[i+1]
 			elif x == '--hook':
 				if len(argv) <= i:
 					print colors.fail + 'Missing hook name' + colors.default
@@ -140,11 +143,12 @@ class if_ncurses(object):
 				self.dbs.append(parser.Parser(fn, hooks=self.hooks))
 			self.currentdb = 0
 		else:
-			if self.password == '':
-				print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+			if self.username == '':
+				print colors.fail + 'Missing username! ' + colors.default + 'Use "--username [user]"'
 				sys.exit(1)
+			self.username = getpass.getpass('Password for ' + username + '@' + host + ': ')
 			self.dbs = []
-			self.dbs.append(parser.Parser(host=self.host, port=self.port, password=self.password, hooks=self.hooks))
+			self.dbs.append(parser.Parser(host=self.host, port=self.port, username=self.username, password=self.password, hooks=self.hooks))
 			self.currentdb = 0
 
 		self.showing = []
