@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import pickle
 import json
 import os
 from StringIO import StringIO
@@ -25,30 +24,8 @@ import time
 import copy
 from interfaces.common import utils
 
-class SafeUnpickler(pickle.Unpickler):
-    PICKLE_SAFE = {
-        'copy_reg': set(['_reconstructor']),
-        '__builtin__': set(['object'])
-    }
-    def find_class(self, module, name):
-        if not module in self.PICKLE_SAFE:
-            raise pickle.UnpicklingError(
-                'Attempting to unpickle unsafe module %s' % module
-            )
-        __import__(module)
-        mod = sys.modules[module]
-        if not name in self.PICKLE_SAFE[module]:
-            raise pickle.UnpicklingError(
-                'Attempting to unpickle unsafe class %s' % name
-            )
-        klass = getattr(mod, name)
-        return klass
-    @classmethod
-    def loads(cls, pickle_string):
-        return cls(StringIO(pickle_string)).load()
-
-def createDB(filename, dbtype, name='', description='', items=[]):
-	if dbtype in ['json', 'pickle'] == False:
+def createDB(filename, dbtype='json', name='', description='', items=[]):
+	if dbtype in ['json'] == False:
 		raise Exception('Wrong db type')
 
 	if isinstance(items, list) == False: raise AssertionError
@@ -58,9 +35,7 @@ def createDB(filename, dbtype, name='', description='', items=[]):
 	f = open(filename, 'w')
 	f.write('[' + dbtype + ']\n')
 	tmp = {'name': name, 'description': description, 'count': len(items), 'items': items}
-	if dbtype == 'pickle':
-		f.write(pickle.dumps(tmp))
-	elif dbtype == 'json':
+	if dbtype == 'json':
 		f.write(json.dumps(tmp))
 	f.close()
 
@@ -146,9 +121,6 @@ class Parser(object):
 			if lines[0].lower() == '[json]':
 				self.dbtype = 'json'
 				self.dictionary = json.load(StringIO(txt[len('[json]\n'):]))
-			elif lines[0].lower() == '[pickle]':
-				self.dbtype = 'pickle'
-				self.dictionary = SafeUnpickler.loads(txt[len('[pickle]\n'):])
 			else:
 				raise Exception('Invalid database type')
 		else:
@@ -165,9 +137,7 @@ class Parser(object):
 			f = open(self.filename, 'w')
 			f.write('[' + self.dbtype + ']\n')
 
-			if self.dbtype == 'pickle':
-				f.write(pickle.dumps(self.dictionary))
-			elif self.dbtype == 'json':
+			if self.dbtype == 'json':
 				f.write(json.dumps(self.dictionary))
 			f.close()
 		else:
