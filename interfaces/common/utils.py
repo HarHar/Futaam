@@ -267,7 +267,11 @@ class VNDB(object):
 		self.sock = socket.socket()
 		
 		if debug: print('Connecting to api.vndb.org')
-		self.sock.connect(('api.vndb.org', 19534))
+		try:
+			self.sock.connect(('api.vndb.org', 19534))
+		except:
+			print('Could not connect to VNDB')
+			return
 		if debug: print('Connected')
 		
 		if debug: print('Authenticating')

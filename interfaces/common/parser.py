@@ -104,7 +104,11 @@ class Parser(object):
 				rc = ''
 				while rc[-1:] != chr(4):
 					rc += self.sock.recv(4096)
-				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))				
+				if json.load(StringIO(rc[:-1]))['response'].find('err:') == 0:
+					print(json.load(StringIO(rc[:-1]))['response'].replace('err:', '').strip())
+					exit(1)
+
+				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))
 				return
 			else:
 				raise Exception(rc)

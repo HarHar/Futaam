@@ -87,6 +87,21 @@ class if_ncurses(object):
 		for x in argv:
 			if os.path.exists(x):
 				self.dbfile.append(x)
+		elif x.lower().startswith('futa://'):
+			host = x
+			host = host.replace('futa://', '')
+			host = host.split('/')[0] #for now
+			if host.find(':') != -1:
+				port = host.split(':')[-1]
+				if port.isdigit():
+					port = int(port)
+				else:
+					print colors.fail + 'Port must be an integer' + colors.default
+					exit(1)
+				host = host.split(':')[0]
+			if host.find('@') != -1:
+				username = host.split('@')[0]
+				host = host.split('@')[1]
 			elif x == '--host':
 				if len(argv) <= i:
 					print colors.fail + 'Missing host' + colors.default
@@ -144,8 +159,7 @@ class if_ncurses(object):
 			self.currentdb = 0
 		else:
 			if self.username == '':
-				print colors.fail + 'Missing username! ' + colors.default + 'Use "--username [user]"'
-				sys.exit(1)
+				username = raw_input('Username for \'' + host + '\': ')
 			self.username = getpass.getpass('Password for ' + username + '@' + host + ': ')
 			self.dbs = []
 			self.dbs.append(parser.Parser(host=self.host, port=self.port, username=self.username, password=self.password, hooks=self.hooks))

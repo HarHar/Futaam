@@ -128,6 +128,21 @@ def main(argv):
 				sys.exit(1)	
 			else:
 				host = argv[i+1]
+		elif x.lower().startswith('futa://'):
+			host = x
+			host = host.replace('futa://', '')
+			host = host.split('/')[0] #for now
+			if host.find(':') != -1:
+				port = host.split(':')[-1]
+				if port.isdigit():
+					port = int(port)
+				else:
+					print colors.fail + 'Port must be an integer' + colors.default
+					exit(1)
+				host = host.split(':')[0]
+			if host.find('@') != -1:
+				username = host.split('@')[0]
+				host = host.split('@')[1]
 		elif x == '--port':
 			if len(argv) <= i:
 				print colors.fail + 'Missing port' + colors.default
@@ -159,9 +174,8 @@ def main(argv):
 		currentdb = 0
 	else:
 		if username == '':
-			print colors.fail + 'Missing username! ' + colors.default + 'Use "--username [user]"'
-			sys.exit(1)
-		password = getpass.getpass('Password for ' + username + '@' + host + ': ')
+			username = raw_input('Username for \'' + host + '\': ')
+		password = getpass.getpass('Password for \'' + username + '@' + host + '\': ')
 		dbs = []
 		dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
 		currentdb = 0
