@@ -433,13 +433,9 @@ class NewDbDialog(QtGui.QDialog):
 
 	def makeNew(self):
 		path = self.ui.pathEdit.text()
-		if self.ui.jsonButton.isChecked():
-			dbType = "json"
-		else:
-			dbType = "pickle"
 		title = self.ui.nameLineEdit.text()
 		des = self.ui.descriptionLineEdit.text()
-		parser.createDB(str(path), str(dbType), str(title), str(des))
+		parser.createDB(str(path), "json", str(title), str(des))
 		self.close()
 
 class DbStatsDialog(QtGui.QDialog):

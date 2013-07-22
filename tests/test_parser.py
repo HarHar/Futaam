@@ -28,17 +28,6 @@ class TestDbCreation(unittest.TestCase):
                       "genre": "genres here", "aid": 30, "type": "anime",
                       "obs": "Best Anime Ever"}]
 
-    def test_pickle_creation(self):
-        parser.createDB("test1.db", "pickle", "testing pickle db creation")
-        self.assertTrue(os.path.exists("test1.db"))
-        os.unlink("test1.db")
-
-    def test_pickle_creation_with_items(self):
-        parser.createDB(
-            "test2.db", "pickle", "test pickle db creation with items", self.items)
-        self.assertTrue(os.path.exists("test2.db"))
-        os.unlink("test2.db")
-
     def test_json_creation(self):
         parser.createDB("test3.db", "json", "test json db creation")
         self.assertTrue(os.path.exists("test3.db"))
@@ -49,7 +38,3 @@ class TestDbCreation(unittest.TestCase):
             "test4.db", "json", "test json db creation with items", self.items)
         self.assertTrue(os.path.exists("test4.db"))
         os.unlink("test4.db")
-
-
-if __name__ == "__main__":
-    unittest.main()
