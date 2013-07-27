@@ -32,7 +32,7 @@ if os.path.exists(confpath):
 else:
 	conf = {}
 
-sha256 = lambda x: hashlib.sha256(x).hexdigest() if x != None else None
+sha256 = lambda x: 'sha256:' + hashlib.sha256(x).hexdigest() if x != None else None
 writeRules = {'default.password': sha256}
 
 def load(filepath):

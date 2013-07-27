@@ -95,7 +95,10 @@ class Parser(object):
 		if host != '':
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
-			self.sock.sendall(username + '/' + hashlib.sha256(password).hexdigest())
+			if password.startswith('sha256:'):
+				self.sock.sendall(username + '/' + password)
+			else:
+				self.sock.sendall(username + '/' + hashlib.sha256(password).hexdigest())
 			rc = self.sock.recv(1024)
 			if rc == 'OK':
 				cmd = {'cmd': 'pull', 'args': ''}
