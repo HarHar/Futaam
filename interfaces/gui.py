@@ -567,6 +567,16 @@ def main(argv):
 	global dbfile
 	global port
 	global host
+
+	confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
+	if os.path.exists(confpath):
+		f = open(confpath, 'r')
+		confs = json.load(f)
+		f.close()
+	else:
+		confs = {}
+
+
 	colors = utils.colors()
 	colors.enable()
 
@@ -670,10 +680,22 @@ def main(argv):
 		currentdb = 0
 	else:
 		if username == '':
-			username = raw_input('Username for \'' + host + '\': ')
-		password = getpass.getpass('Password for ' + username + '@' + host + ': ')
+			if 'default.user' in confs:
+				print '[' + colors.blue + 'info' + colors.default +'] using default user'
+				username = confs['default.user']
+			else:
+				username = raw_input('Username for \'' + host + '\': ')
+		if 'default.password' in confs:
+			print '[' + colors.blue + 'info' + colors.default +'] using default password'
+			password = confs['default.password']
+		else:
+			password = getpass.getpass('Password for ' + username + '@' + host + ': ')
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
+		try:
+			dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
+		except Exception, e:
+			print '[' + colors.fail + 'error' + colors.default + '] ' + str(e).replace('305 ', '')
+			sys.exit(1)
 		currentdb = 0
 
 	ui = uic.loadUi(uiPrefix + "gui.ui")

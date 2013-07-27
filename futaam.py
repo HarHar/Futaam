@@ -79,6 +79,7 @@ interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
 if len(sys.argv) == 1: sys.argv.append('--help')
 for i, arg in enumerate(sys.argv):
+	if i == 0: continue
 	if arg[:6] == '--help':
 		print(help(arg[6:]))
 		sys.exit(0)

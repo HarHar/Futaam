@@ -31,11 +31,16 @@ import time
 import getpass
 
 PS1 = '[%N]> '
-configfile = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
-confs = ConfigParser.RawConfigParser()
-if os.path.exists(configfile): confs.read(configfile)
+confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
+if os.path.exists(confpath):
+	f = open(confpath, 'r')
+	confs = json.load(f)
+	f.close()
+else:
+	confs = {}
+
 try:
-	PS1 = confs.get('Futaam', 'PS1')
+	PS1 = confs['PS1']
 except:
 	PS1 = '[%green%%N%default%]> '
 if PS1 == None: PS1 = '[%green%%N%default%]> '
@@ -174,10 +179,23 @@ def main(argv):
 		currentdb = 0
 	else:
 		if username == '':
-			username = raw_input('Username for \'' + host + '\': ')
-		password = getpass.getpass('Password for \'' + username + '@' + host + '\': ')
+			if 'default.user' in confs:
+				print '[' + colors.blue + 'info' + colors.default +'] using default user'
+				username = confs['default.user']
+			else:
+				username = raw_input('Username for \'' + host + '\': ')
+		if 'default.password' in confs:
+			print '[' + colors.blue + 'info' + colors.default +'] using default password'
+			password = confs['default.password']
+		else:
+			password = getpass.getpass('Password for \'' + username + '@' + host + '\': ')
 		dbs = []
-		dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
+		try:
+			dbs.append(parser.Parser(host=host, port=port, username=username, password=password, hooks=hooks))
+		except Exception, e:
+			print '[' + colors.fail + 'error' + colors.default + '] ' + str(e).replace('305 ', '')
+			sys.exit(1)
+
 		currentdb = 0
 
 	print colors.header + dbs[currentdb].dictionary['name'] + colors.default + ' (' + dbs[currentdb].dictionary['description'] + ')'
@@ -210,11 +228,10 @@ def main(argv):
 			sys.exit(0)
 		elif cmdsplit[0].lower() in ['set_ps1', 'sps1']:
 			args += ' '
-			if confs.sections().__contains__('Futaam') == False:
-				confs.add_section('Futaam')
-			confs.set('Futaam', 'PS1', args)
-			with open(configfile, 'wb') as f:
-				confs.write(f)
+
+			confs['PS1'] = args
+			with open(confpath, 'wb') as f:
+				f.write(json.dumps(confs))
 				f.close()
 			PS1 = args
 		elif cmdsplit[0].lower() in ['help', 'h']:

@@ -96,7 +96,7 @@ class Parser(object):
 			self.sock = socket.socket()
 			self.sock.connect((host, port))
 			if password.startswith('sha256:'):
-				self.sock.sendall(username + '/' + password)
+				self.sock.sendall(username + '/' + password.replace('sha256:', ''))
 			else:
 				self.sock.sendall(username + '/' + hashlib.sha256(password).hexdigest())
 			rc = self.sock.recv(1024)

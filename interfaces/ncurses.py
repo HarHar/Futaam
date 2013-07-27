@@ -84,6 +84,16 @@ class if_ncurses(object):
 		self.password = ''
 		self.username = ''
 		self.hooks = []
+
+		self.confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
+		if os.path.exists(confpath):
+			f = open(confpath, 'r')
+			self.confs = json.load(f)
+			f.close()
+		else:
+			self.confs = {}
+
+
 		for x in argv:
 			if os.path.exists(x):
 				self.dbfile.append(x)
@@ -159,8 +169,16 @@ class if_ncurses(object):
 			self.currentdb = 0
 		else:
 			if self.username == '':
-				username = raw_input('Username for \'' + host + '\': ')
-			self.username = getpass.getpass('Password for ' + username + '@' + host + ': ')
+				if 'default.user' in self.confs:
+					print '[' + colors.blue + 'info' + colors.default +'] using default user'
+					self.username = self.confs['default.user']
+				else:
+					self.username = raw_input('Username for \'' + self.host + '\': ')
+			if 'default.password' in self.confs:
+				print '[' + colors.blue + 'info' + colors.default +'] using default password'
+				self.password = self.confs['default.password']
+			else:
+				self.password = getpass.getpass('Password for ' + self.username + '@' + self.host + ': ')
 			self.dbs = []
 			self.dbs.append(parser.Parser(host=self.host, port=self.port, username=self.username, password=self.password, hooks=self.hooks))
 			self.currentdb = 0
