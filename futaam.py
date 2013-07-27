@@ -21,7 +21,19 @@ import imp
 import traceback
 import interfaces.common.utils as utils
 import subprocess
+import json
+import hashlib
 colors = utils.colors()
+confpath = os.path.join(os.environ['HOME'], '.futaam')
+if os.path.exists(confpath):
+	f = open(confpath, 'r')
+	conf = json.load(f)
+	f.close()
+else:
+	conf = {}
+
+sha256 = lambda x: hashlib.sha256(x).hexdigest() if x != None else None
+writeRules = {'default.password': sha256}
 
 def load(filepath):
 	#Loads filepath
@@ -66,7 +78,7 @@ path = os.path.dirname(os.path.realpath(__file__ ))
 interList = getInterface(os.path.join(path, 'interfaces/'))
 interface = None
 if len(sys.argv) == 1: sys.argv.append('--help')
-for arg in sys.argv[1:]:
+for i, arg in enumerate(sys.argv):
 	if arg[:6] == '--help':
 		print(help(arg[6:]))
 		sys.exit(0)
@@ -81,6 +93,39 @@ for arg in sys.argv[1:]:
 		txt = txt[:-2] + '.'
 		sys.stdout.write(txt + colors.default)
 		print '\n\nTo obtain help on them, use --help-interface, replacing \'interface\' with the name you want'
+		sys.exit(0)
+	elif arg.lower() in ['--conf', '--config']:
+		if len(sys.argv) <= i+1:
+			print 'Missing argument for ' + arg
+			sys.exit(1)
+		elif sys.argv[i+1].startswith('--'):
+			print 'Missing argument for ' + arg
+			sys.exit(1)
+
+		key = sys.argv[i+1]
+		if key.find('=') != -1:
+			key = key.split('=')
+			value = key[1]
+			key = key[0]
+		else:
+			if len(sys.argv) <= i+2:
+				if key in conf:
+					print 'Unsetting ' + key
+				else:
+					print 'Key not found'
+					sys.exit(1)
+				value = None
+			else:
+				value = sys.argv[i+2]
+
+		if key in writeRules:
+			value = writeRules[key](value)
+
+		conf[key] = value
+		f = open(confpath, 'w')
+		f.write(json.dumps(conf))
+		f.close()
+
 		sys.exit(0)
 	elif arg[:2] == '--':
 		if arg[2:] in interList:
