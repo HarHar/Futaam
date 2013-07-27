@@ -76,6 +76,7 @@ class if_ncurses(object):
 	    return width
 
 	def __init__(self, argv):
+		self.screen = curses.initscr()
 		self.curitem = 0
 		self.dbfile = []
 		self.host = ''
@@ -86,8 +87,8 @@ class if_ncurses(object):
 		self.hooks = []
 
 		self.confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
-		if os.path.exists(confpath):
-			f = open(confpath, 'r')
+		if os.path.exists(self.confpath):
+			f = open(self.confpath, 'r')
 			self.confs = json.load(f)
 			f.close()
 		else:
@@ -97,21 +98,21 @@ class if_ncurses(object):
 		for x in argv:
 			if os.path.exists(x):
 				self.dbfile.append(x)
-		elif x.lower().startswith('futa://'):
-			host = x
-			host = host.replace('futa://', '')
-			host = host.split('/')[0] #for now
-			if host.find(':') != -1:
-				port = host.split(':')[-1]
-				if port.isdigit():
-					port = int(port)
-				else:
-					print colors.fail + 'Port must be an integer' + colors.default
-					exit(1)
-				host = host.split(':')[0]
-			if host.find('@') != -1:
-				username = host.split('@')[0]
-				host = host.split('@')[1]
+			elif x.lower().startswith('futa://'):
+				host = x
+				host = host.replace('futa://', '')
+				host = host.split('/')[0] #for now
+				if host.find(':') != -1:
+					port = host.split(':')[-1]
+					if port.isdigit():
+						port = int(port)
+					else:
+						print colors.fail + 'Port must be an integer' + colors.default
+						exit(1)
+					host = host.split(':')[0]
+				if host.find('@') != -1:
+					username = host.split('@')[0]
+					host = host.split('@')[1]
 			elif x == '--host':
 				if len(argv) <= i:
 					print colors.fail + 'Missing host' + colors.default
@@ -186,7 +187,6 @@ class if_ncurses(object):
 		self.showing = []
 		self.range_min = 0
 		self.range_max = self.get_terminal_height()
-		self.screen = curses.initscr()
 		self.screen.keypad(1)
 		curses.cbreak()
 		curses.noecho()
@@ -343,12 +343,14 @@ class if_ncurses(object):
 				#self.screen.addstr(10, 10, str(x))		
 
 	def addEntry(self):
+
 		self.redraw(True)
 		self.screen.addstr(2, 2, 'Press A for anime')
 		self.screen.addstr(3, 2, 'Press M for manga')
-		self.screen.addstr(4, 2, 'Press C to cancel')
+		self.screen.addstr(4, 2, 'Press V for visual novel')
+		self.screen.addstr(5, 2, 'Press C to cancel')
 		x = 0
-		while (x in [ord('a'), ord('m'), ord('A'), ord('M'), ord('c'), ord('C')]) == False:
+		while (x in [ord('a'), ord('m'), ord('A'), ord('M'), ord('c'), ord('C'), ord('v'), ord('V')]) == False:
 			x = self.screen.getch()
 		if x in [ord('c'), ord('C')]:
 			self.redraw()
@@ -356,12 +358,17 @@ class if_ncurses(object):
 			return
 		elif x in [ord('a'), ord('A')]:
 			t = 'anime'
-		else:
+		elif x in [ord('M'), ord('m')]:
 			t = 'manga'
+		elif x in [ord('v'), ord('V')]:
+			t = 'vn'
 
 		self.redraw(True)
 		name = self.prompt('Name: ', 2)
-		searchResults = MAL.search(name, t)
+		if t in ['anime', 'manga']:
+			searchResults = MAL.search(name, t)
+		elif t == 'vn':
+			searchResults = vndb.get('vn', 'basic,details', '(title~"' + name + '")', '')['items']
 		if len(searchResults) == 0:
 			self.alert(t[0].upper() + t[1:].lower() + ' not found on MAL :\\') #this will be better handled on the future
 			self.redraw()
@@ -391,17 +398,21 @@ class if_ncurses(object):
 				self.redraw()
 				self.drawSearch(searchResults)
 			elif x == ord('c') or x == ord('C'):
-				self.footer = f2
+				self.footer = self.f2
 				self.redraw()
 				self.drawitems()
 				return
 			elif x == 10:
-				malanime = searchResults[self.scuritem]
-				deep = MAL.details(malanime['id'], t)
-				g = ''
-				for genre in deep['genres']:
-					g = g + genre + '/'
-				genre = g[:-1]
+				selected = searchResults[self.scuritem]
+				genre = ''
+				if t in ['anime', 'manga']:
+					deep = MAL.details(selected['id'], t)
+					g = ''
+					for genre in deep['genres']:
+						g = g + genre + '/'
+					genre = g[:-1]
+				elif t == 'vn':
+					deep = deep = vndb.get('vn', 'basic,details', '(id='+ str(selected['id']) + ')', '')['items'][0]
 				title = deep['title']
 				self.redraw(True)
 				self.screen.addstr(2, 2, '[Status]', curses.A_BOLD)
@@ -418,24 +429,28 @@ class if_ncurses(object):
 					x = chr(x)
 				if x.lower() == 'w':
 					if t == 'anime':
-						lastEp = str(malanime['episodes'])
+						lastEp = str(selected['episodes'])
+					elif t == 'manga':
+						lastEp = str(selected['chapters'])
 					else:
-						lastEp = str(malanime['chapters'])
+						lastEp = ''
 				elif x.lower() == 'q':
 					lastEp = ''
 					pass
 				else:
 					if t == 'anime':
 						lastEp = self.prompt('<Last episode watched> ', 8).replace('\n', '')
-					else:
+					elif t == 'manga':
 						lastEp = self.prompt('<Last chapter read> ', 9).replace('\n', '')
+					else:
+						lastEp = ''
 				obs = self.prompt('<Observations> ', 10).replace('\n', '')
 
 				try:
 					self.dbs[self.currentdb].dictionary['count'] += 1
 				except:
 					self.dbs[self.currentdb].dictionary['count'] = 1
-				self.dbs[self.currentdb].dictionary['items'].append({'id': self.dbs[self.currentdb].dictionary['count'], 'type': t, 'aid': malanime['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
+				self.dbs[self.currentdb].dictionary['items'].append({'id': self.dbs[self.currentdb].dictionary['count'], 'type': t, 'aid': selected['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
 				for x in xrange(0, self.dbs[self.currentdb].dictionary['count']):
 					self.dbs[self.currentdb].dictionary['items'][x]['id'] = x	
 				self.dbs[self.currentdb].save()
@@ -556,8 +571,11 @@ class if_ncurses(object):
 				bold = curses.A_REVERSE
 				if entry['am'] == 'anime':
 					fields = {'Title: ': entry['title'], 'Type: ': entry['type'], 'Episodes: ': str(entry['episodes']), 'Status: ': entry['status']}
-				else:
+				elif entry['am'] == 'manga':
 					fields = {'Title: ': entry['title'], 'Type: ': entry['type'], 'Chapters: ': str(entry['chapters']), 'Status: ': entry['status']}
+				elif entry['am'] == 'vn':
+					fields = {'Title: ': entry['title'], 'Platforms: ': '/'.join(entry['platforms']), 'Released: ': entry['released'], 'Languages: ': '/'.join(entry['languages'])}
+
 				t = 1
 				for field in fields:
 					if fields[field] == None: fields[field] = ''
@@ -574,17 +592,19 @@ class if_ncurses(object):
 				l = t + 1
 				workwidth = terminalsize[1] - s-1
 				self.screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
-				if len(entry['synopsis']) < workwidth:
-					self.screen.addstr(l, s + len('Synopsis: '), entry['synopsis'])
+				skey = 'synopsis'
+				if entry['am'] == 'vn': skey = 'description'
+				if len(entry[skey]) < workwidth:
+					self.screen.addstr(l, s + len('Synopsis: '), entry[skey])
 				else:
-					self.screen.addstr(l, s + len('Synopsis: '), utils.HTMLEntitiesToUnicode(entry['synopsis'][:workwidth-len('Synopsis: ')]).encode('utf-8'))
+					self.screen.addstr(l, s + len('Synopsis: '), utils.HTMLEntitiesToUnicode(entry[skey][:workwidth-len('Synopsis: ')]).encode('utf-8'))
 					t = workwidth-len('Synopsis: ')
-					while len(entry['synopsis'][t:t+workwidth]) != 0:
+					while len(entry[skey][t:t+workwidth]) != 0:
 						l += 1
 						if l >= terminalsize[0]-5:
-							self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
+							self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry[skey][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
 							break
-						self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
+						self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(entry[skey][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
 						t += workwidth				
 			else:
 				bold = 0
