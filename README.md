@@ -5,6 +5,11 @@ An anime/manga list manager, originated from YAAM. Aims to be more convenient, l
 
 The name is a [gift](http://archive.foolz.us/a/thread/77916192/) from [/a/](http://boards.4chan.org/a/).
 
+Installing
+======
+
+	# pip install https://github.com/HarHar/Futaam/zipball/master
+
 Usage
 ======
 For opening a database file
@@ -41,7 +46,9 @@ Usage (for the server):
 
 Usage (for the client):
 
-    futaam --INTERFACENAME --host SERVER.IP.OR.HOSTNAME --password CHANGEME --port 1234
+    futaam --INTERFACENAME --host SERVER.IP.OR.HOSTNAME --port 1234
+    or
+    futaam --INTERFACENAME futa://server.ip.or.hostname:1234
 
 For the client, there will be no change on the 'appearance' of Futaam
 
