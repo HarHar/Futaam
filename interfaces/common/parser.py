@@ -32,7 +32,7 @@ def createDB(filename, dbtype='json', name='', description='', items=[]):
 	for item in items:
 		if isinstance(item, dict) == False: raise AssertionError
 
-	f = open(filename, 'w')
+	f = open(os.path.expanduser(os.path.expandvars(filename)), 'w')
 	f.write('[' + dbtype + ']\n')
 	tmp = {'name': name, 'description': description, 'count': len(items), 'items': items}
 	if dbtype == 'json':
