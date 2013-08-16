@@ -29,12 +29,24 @@ class TestDbCreation(unittest.TestCase):
                       "obs": "Best Anime Ever"}]
 
     def test_json_creation(self):
-        parser.createDB("test3.db", "json", "test json db creation")
-        self.assertTrue(os.path.exists("test3.db"))
-        os.unlink("test3.db")
+        parser.createDB("test1.db", "json", "test json db creation")
+        self.assertTrue(os.path.exists("test1.db"))
+        os.unlink("test1.db")
 
     def test_json_creation_with_items(self):
         parser.createDB(
-            "test4.db", "json", "test json db creation with items", self.items)
-        self.assertTrue(os.path.exists("test4.db"))
-        os.unlink("test4.db")
+            "test2.db", "json", "test json db creation with items", self.items)
+        self.assertTrue(os.path.exists("test2.db"))
+        os.unlink("test2.db")
+
+class TestDbParsing(unittest.TestCase):
+
+    def setUp(self):
+        self.p = parser.Parser("tests/example.db")
+
+    def testParsing(self):
+        items = self.p.dictionary['items']
+        self.assertTrue(items[0]['name'] == "Boku no Pico")
+
+    def testSaving(self):
+        self.p.save()

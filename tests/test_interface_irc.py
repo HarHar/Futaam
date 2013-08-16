@@ -18,6 +18,3 @@ along with Futaam. If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
-
-if __name__ == "__main__":
-    unittest.main()

@@ -69,7 +69,7 @@ class TestCommand(Command):
 		tests = TestLoader().loadTestsFromNames(testfiles)
 		t = TextTestRunner(verbosity = 1)
 		t.run(tests)
-		sys.quit()
+		quit()
 
 def get_subpackages():
 	packs = []

@@ -18,6 +18,8 @@ along with Futaam. If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 
+class TestGuiMain(unittest.TestCase):
 
-if __name__ == "__main__":
-    unittest.main()
+   def setup():
+       pass
+
