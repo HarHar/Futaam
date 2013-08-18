@@ -248,6 +248,7 @@ def main(argv):
 			print '\tpicture, pic, image, img - shows an image of the entry or name'
 			print '\tnyaa or n\t\t - searches nyaa.eu for torrent of an entry (if given entry number) or name'
 			print '\tsort or s\t\t - swaps or moves entries around'
+			print '\tfilter, f or search\t - searches the database (by name/genre/obs/type/lastwatched)'
 			print ''
 		elif cmdsplit[0].lower() in ['switchdb', 'sdb']:
 			try:
@@ -270,7 +271,25 @@ def main(argv):
 						print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
 					else:
 						print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'].encode('ascii', 'ignore') + colors.default
-
+		elif cmdsplit[0].lower() in ['search', 'filter', 'f']:
+			if len(cmdsplit) < 3:
+				print 'Usage: ' + cmdsplit[0] + ' <filter> <terms>'
+				print 'Where <filter> is name/genre/lastwatched/status/obs/type'
+			else:
+				if cmdsplit[1].lower() in ['name', 'genre', 'lastwatched', 'status', 'obs', 'type']:
+					for entry in sorted(dbs[currentdb].dictionary['items'], key=lambda x: x['id']):
+						if ' '.join(cmdsplit[2:]).lower() in entry[cmdsplit[1].lower()].lower():
+							rcolors = {'d': colors.fail, 'c': colors.blue, 'w': colors.green, 'h': colors.warning, 'q': colors.header}
+								
+							if entry['status'].lower() in rcolors:
+								sys.stdout.write(rcolors[entry['status'].lower()])
+							if os.name != 'nt':
+								print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'] + colors.default
+							else:
+								print '\t' + str(entry['id']) + ' - [' + entry['status'].upper() + '] ' + entry['name'].encode('ascii', 'ignore') + colors.default
+				else:
+					print 'Usage: ' + cmdsplit[0] + ' <filter> <terms>'
+					print 'Where <filter> is name/genre/lastwatched/status/obs'
 		elif cmdsplit[0].lower() in ['d', 'del', 'delete']:
 			entry = pickEntry(args, dbs[currentdb])
 			if entry == None: continue
