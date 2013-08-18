@@ -427,6 +427,8 @@ def main(argv):
 
 			if entry['type'].lower() != 'vn':
 				n_genre = raw_input('<Genre> [' + entry['genre'].decode('utf8') + '] ').replace('\n', '')
+			else:
+				n_genre = ''
 
 
 			#ZIGZAGGING
@@ -466,8 +468,8 @@ def main(argv):
 			#BEGIN THE SOLO
 			if n_name == '': n_name = entry['name']
 			dbs[currentdb].dictionary['items'][int(args)]['name'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_name))
-			if n_genre == '': n_genre = entry['genre']
-			dbs[currentdb].dictionary['items'][int(args)]['genre'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_genre))
+			if n_genre == '' and entry['type'].lower() != 'vn': n_genre = entry['genre']
+			if entry['type'].lower() != 'vn': dbs[currentdb].dictionary['items'][int(args)]['genre'] = utils.HTMLEntitiesToUnicode(utils.remove_html_tags(n_genre))
 			if n_status != None:
 				if n_status == '': n_status = entry['status']
 				dbs[currentdb].dictionary['items'][int(args)]['status'] = n_status
