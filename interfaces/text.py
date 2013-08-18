@@ -599,6 +599,21 @@ def main(argv):
 							continue
 						break
 
+					print 'Done'
+
+					if args.isdigit():
+						choice = ''
+						while not (choice in ['y', 'n']):
+							choice = raw_input('Would you like me to increment the last watched field? [Y/n] ').lower()
+
+						if choice == 'y':
+							if not dbs[currentdb].dictionary['items'][int(args)]['lastwatched'].isdigit():
+								print colors.error + 'The last watched field on this entry is apparently not a digit,'
+								print 'will not proceed.' + colors.default
+							else:
+								dbs[currentdb].dictionary['items'][int(args)]['lastwatched'] = str(int(dbs[currentdb].dictionary['items'][int(args)]['lastwatched']) + 1)
+								dbs[currentdb].save()
+
 				if choice == 'd':
 					try:
 						import libtorrent as lt 
@@ -627,6 +642,21 @@ def main(argv):
 
 							time.sleep(1)
 					print ''
+					print 'Done'
+
+					if args.isdigit():
+						choice = ''
+						while not (choice in ['y', 'n']):
+							choice = raw_input('Would you like me to increment the last watched field? [Y/n] ').lower()
+
+						if choice == 'y':
+							if not dbs[currentdb].dictionary['items'][int(args)]['lastwatched'].isdigit():
+								print colors.error + 'The last watched field on this entry is apparently not a digit,'
+								print 'will not proceed.' + colors.default
+							else:
+								dbs[currentdb].dictionary['items'][int(args)]['lastwatched'] = str(int(dbs[currentdb].dictionary['items'][int(args)]['lastwatched']) + 1)
+								dbs[currentdb].save()
+					
 
 		elif cmdsplit[0].lower() in ['o', 'oinfo']:
 			accepted = False
