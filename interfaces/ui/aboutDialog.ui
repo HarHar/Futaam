@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
+    <width>382</width>
     <height>158</height>
    </rect>
   </property>
@@ -60,12 +60,12 @@
     <rect>
      <x>20</x>
      <y>50</y>
-     <width>331</width>
+     <width>351</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Futaam is an anime and manga list manager.</string>
+    <string>Futaam is an anime, manga, and visual novel list manager.</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -78,7 +78,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Copyright (C) 2013 Futaam Contributors</string>
+    <string>Copyright © 2013 Futaam Contributors</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
