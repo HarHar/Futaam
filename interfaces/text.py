@@ -23,6 +23,7 @@ else:
   readline.parse_and_bind("tab: complete")
 
 from interfaces.common import *
+from interfaces.common import rtorrent_xmlrpc
 import os
 import sys
 import ConfigParser
@@ -576,13 +577,32 @@ def main(argv):
 
 				print ''
 				choice = ''
-				while (choice in ['t', 'd', 'n']) == False:
+				while (choice in ['t', 'd', 'n', 'r']) == False:
 					print colors.bold + '[T] ' + colors.default + 'Download .torrent file'
 					print colors.bold + '[D] ' + colors.default + 'Download all files (simple torrent client)'
+					print colors.bold + '[R] ' + colors.default + 'Load and start on rTorrent (xmlrpc)'
 					print colors.bold + '[N] ' + colors.default + 'Do nothing'
 					choice = raw_input(colors.bold + 'Choose> ' + colors.default).lower()
 
-				if choice == 't':
+				if choice == 'r':
+					if os.name == 'nt':
+						print colors.fail + 'Not available on Windows' + colors.default
+						continue
+
+					try:
+						server = rtorrent_xmlrpc.SCGIServerProxy('scgi://localhost:5000/')
+						time.sleep(1)
+						server.load_start(picked['url'])
+						time.sleep(.5)
+						print colors.green + 'Success' + colors.default
+					except:
+						print colors.fail + 'Error while connecting or adding torrent to rTorrent' + colors.default
+						print colors.warning + 'ATTENTION: for this to work you need to add the following line to ~/.rtorrent.rc:'
+						print '\tscgi_port = localhost:5000'
+						print ''
+						print 'And rTorrent needs to be running' + colors.default
+						continue
+				elif choice == 't':
 					metadata = urlopen(picked['url']).read()
 
 					while True:
