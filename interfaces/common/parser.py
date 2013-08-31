@@ -137,7 +137,7 @@ class Parser(object):
 	def hash(self):
 		for entry in self.dictionary['items']:
 			if entry.get('hash') == None:
-				entry['hash'] = hashlib.sha256(entry['name'] + str(time.time())).hexdigest()
+				entry['hash'] = hashlib.sha256(entry['name'].encode('utf-8') + str(time.time())).hexdigest()
 	def save(self):
 		self.hash()
 		if self.host == '':
