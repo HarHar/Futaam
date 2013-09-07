@@ -7,6 +7,11 @@ The name is a [gift](http://archive.foolz.us/a/thread/77916192/) from [/a/](http
 
 Installing
 ======
+For stable version use
+
+	# pip install futaam
+
+For development version use
 
 	# pip install https://github.com/HarHar/Futaam/zipball/master
 
