@@ -140,8 +140,8 @@ class MALWrapper(object):
 		"""Returns a list of tuples in the following form
 				[('GroupName', 'details'), ('GroupName', 'details'), ('GroupName', None)]
 		"""
-		url = 'http://myanimelist.net/anime/' + str(animeId) + '/' + urllib.quote(animeTitle) + '/characters' ##Anime only?
-		c = urllib2.urlopen(url).read().replace("'+'", '').replace("' + '", '')
+		url = 'http://myanimelist.net/anime/' + str(animeId) + '/' + urllib.quote(animeTitle) ##Anime only?
+		c = urllib2.urlopen(url).read()
 		bs = BeautifulSoup(c)
 
 		smalls = []
