@@ -140,7 +140,7 @@ class MALWrapper(object):
 		"""Returns a list of tuples in the following form
 				[('GroupName', 'details'), ('GroupName', 'details'), ('GroupName', None)]
 		"""
-		url = 'http://myanimelist.net/anime/' + str(animeId) + '/' + animeTitle + '/characters' ##Anime only?
+		url = 'http://myanimelist.net/anime/' + str(animeId) + '/' + urllib.quote(animeTitle) + '/characters' ##Anime only?
 		c = urllib2.urlopen(url).read().replace("'+'", '').replace("' + '", '')
 		bs = BeautifulSoup(c)
 
@@ -165,7 +165,7 @@ class MALWrapper(object):
 		if not stype in ['anime', 'manga']:
 			raise TypeError('second parameter must be either "anime" or "manga"')
 
-		url = 'http://myanimelist.net/'+ stype +'/' + str(animeId) + '/' + animeTitle + '/characters'
+		url = 'http://myanimelist.net/'+ stype +'/' + str(animeId) + '/' + urllib.quote(animeTitle) + '/characters'
 		c = urllib2.urlopen(url).read().replace("'+'", '').replace("' + '", '')
 		bs = BeautifulSoup(c)
 
