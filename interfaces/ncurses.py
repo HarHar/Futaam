@@ -24,6 +24,14 @@ import locale
 import urllib2
 from time import sleep as sleep
 import getpass
+try:
+  import readline
+except ImportError:
+  print "Module readline unavailable."
+else:
+  import rlcompleter
+  readline.parse_and_bind("tab: complete")
+
 
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
@@ -99,20 +107,20 @@ class if_ncurses(object):
 			if os.path.exists(x):
 				self.dbfile.append(x)
 			elif x.lower().startswith('futa://'):
-				host = x
-				host = host.replace('futa://', '')
-				host = host.split('/')[0] #for now
-				if host.find(':') != -1:
-					port = host.split(':')[-1]
-					if port.isdigit():
-						port = int(port)
+				self.host = x
+				self.host = self.host.replace('futa://', '')
+				self.host = self.host.split('/')[0] #for now
+				if self.host.find(':') != -1:
+					self.port = self.host.split(':')[-1]
+					if self.port.isdigit():
+						self.port = int(self.port)
 					else:
 						print colors.fail + 'Port must be an integer' + colors.default
 						exit(1)
-					host = host.split(':')[0]
-				if host.find('@') != -1:
-					username = host.split('@')[0]
-					host = host.split('@')[1]
+					self.host = self.host.split(':')[0]
+				if self.host.find('@') != -1:
+					self.username = self.host.split('@')[0]
+					self.host = self.host.split('@')[1]
 			elif x == '--host':
 				if len(argv) <= i:
 					print colors.fail + 'Missing host' + colors.default
@@ -179,6 +187,7 @@ class if_ncurses(object):
 				print '[' + colors.blue + 'info' + colors.default +'] using default password'
 				self.password = self.confs['default.password']
 			else:
+				getpass.getpass('lel> ')
 				self.password = getpass.getpass('Password for ' + self.username + '@' + self.host + ': ')
 			self.dbs = []
 			self.dbs.append(parser.Parser(host=self.host, port=self.port, username=self.username, password=self.password, hooks=self.hooks))
