@@ -84,7 +84,6 @@ class if_ncurses(object):
 	    return width
 
 	def __init__(self, argv):
-		self.screen = curses.initscr()
 		self.curitem = 0
 		self.dbfile = []
 		self.host = ''
@@ -195,6 +194,7 @@ class if_ncurses(object):
 		self.showing = []
 		self.range_min = 0
 		self.range_max = self.get_terminal_height()
+		self.screen = curses.initscr()
 		self.screen.keypad(1)
 		curses.cbreak()
 		curses.noecho()
