@@ -187,7 +187,6 @@ class if_ncurses(object):
 				print '[' + colors.blue + 'info' + colors.default +'] using default password'
 				self.password = self.confs['default.password']
 			else:
-				getpass.getpass('lel> ')
 				self.password = getpass.getpass('Password for ' + self.username + '@' + self.host + ': ')
 			self.dbs = []
 			self.dbs.append(parser.Parser(host=self.host, port=self.port, username=self.username, password=self.password, hooks=self.hooks))
