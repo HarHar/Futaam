@@ -33,60 +33,60 @@ else:
 
 import os
 import sys
-from interfaces.common import *
+from interfaces.common.utils import colors 
+from interfaces.common.parser import Parser
 
+COLORS = colors()
+COLORS.enable()
 
 def main(argv):
     dbfile = []
     host = ''
     port = 8500
     i = 0
-    ircn = False
     for x in argv:
         if os.path.exists(x):
             dbfile.append(x)
-        elif x == '--ircnotify':
-            ircn = True
         elif x == '--host':
             if len(argv) <= i:
-                print colors.fail + 'Missing host' + colors.default
+                print COLORS.fail + 'Missing host' + COLORS.default
                 sys.exit(1)
             elif argv[i + 1].startswith('--'):
-                print colors.fail + 'Missing host' + colors.default
+                print COLORS.fail + 'Missing host' + COLORS.default
                 sys.exit(1)
             else:
                 host = argv[i + 1]
         elif x == '--port':
             if len(argv) <= i:
-                print colors.fail + 'Missing port' + colors.default
+                print COLORS.fail + 'Missing port' + COLORS.default
                 sys.exit(1)
             elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() == False:
-                print colors.fail + 'Missing port' + colors.default
+                print COLORS.fail + 'Missing port' + COLORS.default
                 sys.exit(1)
             else:
                 port = int(argv[i + 1])
         elif x == '--password':
             if len(argv) <= i:
-                print colors.fail + 'Missing password' + colors.default
+                print COLORS.fail + 'Missing password' + COLORS.default
                 sys.exit(1)
             elif argv[i + 1].startswith('--'):
-                print colors.fail + 'Missing password' + colors.default
+                print COLORS.fail + 'Missing password' + COLORS.default
                 sys.exit(1)
             else:
                 password = argv[i + 1]
         i += 1
     if len(dbfile) == 0 and host == '':
-        print colors.fail + 'No database specified' + colors.default
+        print COLORS.fail + 'No database specified' + COLORS.default
         sys.exit(1)
 
     if host == '':
         dbs = []
         for fn in dbfile:
-            dbs.append(parser.Parser(fn, ircHook=ircn))
+            dbs.append(Parser(fn))
         currentdb = 0
     else:
         if password == '':
-            print colors.fail + 'Missing password! ' + colors.default +\
+            print COLORS.fail + 'Missing password! ' + COLORS.default +\
 			'Use "--password [pass]"'
             sys.exit(1)
         dbs = []
