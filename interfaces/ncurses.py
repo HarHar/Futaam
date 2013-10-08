@@ -796,5 +796,5 @@ def main(argv):
 		curses.endwin()
 		raise
 
-def help():
+def print_help():
 	return 'No particular arguments for this interface... Sorry to disappoint'

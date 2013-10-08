@@ -209,7 +209,7 @@ def main(argv):
 		except KeyboardInterrupt:
 			os.kill(os.getpid(), 9) #seppuku
 
-def help():
+def print_help():
 	hlp = ''
 	hlp += colors.header + '[Usage] ' + colors.default
 	hlp += sys.argv[0] + ' [file, [file2, file3]] --password [pass] --port [number] [--readonly]\n'

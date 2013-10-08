@@ -730,6 +730,6 @@ def main(argv):
 	QtCore.QObject.connect(rowHeader, QtCore.SIGNAL("sectionMoved(int, int, int)"), dragSwap)
 	exit(app.exec_())
 
-def help():
+def print_help():
 	print """USAGE: ./futaam.py --gui [DATABASE] [Qt Options]"""
 	quit()

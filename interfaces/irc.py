@@ -169,7 +169,7 @@ def main(argv):
 	print 'IRC bot daemon already running'
 	print 'Choose another interface and use the argument --ircnotify'
 
-def help():
+def print_help():
 	ret = colors.bold + 'Interface parameters:' + colors.default + ' --host [irc server] --port [number] --channel [#chan] --nick [nick]'
 	ret += '\n\tThis will spawn a bot daemon, it will connect and join the specified channel,'
 	ret += '\n\tAfter that, use your favorite interface with the argument --ircnotify'

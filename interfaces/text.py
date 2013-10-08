@@ -835,7 +835,7 @@ def main(argv):
 			print colors.warning + 'Command not recognized' + colors.default
 			continue
 
-def help():
+def print_help():
 	ret = colors.header + 'Help for text interface' + colors.default + '\n'
 	ret += colors.header + 'Usage: ' + colors.default + sys.argv[0] + ' [filename] [options]\n\n'
 	ret += '\t--create or -c initiates the database creation routine'
