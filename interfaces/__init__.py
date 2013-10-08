@@ -1,3 +1,4 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import common
+"""Imports common to make it easier to write the interfaces"""
+import interfaces.common
