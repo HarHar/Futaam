@@ -33,7 +33,7 @@ else:
 
 import os
 import sys
-from interfaces.common.utils import colors 
+from interfaces.common.utils import colors
 from interfaces.common.parser import Parser
 
 COLORS = colors()
@@ -44,10 +44,10 @@ def main(argv):
     host = ''
     port = 8500
     i = 0
-    for x in argv:
-        if os.path.exists(x):
-            dbfile.append(x)
-        elif x == '--host':
+    for arg in argv:
+        if os.path.exists(arg):
+            dbfile.append(arg)
+        elif arg == '--host':
             if len(argv) <= i:
                 print COLORS.fail + 'Missing host' + COLORS.default
                 sys.exit(1)
@@ -56,7 +56,7 @@ def main(argv):
                 sys.exit(1)
             else:
                 host = argv[i + 1]
-        elif x == '--port':
+        elif arg == '--port':
             if len(argv) <= i:
                 print COLORS.fail + 'Missing port' + COLORS.default
                 sys.exit(1)
@@ -65,7 +65,7 @@ def main(argv):
                 sys.exit(1)
             else:
                 port = int(argv[i + 1])
-        elif x == '--password':
+        elif arg == '--password':
             if len(argv) <= i:
                 print COLORS.fail + 'Missing password' + COLORS.default
                 sys.exit(1)
@@ -81,17 +81,16 @@ def main(argv):
 
     if host == '':
         dbs = []
-        for fn in dbfile:
-            dbs.append(Parser(fn))
-        currentdb = 0
+        for path in dbfile:
+            dbs.append(Parser(path))
+        currentDb = 0
     else:
         if password == '':
             print COLORS.fail + 'Missing password! ' + COLORS.default +\
 			'Use "--password [pass]"'
             sys.exit(1)
         dbs = []
-        dbs.append(parser.Parser(host=host, port=port, password=password))
-        currentdb = 0
+        currentDb = 0
 
     while True:
         exec 'print(repr(' + raw_input('>>> ') + '))'
