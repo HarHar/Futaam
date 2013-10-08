@@ -92,7 +92,7 @@ def main():
             if os.path.exists(os.path.join(path, 'interfaces/')
 			+ intf[1:] + '.py'):
                 return load(os.path.join(path, 'interfaces/') +
-				intf[1:] + '.py').help()
+				intf[1:] + '.py').print_help()
             elif os.path.exists(os.path.join(path, 'interfaces/')
 			+ intf[1:] + '.js'):
                 return subprocess.Popen(['node', os.path.join(path,
