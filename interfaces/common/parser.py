@@ -73,7 +73,7 @@ class IRCHook(object):
 		if propertyName == 'obs':
 			self.msg('[{0}] Observation: "{1}" --> "{2}"'.format(newEntry['name'], oldEntry[propertyName], newEntry[propertyName]))
 		elif propertyName == 'status':
-			self.msg('[{0}] {1} -> {2}'.format(newEntry['name'], '\x03' + self.statusColors[oldEntry['status']] + utils.translated_status[entry['type']][oldEntry['status'].lower()] + '\x15', '\x03' + self.statusColors[newEntry['status']] + utils.translated_status[entry['type']][newEntry['status'].lower()] + '\x15'))
+			self.msg('[{0}] {1} -> {2}'.format(newEntry['name'], '\x03' + self.statusColors[oldEntry['status']] + utils.translated_status[oldEntry['type']][oldEntry['status'].lower()] + '\x15', '\x03' + self.statusColors[newEntry['status']] + utils.translated_status[oldEntry['type']][newEntry['status'].lower()] + '\x15'))
 		elif propertyName == 'lastwatched':
 			action = 'Watched ' if newEntry['type'] == 'anime' else 'Read ' if newEntry['type'] == 'manga' else 'Played ' if newEntry['type'] == 'vn' else ''
 			thing = 'episodes' if newEntry['type'] == 'anime' else 'chapters' if newEntry['type'] == 'manga' else ''
