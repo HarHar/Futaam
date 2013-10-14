@@ -38,7 +38,7 @@ class TableModel(QtCore.QAbstractTableModel):
     a table that can hold a futaam db's information"""
     def __init__(self, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
-        self.animeList = []
+        self.anime_list = []
         self.headers = ["Title", "Genres", "Status", "Watched", "Observations"]
         self.active_file = ""
 
@@ -53,21 +53,21 @@ class TableModel(QtCore.QAbstractTableModel):
 
         if role == QtCore.Qt.DisplayRole:
             if index.column() == 0:
-                return self.animeList[index.row()][0]
+                return self.anime_list[index.row()][0]
             elif index.column() == 1:
-                return self.animeList[index.row()][1]
+                return self.anime_list[index.row()][1]
             elif index.column() == 2:
-                return self.animeList[index.row()][2]
+                return self.anime_list[index.row()][2]
             elif index.column() == 3:
-                return self.animeList[index.row()][3]
+                return self.anime_list[index.row()][3]
             elif index.column() == 4:
-                return self.animeList[index.row()][4]
+                return self.anime_list[index.row()][4]
 
         return QtCore.QVariant()
 
-    def getAnimeNames(self):
+    def get_entry_names(self):
         names = []
-        for anime in self.animeList:
+        for anime in self.anime_list:
             names.append(anime[0])
         return names
 
@@ -80,14 +80,15 @@ class TableModel(QtCore.QAbstractTableModel):
         return QtCore.QVariant()
 
     def rowCount(self, parent=QtCore.QModelIndex()):
-        return len(self.animeList)
+        return len(self.anime_list)
 
     def load_db(self, fl, db):
         self.active_file = fl
         self.db = db
         for entry in self.db.dictionary['items']:
-            self.animeList.append([entry["name"], entry["genre"], 
-			utils.translated_status[entry['type'].lower()][entry["status"].lower()],
+            self.anime_list.append([entry["name"], entry["genre"], 
+			utils.translated_status[entry['type'].lower()][
+            entry["status"].lower()],
 			entry["lastwatched"], entry["obs"]])
 
     def cbIndexToStatus(self, index):
@@ -116,10 +117,9 @@ class TableModel(QtCore.QAbstractTableModel):
         title = utils.HTMLEntitiesToUnicode(
             utils.remove_html_tags(malInfo['title']))
         title = title.replace("&amp;", "&")
-        self.db.dictionary[
-            'items'].append({'id': self.db.dictionary['count'], 'type': am,
-                             'aid': malInfo['id'], 'name': title, 'genre': str(genres), 'status': status,
-                             'lastwatched': eps, 'obs': str(obs)})
+        self.db.dictionary['items'].append({'id': self.db.dictionary['count'],
+        'type': am, 'aid': malInfo['id'], 'name': title, 'genre': str(genres),
+        'status': status, 'lastwatched': eps, 'obs': str(obs)})
         self.rebuildIds()
         reloadTable()
 
@@ -168,11 +168,14 @@ class AddEntryDialog(QtGui.QDialog):
         QtCore.QObject.connect(
             self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
         QtCore.QObject.connect(
-            self.ui.titleLine, QtCore.SIGNAL("editingFinished()"), self.populateCB)
+            self.ui.titleLine, QtCore.SIGNAL("editingFinished()"), 
+            self.populateCB)
         QtCore.QObject.connect(
-            self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"), self.populateCB)
+            self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"), 
+            self.populateCB)
         QtCore.QObject.connect(
-            self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"), self.populateCB)
+            self.ui.animeButton, QtCore.SIGNAL("toggled(bool)"),
+            self.populateCB)
         QtCore.QObject.connect(self.ui.resultSelect, QtCore.SIGNAL(
             "currentIndexChanged(int)"), self.resultChanged)
 
@@ -337,7 +340,8 @@ class EntryInfoDialog(QtGui.QDialog):
         self.ui.entrySelect.addItems(names)
         self.ui.entrySelect.setCurrentIndex(index)
         QtCore.QObject.connect(
-            self.ui.closeButton, QtCore.SIGNAL("clicked()"), self.removeTempAndClose)
+            self.ui.closeButton, QtCore.SIGNAL("clicked()"), 
+            self.removeTempAndClose)
         QtCore.QObject.connect(self.ui.entrySelect, QtCore.SIGNAL(
             "currentIndexChanged(int)"), self.fillEntries)
         self.fillEntries(index)
@@ -353,13 +357,13 @@ class EntryInfoDialog(QtGui.QDialog):
         self.index = index
         self.currentEntry = self.entries[self.index]
         if self.currentEntry["type"] != "vn":
-            details = MALWrapper.details(
+            details = utils.MALWrapper.details(
                 self.currentEntry['aid'], self.currentEntry['type'])
             self.showingVN = False
         else:
             vndb = utils.VNDB("Futaam", "0.1")
-            details = vndb.get("vn", "basic,details", "(id = " + str(self.currentEntry['aid'])
-                               + ")", "")["items"][0]
+            details = vndb.get("vn", "basic,details", "(id = " +\
+            str(self.currentEntry['aid']) + ")", "")["items"][0]
             vndb.close()
             self.showingVN = True
             self.ui.releaseDateLine.setText(details["released"])
@@ -478,7 +482,8 @@ class NewDbDialog(QtGui.QDialog):
         QtCore.QObject.connect(
             self.ui.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
         QtCore.QObject.connect(
-            self.ui.pathSelectButton, QtCore.SIGNAL("clicked()"), self.fileDialog)
+            self.ui.pathSelectButton, QtCore.SIGNAL("clicked()"), 
+			self.fileDialog)
 
     def fileDialog(self):
         filename = QtGui.QFileDialog.getSaveFileName(
@@ -532,7 +537,8 @@ class DbStatsDialog(QtGui.QDialog):
 def showOpenDbDialog():
     global model
     filename = QtGui.QFileDialog.getOpenFileName(
-        ui.centralwidget, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
+        ui.centralwidget, "Open Data File", "", 
+		"Futaam Database (*.db);; All Files (*)")
     if filename != None:
         model = TableModel()
         model.load_db(filename, parser.Parser(filename))
@@ -541,7 +547,7 @@ def showOpenDbDialog():
 
 def showDeleteEntryDialog():
     dialog = DeleteEntryDialog(
-        parent=ui.centralwidget, names=model.getAnimeNames())
+        parent=ui.centralwidget, names=model.get_entry_names())
     toDelete = dialog.exec_()
 
 
@@ -562,25 +568,27 @@ def showStatsDialog():
 
 def showSwapEntriesDialog():
     dialog = SwapEntryDialog(
-        names=model.getAnimeNames(), parent=ui.centralwidget)
+        names=model.get_entry_names(), parent=ui.centralwidget)
     dialog.exec_()
 
 
 def showEditEntryDialog():
     dialog = EditEntryDialog(
-        parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
+        parent=ui.centralwidget, names=model.get_entry_names(), 
+		entries=model.db.dictionary['items'])
     dialog.exec_()
 
 
 def showInfoDialog():
     dialog = EntryInfoDialog(
-        parent=ui.centralwidget, names=model.getAnimeNames(), entries=model.db.dictionary['items'])
+        parent=ui.centralwidget, names=model.get_entry_names(), 
+		entries=model.db.dictionary['items'])
     dialog.exec_()
 
 
 def showInfoDialog_preselected(index):
     dialog = EntryInfoDialog(
-        parent=ui.centralwidget, names=model.getAnimeNames(),
+        parent=ui.centralwidget, names=model.get_entry_names(),
         entries=model.db.dictionary['items'], index=index.row())
     dialog.exec_()
 
@@ -598,7 +606,8 @@ def reloadTable():
         model.load_db(filename, parser.Parser(DB_FILE[0]))
     else:
         if password == '':
-            print colors.fail + 'Missing password! ' + colors.default + 'Use "--password [pass]"'
+            print colors.fail + 'Missing password! ' + colors.default +\
+			'Use "--password [pass]"'
             sys.exit(1)
         model.load_db(filename, parser.Parser(
             HOST=host, PORT=port, password=password))
@@ -617,7 +626,7 @@ def dragSwap(logicalIndex, originalIndex, newIndex):
     model.swapEntries(logicalIndex, newIndex)
 
 
-def tableMenu(position):
+def table_menu(position):
     menu = QtGui.QMenu()
     infoAction = menu.addAction("Info")
     editAction = menu.addAction("Edit")
@@ -627,13 +636,15 @@ def tableMenu(position):
     action = menu.exec_(ui.tableView.mapToGlobal(position))
     if action == infoAction:
         dialog = EntryInfoDialog(
-            parent=ui.centralwidget, names=model.getAnimeNames(),
-            entries=model.db.dictionary['items'], index=ui.tableView.indexAt(position).row())
+            parent=ui.centralwidget, names=model.get_entry_names(),
+            entries=model.db.dictionary['items'], 
+			index=ui.tableView.indexAt(position).row())
         dialog.exec_()
     elif action == editAction:
         dialog = EditEntryDialog(
-            parent=ui.centralwidget, names=model.getAnimeNames(),
-            entries=model.db.dictionary['items'], index=ui.tableView.indexAt(position).row())
+            parent=ui.centralwidget, names=model.get_entry_names(),
+            entries=model.db.dictionary['items'], 
+			index=ui.tableView.indexAt(position).row())
         dialog.exec_()
     elif action == deleteAction:
         model.deleteEntry(ui.tableView.indexAt(position).row())
@@ -685,7 +696,8 @@ def main(argv):
             break
     else:
         filename = QtGui.QFileDialog.getOpenFileName(
-            None, "Open Data File", "", "Futaam Database (*.db);; All Files (*)")
+            None, "Open Data File", "", 
+            "Futaam Database (*.db);; All Files (*)")
         if filename != None:
             argv.append(filename)
 
@@ -714,7 +726,8 @@ def main(argv):
                 if PORT.isdigit():
                     PORT = int(port)
                 else:
-                    print colors.fail + 'Port must be an integer' + colors.default
+                    print colors.fail + 'Port must be an integer' +\
+                    colors.default
                     exit(1)
                 HOST = host.split(':')[0]
             if HOST.find('@') != -1:
@@ -724,7 +737,8 @@ def main(argv):
             if len(argv) <= i:
                 print colors.fail + 'Missing PORT' + colors.default
                 sys.exit(1)
-            elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() == False:
+            elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() == \
+            False:
                 print colors.fail + 'Missing PORT' + colors.default
                 sys.exit(1)
             else:
@@ -753,7 +767,8 @@ def main(argv):
                     hooks.append(parser.availableHooks[argv[i + 1]]())
         elif x == '--list-hooks':
             for hook in parser.availableHooks:
-                print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
+                print colors.header + hook + colors.default + ': ' +\
+                parser.availableHooks[hook].__doc__
             sys.exit(0)
         i += 1
 
@@ -769,12 +784,14 @@ def main(argv):
     else:
         if username == '':
             if 'default.user' in confs:
-                print '[' + colors.blue + 'info' + colors.default + '] using default user'
+                print '[' + colors.blue + 'info' + colors.default +\
+                '] using default user'
                 username = confs['default.user']
             else:
                 username = raw_input('Username for \'' + HOST + '\': ')
         if 'default.password' in confs:
-            print '[' + colors.blue + 'info' + colors.default + '] using default password'
+            print '[' + colors.blue + 'info' + colors.default +\
+            '] using default password'
             password = confs['default.password']
         else:
             password = getpass.getpass(
@@ -782,9 +799,11 @@ def main(argv):
         DBS = []
         try:
             DBS.append(
-                parser.Parser(HOST=host, PORT=port, username=username, password=password, hooks=hooks))
+                parser.Parser(HOST=host, PORT=port, username=username, 
+                password=password, hooks=hooks))
         except Exception, e:
-            print '[' + colors.fail + 'error' + colors.default + '] ' + str(e).replace('305 ', '')
+            print '[' + colors.fail + 'error' + colors.default + '] ' +\
+            str(e).replace('305 ', '')
             sys.exit(1)
         currentdb = 0
 
@@ -802,7 +821,7 @@ def main(argv):
     rowHeader.setMovable(True)
     reloadTable()
     ui.tableView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-    ui.tableView.customContextMenuRequested.connect(tableMenu)
+    ui.tableView.customContextMenuRequested.connect(table_menu)
 
     QtCore.QObject.connect(
         ui.actionQuit, QtCore.SIGNAL("triggered()"), ui.close)
@@ -811,11 +830,13 @@ def main(argv):
     QtCore.QObject.connect(
         ui.actionSave, QtCore.SIGNAL("triggered()"), model.db.save)
     QtCore.QObject.connect(
-        ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), showDeleteEntryDialog)
+        ui.actionDelete_Entry, QtCore.SIGNAL("triggered()"), 
+        showDeleteEntryDialog)
     QtCore.QObject.connect(
         ui.actionAdd_Entry, QtCore.SIGNAL("triggered()"), showAddEntryDialog)
     QtCore.QObject.connect(
-        ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), showSwapEntriesDialog)
+        ui.actionSwap_Entries, QtCore.SIGNAL("triggered()"), 
+        showSwapEntriesDialog)
     QtCore.QObject.connect(
         ui.actionAbout_Futaam, QtCore.SIGNAL("triggered()"), showAboutDialog)
     QtCore.QObject.connect(
