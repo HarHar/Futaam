@@ -114,11 +114,14 @@ class NyaaWrapper(object):
 class ANNWrapper(object):
 	def __init__(self):
 		# - check if we need to renew our local db
-		# -- first time
+		# -- first time fetch entire db
+		pass
 	def search(self, name, stype):
 		# - search in our local db (will probably need heuristics algorithm)
+		pass
 	def details(self, id, stype):
 		# - fetch remote xml
+		pass
 
 class MALWrapper(object):
 	@staticmethod
