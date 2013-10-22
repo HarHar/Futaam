@@ -19,7 +19,6 @@ __version__ = "0.2"
 def maingui():
 	import sys
 	sys.argv.append('--gui')
-	global sys
 	main()
 	#kek
 
