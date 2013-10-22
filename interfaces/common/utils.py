@@ -111,6 +111,14 @@ class NyaaWrapper(object):
 			return ''
 		return xml_str[start + 1:end]	
 
+class ANNWrapper(object):
+	def __init__(self):
+		# - check if we need to renew our local db
+		# -- first time
+	def search(self, name, stype):
+		# - search in our local db (will probably need heuristics algorithm)
+	def details(self, id, stype):
+		# - fetch remote xml
 
 class MALWrapper(object):
 	@staticmethod
