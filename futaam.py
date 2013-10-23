@@ -17,13 +17,10 @@ __version__ = "0.2"
 
 
 def maingui():
-=======
     """The GUI entry point for futaam."""
     import sys
     sys.argv.append('--gui')
     main()
-
->>>>>>> pep8
 
 def main():
     """The main method of futaam, loads the selected interface and
