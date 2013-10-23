@@ -35,13 +35,34 @@ from urllib import quote
 from xml.dom import minidom
 import socket
 import time
-
+import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watching', 'w': 'Watched', 'd': 'Dropped'}
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
 vn_translated_status = {'q': 'To play', 'c': 'Currently playing', 'h': 'On hold', 'd': 'Dropped', 'w': 'Played'}
 
 translated_status = {'anime': anime_translated_status, 'manga': manga_translated_status, 'vn': vn_translated_status}
+
+def etree_to_dict(t):
+    d = {t.tag: {} if t.attrib else None}
+    children = list(t)
+    if children:
+        dd = defaultdict(list)
+        for dc in map(etree_to_dict, children):
+            for k, v in dc.iteritems():
+                dd[k].append(v)
+        d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in dd.iteritems()}}
+    if t.attrib:
+        d[t.tag].update(('@' + k, v) for k, v in t.attrib.iteritems())
+    if t.text:
+        text = t.text.strip()
+        if children or t.attrib:
+            if text:
+              d[t.tag]['#text'] = text
+        else:
+            d[t.tag] = text
+    return d
 
 def showImage(url):
     remote_fo = urllib2.urlopen(url)
@@ -113,15 +134,118 @@ class NyaaWrapper(object):
 
 class ANNWrapper(object):
 	def __init__(self):
-		# - check if we need to renew our local db
-		# -- first time fetch entire db
-		pass
-	def search(self, name, stype):
-		# - search in our local db (will probably need heuristics algorithm)
-		pass
-	def details(self, id, stype):
-		# - fetch remote xml
-		pass
+		self.searchURL = {'anime': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?anime=~',
+		'manga': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?manga=~'}
+
+		self.detailsURL = {'anime': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?anime=',
+		'manga': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?manga='}
+
+		self.reportURL = {'anime': 'http://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=anime&nlist=',
+		'manga': 'http://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=manga&nlist='}
+
+		self.URLEnc = lambda x: urllib.quote(x)
+
+	def init(self):
+		#Creates ~/.cache/futaam/ and populates it with the files ANN_anime_cache
+		# and ANN_manga_cache
+		self.caches = {}
+		self.cacheDir = os.getenv('XDG_CACHE_HOME')
+		if self.cacheDir is None: self.cacheDir = os.path.join(os.path.expanduser('~'), '.cache/futaam')
+		if not os.path.exists(self.cacheDir):
+			os.makedirs(self.cacheDir)
+			for filename in ['ANN_anime_cache', 'ANN_manga_cache', 'ANN_id_cache', 'info']:
+				open(os.path.join(self.cacheDir, filename), 'w').write('{}')
+			for cache in ['ANN_anime_cache', 'ANN_manga_cache', 'ANN_id_cache', 'info']:
+				self.caches[cache] = json.load(open(os.path.join(self.cacheDir, cache), 'r'))
+			return 2 #2 for first time using ANNWrapper (needs to get populated)
+
+		if len(self.caches) == 0:
+			for cache in ['ANN_anime_cache', 'ANN_manga_cache', 'ANN_id_cache', 'info']:
+				self.caches[cache] = json.load(open(os.path.join(self.cacheDir, cache), 'r'))
+
+		if self.caches['info'].get('lastTimeUpdated', 0) < time.time() + 86400:
+			return 1 #1 for need of daily update
+
+		return 0 #0 for everything alright 
+
+	def saveCache(self):
+		for cache in self.caches:
+			json.dump(self.caches[cache], open(os.path.join(self.cacheDir, cache), 'w'))
+
+	def fetchReport(self, count):
+		count = str(count)
+
+		for stype in self.reportURL:
+			if self.caches['ANN_id_cache'].get(stype) is None:
+				self.caches['ANN_id_cache'][stype] = {}
+
+			queryurl = self.reportURL[stype] + count
+			res = urllib2.urlopen(queryurl).read()
+			root = ET.fromstring(res)
+			del res; res = etree_to_dict(root) #recycling is important
+
+			#Merge fetched content to our id cache
+			for item in res['report']['item']:
+				self.caches['ANN_id_cache'][stype][item['name']] = item['id']
+
+			#Update time of last update #lel
+			self.caches['info']['lastTimeUpdated'] = time.time()
+		self.saveCache()
+
+	def mergeEntry(self, stype, entry):
+		self.caches['ANN_' + stype + '_cache'][entry['@id']] = {}
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['id'] = entry['@id']
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['title'] = entry['@name']
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'] = {'english': [], 'japanese': [], 'synonyms': []}
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = ''
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'] = []
+		for info in entry['info']:
+			if info['@type'] == 'Alternative title':
+				try: #yeeeeeeeaaaah...
+					self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'][{'JA': 'japanese', 'EN': 'english'}[info['@lang']]] = info['#text']
+				except: pass
+			elif info['@type'] == 'Picture':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = info['@src']
+			elif info['@type'] == 'Genres':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'].append(info['#text'])
+
+	def search(self, name, stype, online=False):
+		if online:
+			queryurl = self.searchURL[stype] + self.URLEnc(name)
+			res = urllib2.urlopen(queryurl).read()
+			root = ET.fromstring(res)
+			del res; res = etree_to_dict(root)
+
+			foundlings = []
+			for entry in res['ann'][stype]:
+				if name.lower() in entry['@name'].lower():
+					foundlings.append({'id': entry['@id'], 'title': entry['@name']})
+
+			for entry in res['ann'][stype]:
+				self.mergeEntry(stype, entry)
+			self.saveCache()
+		else:
+			foundlings = []
+			for item in self.caches['ANN_id_cache'][stype]:
+				if name.lower() in item.lower():
+					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
+
+		return foundlings
+	def details(self, eid, stype):
+		if str(eid) in self.caches['ANN_' + stype + '_cache']:
+			return self.caches['ANN_' + stype + '_cache']
+
+		queryurl = self.detailsURL[stype] + eid
+		res = urllib2.urlopen(queryurl).read()
+		root = ET.fromstring(res)
+		del res; res = etree_to_dict(root)
+
+		self.mergeEntry(stype, res['ann'][stype])
+		self.saveCache()
+
+		if str(eid) in self.caches['ANN_' + stype + '_cache']:
+			return self.caches['ANN_' + stype + '_cache'][eid]
+		raise Exception('Entry with specified ID not found')
 
 class MALWrapper(object):
 	@staticmethod
