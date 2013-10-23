@@ -163,7 +163,7 @@ class ANNWrapper(object):
 			for cache in ['ANN_anime_cache', 'ANN_manga_cache', 'ANN_id_cache', 'info']:
 				self.caches[cache] = json.load(open(os.path.join(self.cacheDir, cache), 'r'))
 
-		if self.caches['info'].get('lastTimeUpdated', 0) < time.time() + 86400:
+		if self.caches['info'].get('lastTimeUpdated', 0) > time.time() + 86400:
 			return 1 #1 for need of daily update
 
 		return 0 #0 for everything alright 
@@ -196,6 +196,7 @@ class ANNWrapper(object):
 		self.caches['ANN_' + stype + '_cache'][entry['@id']] = {}
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['id'] = entry['@id']
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['title'] = entry['@name']
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['type'] = entry['@type']
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'] = {'english': [], 'japanese': [], 'synonyms': []}
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = ''
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'] = []
@@ -220,6 +221,15 @@ class ANNWrapper(object):
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'].append(info['#text'])
 			elif info['@type'] == 'Number of episodes':
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = int(info['#text'])
+			elif info['@type'] == 'Vintage':
+				if info['#text'].find(' to ') != -1:
+					self.caches['ANN_' + stype + '_cache'][entry['@id']]['start_date'] = info['#text'].split(' to ')[0]
+					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = info['#text'].split(' to ')[1]
+				else:
+					self.caches['ANN_' + stype + '_cache'][entry['@id']]['start_date'] = info['#text']
+					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = None
+			elif info['@type'] == 'Objectionable content':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['classification'] = info['#text']
 		if len(entry.get('episode')) > 0:
 			for episode in entry['episode']:
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text']
@@ -248,9 +258,9 @@ class ANNWrapper(object):
 		return foundlings
 	def details(self, eid, stype):
 		if str(eid) in self.caches['ANN_' + stype + '_cache']:
-			return self.caches['ANN_' + stype + '_cache']
+			return self.caches['ANN_' + stype + '_cache'][eid]
 
-		queryurl = self.detailsURL[stype] + eid
+		queryurl = self.detailsURL[stype] + str(eid)
 		res = urllib2.urlopen(queryurl).read()
 		root = ET.fromstring(res)
 		del res; res = etree_to_dict(root)
