@@ -199,6 +199,10 @@ class ANNWrapper(object):
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'] = {'english': [], 'japanese': [], 'synonyms': []}
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = ''
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'] = []
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['OPsongs'] = []
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'] = []
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = None
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'] = {}
 		for info in entry['info']:
 			if info['@type'] == 'Alternative title':
 				try: #yeeeeeeeaaaah...
@@ -206,8 +210,19 @@ class ANNWrapper(object):
 				except: pass
 			elif info['@type'] == 'Picture':
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = info['@src']
-			elif info['@type'] == 'Genres':
+			elif info['@type'] in ['Genres', 'Themes']:
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'].append(info['#text'])
+			elif info['@type'] == 'Plot Summary':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['synopsis'] = info['#text']
+			elif info['@type'] == 'Opening Theme':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['OPsongs'].append(info['#text'])
+			elif info['@type'] == 'Ending Theme':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'].append(info['#text'])
+			elif info['@type'] == 'Number of episodes':
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = int(info['#text'])
+		if len(entry.get('episode')) > 0:
+			for episode in entry['episode']:
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text']
 
 	def search(self, name, stype, online=False):
 		if online:
