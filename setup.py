@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #from distutils.core import setup
+"""The setup script for Futaam"""
 from setuptools import setup
 
 PACKAGE = "futaam"
@@ -28,19 +29,18 @@ setup(
         "Programming Language :: Python",
     ],
     install_requires=[
-       'BeautifulSoup >= 0.1.0',
-       'beautifulsoup4 >= 0.1.0',
-       'PIL >= 0.1.0',
+        'BeautifulSoup >= 0.1.0',
+        'beautifulsoup4 >= 0.1.0',
+        'PIL >= 0.1.0',
     ],
     packages=['interfaces', 'tests', 'docs'],
     package_data={'interfaces': ['common/*.py']},
     entry_points={
-       'console_scripts': [
-          'futaam = futaam:main',
-       ],
-       'gui_scripts': [
-          'futaam-gui = futaam:maingui',
-       ],
+        'console_scripts': [
+            'futaam = futaam:main',
+        ],
+        'gui_scripts': [
+            'futaam-gui = futaam:maingui',
+        ],
     },
 )
-
