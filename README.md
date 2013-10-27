@@ -93,3 +93,7 @@ Usage:
 Developers
 ====
 This can be quite confusing for some, but there is a debugging interface (called "debug"), that loads a Futaam file, stores it on a variable called "dbs" and continuously reads raw input and executes it as Python code, that way you can see how the database works and what some functions do. Also you can use the debugging interface as a base for another interface if you'd like.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/HarHar/futaam/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
