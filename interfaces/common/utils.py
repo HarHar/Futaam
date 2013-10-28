@@ -230,7 +230,7 @@ class ANNWrapper(object):
 					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = None
 			elif info['@type'] == 'Objectionable content':
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['classification'] = info['#text']
-		if len(entry.get('episode', None)) > 0:
+		if len(entry.get('episode', [])) > 0:
 			for episode in entry['episode']:
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text']
 
