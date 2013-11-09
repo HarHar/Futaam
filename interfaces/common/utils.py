@@ -258,20 +258,21 @@ class ANNWrapper(object):
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
 
 		return foundlings
+
 	def details(self, eid, stype):
-		if str(eid) in self.caches['ANN_' + stype + '_cache']:
-			return self.caches['ANN_' + stype + '_cache'][eid]
+		if str(eid) in self.caches['ANN_' + stype + '_cache'].keys():
+			return self.caches['ANN_' + stype + '_cache'][str(eid)]
 
 		queryurl = self.detailsURL[stype] + str(eid)
 		res = urllib2.urlopen(queryurl).read()
 		root = ET.fromstring(res)
 		del res; res = etree_to_dict(root)
-
+		
 		self.mergeEntry(stype, res['ann'][stype])
 		self.saveCache()
-
-		if str(eid) in self.caches['ANN_' + stype + '_cache']:
-			return self.caches['ANN_' + stype + '_cache'][eid]
+			
+		if str(eid) in self.caches['ANN_' + stype + '_cache'].keys():
+			return self.caches['ANN_' + stype + '_cache'][str(eid)]
 		raise Exception('Entry with specified ID not found')
 
 class MALWrapper(object):
