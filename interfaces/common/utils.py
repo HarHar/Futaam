@@ -242,15 +242,19 @@ class ANNWrapper(object):
 			del res; res = etree_to_dict(root)
 			if res['ann'].get(stype) is None:
 				return []
-
+			
 			foundlings = []
-			for entry in res['ann'][stype]:
-				if name.lower() in entry['@name'].lower():
-					foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 
-			for entry in res['ann'][stype]:
+			if "@id" in res['ann'][stype].keys():
+				entry = res['ann'][stype]
+				foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 				self.mergeEntry(stype, entry)
-			self.saveCache()
+			else:
+				for entry in res['ann'][stype]:
+					if name.lower() in entry['@name'].lower():
+						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
+						self.mergeEntry(stype, entry)
+			self.saveCache()		
 		else:
 			foundlings = []
 			for item in self.caches['ANN_id_cache'][stype]:

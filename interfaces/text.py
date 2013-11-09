@@ -52,6 +52,7 @@ if PS1[-1:] != ' ':
     PS1 += ' '
 
 NYAA = utils.NyaaWrapper()
+ANN = utils.ANNWrapper()
 MAL = utils.MALWrapper()
 VNDB = utils.VNDB('Futaam', '0.1')
 COLORS = utils.colors()
@@ -84,7 +85,7 @@ def pick_entry(index, database):
 def main(argv):
     """The text interface's main method."""
     global PS1
-
+    ANN.init()
     dbfile = []
     host = ''
     password = ''
@@ -388,7 +389,7 @@ def main(argv):
                     COLORS.default).lower()
 
                 if entry_type in ['anime', 'manga']:
-                    search_results = MAL.search(title, entry_type)
+                    search_results = ANN.search(title, entry_type)
                 elif entry_type == 'vn':
                     search_results = VNDB.get(
                    'vn', 'basic', '(title~"' + title + '")', '')['items']
@@ -417,7 +418,7 @@ def main(argv):
                             accepted = True
             if accepted:
                 if etype in ['anime', 'manga']:
-                    deep = MAL.details(eid, etype)
+                    deep = ANN.details(eid, etype)
                 elif etype == 'vn':
                     deep = VNDB.get(
                     'vn', 'basic,details', '(id=' + str(eid) + ')', '')\
@@ -426,7 +427,7 @@ def main(argv):
 				COLORS.default
                 utils.showImage(
                 deep[('image_url' if etype != 'vn' else 'image')])
-
+        
         elif cmdsplit[0].lower() in ['s', 'sort']:
             if len(cmdsplit) != 4:
                 print 'Invalid number of arguments'
@@ -688,7 +689,7 @@ def main(argv):
                     print COLORS.bold + '[' + str(i) + '] ' + COLORS.default +\
                     result['title'].encode('ascii', 'ignore')
                 i += 1
-            print '[A] Abort'
+            print '[C] Cancel'
 
             has_picked = False
             while has_picked == False:  # Ugly I know
@@ -878,7 +879,7 @@ def main(argv):
                         COLORS.default).lower()
 
                 if entry_type in ['anime', 'manga']:
-                    search_results = MAL.search(title, entry_type)
+                    search_results = ANN.search(title, entry_type, True)
                 elif entry_type == 'vn':
                     search_results = VNDB.get(
                         'vn', 'basic', '(title~"' + title + '")', '')['items']
@@ -908,7 +909,7 @@ def main(argv):
 
             if accepted:
                 if etype in ['anime', 'manga']:
-                    deep = MAL.details(eid, etype)
+                    deep = ANN.details(eid, etype)
                 elif etype == 'vn':
                     deep = VNDB.get(
                         'vn', 'basic,details', '(id=' + str(eid) + ')', '')[
@@ -937,14 +938,8 @@ def main(argv):
                 elif etype == 'manga':
                     print COLORS.bold + 'Title: ' + COLORS.default +\
                     deep['title']
-                    print COLORS.bold + 'Type: ' + COLORS.default +\
-                    str(round(deep['members_score']))
-                    print COLORS.bold + 'Score: ' + COLORS.default +\
-                    str(deep['chapters'])
-                    print COLORS.bold + 'Volumes: ' + COLORS.default +\
-                    str(deep['volumes'])
                     print COLORS.bold + 'Chapters: ' + COLORS.default +\
-                    str(deep['chapters'])
+                    str(deep['episodes'])
                     print COLORS.bold + 'Synopsis: ' + COLORS.default +\
                     utils.HTMLEntitiesToUnicode(
                      utils.remove_html_tags(deep['synopsis']))
@@ -988,7 +983,7 @@ def main(argv):
                     COLORS.default).lower()
 
             if entry_type in ['anime', 'manga']:
-                search_results = MAL.search(title, entry_type)
+                search_results = ANN.search(title, entry_type, True)
             elif entry_type == 'vn':
                 search_results = VNDB.get(
                     'vn', 'basic', '(title~"' + title + '")', '')['items']
@@ -1012,7 +1007,7 @@ def main(argv):
                     if int(which) <= len(search_results):
                         search_picked = search_results[int(which)]
                         if entry_type in ['anime', 'manga']:
-                            deep = MAL.details(search_picked['id'], entry_type)
+                            deep = ANN.details(search_picked['id'], entry_type)
                         elif entry_type == 'vn':
                             deep = VNDB.get(
                                 'vn', 'basic,details', '(id=' +\
@@ -1044,9 +1039,9 @@ def main(argv):
                     COLORS.default).replace('\n', '')
             else:
                 if entry_type == "anime":
-                    last_ep = str(search_picked['episodes'])
+                    last_ep = str(deep['episodes'])
                 elif entry_type == "manga":
-                    last_ep = str(search_picked['chapters'])
+                    last_ep = str(deep['episodes'])
                 else:
                     last_ep = ''
 
