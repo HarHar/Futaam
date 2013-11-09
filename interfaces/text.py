@@ -53,7 +53,6 @@ if PS1[-1:] != ' ':
 
 NYAA = utils.NyaaWrapper()
 ANN = utils.ANNWrapper()
-MAL = utils.MALWrapper()
 VNDB = utils.VNDB('Futaam', '0.1')
 COLORS = utils.colors()
 COLORS.enable()
@@ -597,50 +596,6 @@ def main(argv):
 
                     if dbs[currentdb].dictionary['items'][int(args)]['type'\
                     ].lower() == 'anime':
-                        choice = ''
-                        while (choice in ['y', 'n']) == False:
-                            choice = raw_input(
-                                COLORS.bold + 'Do you want to choose a' +\
-                                'specific subbing group? [Y/n] ' +\
-                                COLORS.default).lower()
-                            if choice.replace('\n', '') == '':
-                                choice = 'y'
-                        if choice == 'y':
-                            print COLORS.header + 'Please wait...' +\
-                            COLORS.default
-                            groups = MAL.getGroupsList(dbs[currentdb
-                            ].dictionary['items'][int(args)]['aid'],
-                            dbs[currentdb].dictionary['items'][int(args)]
-                            ['name'])
-
-                            print ''
-                            i = 0
-                            for group in groups:
-                                if len(groups) > 1:
-                                    print COLORS.bold + '[' + str(i) + '] ' +\
-                                    COLORS.default + str(group[0
-                                    ].replace('[', '').replace(']', '')) +\
-                                    ' - ' + str(group[1])
-                                else:
-                                    print COLORS.bold + '[' + str(i) + '] ' +\
-                                    COLORS.default + str(group[0
-                                    ].replace('[', '').replace(']', ''))
-                                i += 1
-                            print '[C] Cancel'
-
-                            while True:
-                                which = raw_input(
-                                    COLORS.bold + 'Choose> ' +\
-                                    COLORS.default).replace('\n', '')
-                                if which.lower() == 'c':
-                                    break
-
-                                if which.isdigit():
-                                    if int(which) <= len(groups):
-                                        term = groups[int(which)][
-                                            0] + ' ' + term
-                                        break
-
                         if dbs[currentdb].dictionary['items'][int(args)][\
                         'status'].lower() == 'c':
                             if dbs[currentdb].dictionary['items'][int(args)][\
@@ -695,7 +650,7 @@ def main(argv):
             while has_picked == False:  # Ugly I know
                 which = raw_input(
                     COLORS.bold + 'Choose> ' + COLORS.default).replace('\n', '')
-                if which.lower() == 'a':
+                if which.lower() == 'c':
                     break
 
                 if which.isdigit():
