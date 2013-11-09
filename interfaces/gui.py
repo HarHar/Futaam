@@ -16,14 +16,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 import os
+import urllib2
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
-from interfaces.common import parser
-from interfaces.common import utils
 import inspect
 import getpass
-
+from interfaces.common import parser
+from interfaces.common import utils
 DB_FILE = []
 HOST = ''
 PORT = 8500
@@ -185,9 +185,9 @@ class AddEntryDialog(QtGui.QDialog):
         if title == "":
             return
         if self.ui.animeButton.isChecked():
-            search_results = utils.MALWrapper.search(title, "anime")
+            search_results = ANN.search(title, "anime", True)
         elif self.ui.mangaButton.isChecked():
-            search_results = utils.MALWrapper.search(title, "manga")
+            search_results = ANN.search(title, "manga", True)
         elif self.ui.vnButton.isChecked():
             self.vndb = utils.VNDB("Futaam", "0.1")
             search_results = self.vndb.get(
@@ -202,11 +202,11 @@ class AddEntryDialog(QtGui.QDialog):
     def resultChanged(self, index):
         title = self.ui.titleLine.text()
         if self.ui.animeButton.isChecked():
-            entryId = utils.MALWrapper.search(title, "anime")[index]['id']
-            self.result = utils.MALWrapper.details(entryId, "anime")
+            entryId = ANN.search(title, "anime", True)[index]['id']
+            self.result = ANN.details(entryId, "anime")
         elif self.ui.animeButton.isChecked():
-            entryId = utils.MALWrapper.search(title, "manga")[index]['id']
-            self.result = utils.MALWrapper.details(entryId, "manga")
+            entryId = ANN.search(title, "manga", True)[index]['id']
+            self.result = ANN.details(entryId, "manga")
         # VNDB doesn't have genre info and epsidoes
         # are a silly concept for VNs
         else:
@@ -357,7 +357,7 @@ class EntryInfoDialog(QtGui.QDialog):
         self.index = index
         self.currentEntry = self.entries[self.index]
         if self.currentEntry["type"] != "vn":
-            details = utils.MALWrapper.details(
+            details = ANN.details(
                 self.currentEntry['aid'], self.currentEntry['type'])
             self.showingVN = False
         else:
@@ -376,8 +376,6 @@ class EntryInfoDialog(QtGui.QDialog):
             for genre in details['genres']:
                 genres = genres + genre + '/'
             self.ui.genreLine.setText(genres[:-1])
-            self.ui.statusLine.setText(details['status'].title())
-            self.ui.malRank.setText(str(details['rank']))
         syn_key = 'synopsis' if self.currentEntry[
             'type'] != 'vn' else 'description'
         self.ui.summaryText.setPlainText(utils.HTMLEntitiesToUnicode(
@@ -388,22 +386,22 @@ class EntryInfoDialog(QtGui.QDialog):
 
         if self.currentEntry['type'] == 'vn':
             self.ui.typeLine.setText("Visual Novel")
-        else:
-            if len(details['prequels']) == 0:
-                self.ui.parentStoryLine.setText("None")
-            else:
-                self.ui.parentStoryLine.setText(
-                    details['prequels'][0]['title'])
-            if details['end_date'] == None:
-                self.ui.endDate.setText("Unknown")
-            else:
-                self.ui.endDate.setText(details['end_date'][:10])
-            if details['type'] == u'Movie':
-                self.ui.typeLine.setText("Feature Film")
-            elif details['type'] == u'TV':
-                self.ui.typeLine.setText("TV Series")
-            else:
-                self.ui.typeLine.setText(details['type'])
+        #else:
+        #    if len(details['prequels']) == 0:
+        #        self.ui.parentStoryLine.setText("None")
+        #    else:
+        #        self.ui.parentStoryLine.setText(
+        #            details['prequels'][0]['title'])
+        #    if details['end_date'] == None:
+        #        self.ui.endDate.setText("Unknown")
+        #    else:
+        #        self.ui.endDate.setText(details['end_date'][:10])
+        #    if details['type'] == u'Movie':
+        #        self.ui.typeLine.setText("Feature Film")
+        #    elif details['type'] == u'TV':
+        #        self.ui.typeLine.setText("TV Series")
+        #    else:
+        #        self.ui.typeLine.setText(details['type'])
 
         self.ui.pictureLabel.setText("")
         if os.path.exists(".temp"):
@@ -664,6 +662,10 @@ def main(argv):
     global DB_FILE
     global PORT
     global HOST
+    global ANN
+
+    ANN = utils.ANNWrapper()
+    ANN.init()
 
     confpath = os.path.join(
         os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
