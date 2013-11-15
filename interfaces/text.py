@@ -960,6 +960,7 @@ def main(argv):
                 if which.lower() == 'n':
                     accepted = True
                 if which.lower() == 'c':
+                	print ''
                 	accepted = True
                 if which.isdigit():
                     if int(which) <= len(search_results):
