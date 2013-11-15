@@ -256,18 +256,15 @@ class ANNWrapper(object):
 						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 						self.mergeEntry(stype, entry)
 			self.saveCache()
-
-			for found in process.extract(name, self.caches['ANN_id_cache'][stype]):
-				if found[1] >= 69:
-					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 		else:
 			foundlings = []
 			for item in self.caches['ANN_id_cache'][stype]:
 				if name.lower() in item.lower():
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
-			for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
-				if found[1] >= 69:
-					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
+
+		for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
+			if found[1] >= 69:
+				foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 
 		return foundlings
 
