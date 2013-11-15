@@ -32,6 +32,7 @@ setup(
         'BeautifulSoup >= 0.1.0',
         'beautifulsoup4 >= 0.1.0',
         'PIL >= 0.1.0',
+        'fuzzywuzzy >= 0.1.0',
     ],
     packages=['interfaces', 'tests', 'docs'],
     package_data={'interfaces': ['common/*.py']},

@@ -37,6 +37,7 @@ import socket
 import time
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+from fuzzywuzzy import process
 
 anime_translated_status = {'q': 'To watch', 'h': 'On hold', 'c': 'Currently watching', 'w': 'Watched', 'd': 'Dropped'}
 manga_translated_status = {'q': 'To read', 'h': 'On hold', 'c': 'Currently reading', 'w': 'Read', 'd': 'Dropped'}
@@ -245,7 +246,7 @@ class ANNWrapper(object):
 			
 			foundlings = []
 
-			if "@id" in res['ann'][stype].keys():
+			if "@id" in res['ann'][stype]:
 				entry = res['ann'][stype]
 				foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 				self.mergeEntry(stype, entry)
@@ -254,12 +255,19 @@ class ANNWrapper(object):
 					if name.lower() in entry['@name'].lower():
 						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 						self.mergeEntry(stype, entry)
-			self.saveCache()		
+			self.saveCache()
+
+			for found in process.extract(name, self.caches['ANN_id_cache'][stype]):
+				if found[1] >= 69:
+					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 		else:
 			foundlings = []
 			for item in self.caches['ANN_id_cache'][stype]:
 				if name.lower() in item.lower():
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
+			for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
+				if found[1] >= 69:
+					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 
 		return foundlings
 

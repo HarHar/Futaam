@@ -938,7 +938,7 @@ def main(argv):
                     COLORS.default).lower()
 
             if entry_type in ['anime', 'manga']:
-                search_results = ANN.search(title, entry_type, True)
+                search_results = ANN.search(title, entry_type)
             elif entry_type == 'vn':
                 search_results = VNDB.get(
                     'vn', 'basic', '(title~"' + title + '")', '')['items']
@@ -952,12 +952,15 @@ def main(argv):
                     result['title'].encode('ascii', 'ignore')
                 i += 1
             print COLORS.bold + '[N] ' + COLORS.default + 'None of the above'
+            print COLORS.bold + '[C] ' + COLORS.default + 'Cancel'
             accepted = False
             while accepted == False:
                 which = raw_input(
                     COLORS.bold + 'Choose> ' + COLORS.default).replace('\n', '')
                 if which.lower() == 'n':
                     accepted = True
+                if which.lower() == 'c':
+                	accepted = True
                 if which.isdigit():
                     if int(which) <= len(search_results):
                         search_picked = search_results[int(which)]
@@ -969,6 +972,7 @@ def main(argv):
                                  str(search_picked['id']) + ')', '')['items'][0]
                         accepted = True
 
+            if which.lower() == 'c': continue
             genre = ''
             if which == 'n':
                 genre = raw_input(
