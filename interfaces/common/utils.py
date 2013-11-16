@@ -194,6 +194,8 @@ class ANNWrapper(object):
 		self.saveCache()
 
 	def mergeEntry(self, stype, entry):
+		oldheight = 0
+
 		self.caches['ANN_' + stype + '_cache'][entry['@id']] = {}
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['id'] = entry['@id']
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['title'] = entry['@name']
@@ -212,6 +214,11 @@ class ANNWrapper(object):
 				except: pass
 			elif info['@type'] == 'Picture':
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = info['@src']
+
+				for img in info['img']:
+					if int(img['@height']) > oldheight:
+						self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = img['@src']
+						oldheight = int(img['@height'])
 			elif info['@type'] in ['Genres', 'Themes']:
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'].append(info['#text'])
 			elif info['@type'] == 'Plot Summary':
@@ -245,6 +252,7 @@ class ANNWrapper(object):
 				return []
 			
 			foundlings = []
+			rawfoundlings = []
 
 			if "@id" in res['ann'][stype]:
 				entry = res['ann'][stype]
@@ -254,16 +262,22 @@ class ANNWrapper(object):
 				for entry in res['ann'][stype]:
 					if name.lower() in entry['@name'].lower():
 						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
+						rawfoundlings.append(entry['@name'])
 						self.mergeEntry(stype, entry)
 			self.saveCache()
 		else:
 			foundlings = []
+			rawfoundlings = []
+			
 			for item in self.caches['ANN_id_cache'][stype]:
 				if name.lower() in item.lower():
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
+					rawfoundlings.append(item)
 
 		for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
 			if found[1] >= 69:
+				if found[0] in rawfoundlings:
+					continue
 				foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 
 		return foundlings
