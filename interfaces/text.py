@@ -84,7 +84,15 @@ def pick_entry(index, database):
 def main(argv):
     """The text interface's main method."""
     global PS1
-    ANN.init()
+    ANNInitRet = ANN.init()
+    if ANNInitRet == 0:
+        pass
+    elif ANNInitRet == 1:
+        print COLORS.header + 'Updating metadata...' + COLORS.default
+        ANN.fetchReport(50)
+    elif ANNInitRet == 2:
+        print COLORS.header + 'Updating ANN metadata cache for the first time...' + COLORS.default
+        ANN.fetchReport('all')
     dbfile = []
     host = ''
     password = ''
