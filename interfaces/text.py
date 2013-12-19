@@ -902,35 +902,35 @@ def main(argv):
                     str(deep['episodes'])
                     print COLORS.bold + 'Synopsis: ' + COLORS.default +\
                     utils.remove_html_tags(deep['synopsis'])
-                    #print ''
+                    print ''
                     if len(deep['OPsongs']) > 0:
                         print COLORS.bold + 'Opening' + \
                             ('s' if len(deep['OPsongs']) > 1 else '') + \
-                            ': ' + COLORS.default
-                        for song in deep['OPsongs']:
-                            print '\t' + song
+                            ': ' + COLORS.default + deep['OPsongs'][0]
+                        for song in deep['OPsongs'][1:]: 
+                            print (' ' * 10) + song
 
                     if len(deep['EDsongs']) > 0:
                         print COLORS.bold + 'Ending' + \
                             ('s' if len(deep['EDsongs']) > 1 else '') + \
-                            ': ' + COLORS.default
-                        for song in deep['EDsongs']:
-                            print '\t' + song
-                    #print ''
+                            ': ' + COLORS.default + deep['EDsongs'][0]
+                        for song in deep['EDsongs'][1:]:
+                            print (' ' * 9) + song
+                    print ''
                     print COLORS.bold + 'Studio' +\
                         ('s' if len(deep['credit']) > 1 else '') + ': ' + \
                         COLORS.default + (' / '.join(deep['credit']))
-                    #print ''
+                    print ''
                     print COLORS.bold + 'Character list:' + COLORS.default
                     for character in deep['characters']:
                         print '\t' + character + ' (voiced by ' + \
                             deep['characters'][character] + ')'
-                    #print ''
+                    print ''
                     print COLORS.bold + 'Episode list:' + COLORS.default
                     for ep in sorted(deep['episode_names'], key=lambda x: int(x)):
                         print '\t #' + ep + ' ' + \
                             deep['episode_names'][ep]
-                    #print ''
+                    print ''
                     print COLORS.bold + 'Staff list:' + COLORS.default
                     for staff in deep['staff']:
                         print '\t' + staff + ' (' + deep['staff'][staff] + ')'
