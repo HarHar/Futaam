@@ -185,9 +185,9 @@ class AddEntryDialog(QtGui.QDialog):
         if title == "":
             return
         if self.ui.animeButton.isChecked():
-            search_results = ANN.search(title, "anime", True)
+            search_results = ANN.search(str(title), "anime", True)
         elif self.ui.mangaButton.isChecked():
-            search_results = ANN.search(title, "manga", True)
+            search_results = ANN.search(str(title), "manga", True)
         elif self.ui.vnButton.isChecked():
             self.vndb = utils.VNDB("Futaam", "0.1")
             search_results = self.vndb.get(
@@ -202,10 +202,10 @@ class AddEntryDialog(QtGui.QDialog):
     def resultChanged(self, index):
         title = self.ui.titleLine.text()
         if self.ui.animeButton.isChecked():
-            entryId = ANN.search(title, "anime", True)[index]['id']
+            entryId = ANN.search(str(title), "anime", True)[index]['id']
             self.result = ANN.details(entryId, "anime")
         elif self.ui.animeButton.isChecked():
-            entryId = ANN.search(title, "manga", True)[index]['id']
+            entryId = ANN.search(str(title), "manga", True)[index]['id']
             self.result = ANN.details(entryId, "manga")
         # VNDB doesn't have genre info and epsidoes
         # are a silly concept for VNs
@@ -219,6 +219,10 @@ class AddEntryDialog(QtGui.QDialog):
         self.ui.genreLine.setText(genres[:-1])
         if self.ui.animeButton.isChecked():
             number = self.result['episodes']
+            # the following condition will only be true if the entry is a
+            # movie so we can safely set episodes to 1
+            if number == None:
+                number = 1
         elif self.ui.mangaButton.isChecked():
             number = self.result['chapters']
         else:
@@ -226,7 +230,7 @@ class AddEntryDialog(QtGui.QDialog):
         self.ui.episodesBox.setValue(number)
 
     def add(self):
-        result = self.results[self.ui.resultSelect.currentIndex()]
+        result = self.result
         obs = self.ui.obsLine.text()
         statusIndex = self.ui.statusSelect.currentIndex()
         genres = self.ui.genreLine.text()
@@ -239,7 +243,11 @@ class AddEntryDialog(QtGui.QDialog):
 
         if statusIndex == 0:
             if self.ui.animeButton.isChecked():
-                eps = result['episodes']
+                eps = result['episodes']	
+                # the following condition will only be true if the entry is a
+                # movie so we can safely set episodes to 1
+                if eps == None:
+                    eps = 1
             elif self.ui.mangaButton.isChecked():
                 eps = result['chapters']
             else:
