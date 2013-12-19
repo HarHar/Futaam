@@ -164,7 +164,7 @@ class ANNWrapper(object):
 			for cache in ['ANN_anime_cache', 'ANN_manga_cache', 'ANN_id_cache', 'info']:
 				self.caches[cache] = json.load(open(os.path.join(self.cacheDir, cache), 'r'))
 
-		if self.caches['info'].get('lastTimeUpdated', 0) > time.time() + 86400:
+		if self.caches['info'].get('lastTimeUpdated', 0) + 86400 < time.time():
 			return 1 #1 for need of daily update
 
 		return 0 #0 for everything alright 
@@ -219,6 +219,8 @@ class ANNWrapper(object):
 					if type(img) == str:
 						continue
 					if int(img['@height']) > oldheight:
+						if int(img['@height']) > 500 and oldheight > 100:
+							continue
 						self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = img['@src']
 						oldheight = int(img['@height'])
 			elif info['@type'] in ['Genres', 'Themes']:
