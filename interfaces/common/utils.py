@@ -450,9 +450,16 @@ class vndbException(Exception):
 class VNDB(object):
 	""" Python interface for vndb's api (vndb.org), featuring cache """
 	protocol = 1
-	def __init__(self, clientname, clientver, username=None, password=None, debug=False):
+	def __init__(self, clientname, clientver, username=None, password=None, debug=False, forReal=False):
 		if '--no-vndb' in __import__('sys').argv:
 			return
+
+		if not forReal:
+			self.initialized = False
+			self.initArgs = (clientname, clientver, username, password, debug, True)
+			return
+		self.initialized = True
+
 		self.sock = socket.socket()
 		
 		if debug: print('Connecting to api.vndb.org')
@@ -478,7 +485,9 @@ class VNDB(object):
 		self.cache = {'get': []}
 		self.cachetime = 720 #cache stuff for 12 minutes
 	def close(self):
-		self.sock.close()	
+		if not self.initialized: self.__init__(*self.initArgs) #<-- lol
+
+		self.sock.close()
 	def get(self, type, flags, filters, options):
 		""" Gets a VN/producer
 		
@@ -487,6 +496,8 @@ class VNDB(object):
 		>>> results['items'][0]['image']
 		u'http://s.vndb.org/cv/99/4599.jpg'
 		"""
+		if not self.initialized: self.__init__(*self.initArgs)
+
 		args = '{0} {1} {2} {3}'.format(type, flags, filters, options)
 		for item in self.cache['get']:
 			if (item['query'] == args) and (time.time() < (item['time'] + self.cachetime)):
@@ -503,6 +514,8 @@ class VNDB(object):
 		Example
 		>>> self.sendCommand('test', {'this is an': 'argument'})
 		"""
+		if not self.initialized: self.__init__(*self.initArgs)
+
 		whole = ''
 		whole += command.lower()
 		if isinstance(args, basestring):
@@ -520,6 +533,8 @@ class VNDB(object):
 		>>> self.getResponse()
 		('ok', {'test': 0})
 		"""
+		if not self.initialized: self.__init__(*self.initArgs)
+
 		res = self.getRawResponse()
 		cmdname = res.split(' ')[0]
 		if len(res.split(' ')) > 1:
@@ -539,6 +554,8 @@ class VNDB(object):
 		>>> self.getRawResponse()
 		'ok {"test": 0}'
 		"""
+		if not self.initialized: self.__init__(*self.initArgs)
+
 		finished = False
 		whole = ''
 		while not finished:
