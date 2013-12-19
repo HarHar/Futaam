@@ -884,11 +884,13 @@ def main(argv):
                         deep[key] = deep[key].encode('ascii', 'ignore')
 
                 if etype == 'anime':
-                    print COLORS.bold + 'Title: ' + COLORS.default +\
-                    deep['title'] + \
-                        (' (' + deep['other_titles'].get('japanese') + ')' \
+                    alternative_title = (' (' + deep['other_titles'].get('japanese') + ')' \
                         if deep['other_titles'].get('japanese', '') != '' \
-                        else '')
+                        else '') if isinstance(deep['other_titles'].get('japanese', ''), basestring) \
+                        else (' (' + '/'.join(deep['other_titles'].get('japanese', [])) + ')' if \
+                        len(deep['other_titles'].get('japanese', [])) > 0 else '')
+                    print COLORS.bold + 'Title: ' + COLORS.default +\
+                    deep['title'] + alternative_title
                     if deep['end_date'] != None:
                         print COLORS.bold + 'Year: ' + COLORS.default +\
                         deep['start_date'] + ' - ' + deep['end_date']
@@ -902,6 +904,8 @@ def main(argv):
                     str(deep['episodes'])
                     print COLORS.bold + 'Synopsis: ' + COLORS.default +\
                     utils.remove_html_tags(deep['synopsis'])
+                    print COLORS.bold + 'Picture available: ' + COLORS.default + \
+                        ('yes' if deep['image_url'] != '' else 'no')
                     print ''
                     if len(deep['OPsongs']) > 0:
                         print COLORS.bold + 'Opening' + \

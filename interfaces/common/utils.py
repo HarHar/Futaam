@@ -221,9 +221,7 @@ class ANNWrapper(object):
 				for img in info['img']:
 					if type(img) == str:
 						continue
-					if int(img['@height']) > oldheight or (int(img['@height']) > 500 and oldheight > 100):
-						if int(img['@height']) > 500 and oldheight > 100:
-							continue
+					if int(img['@height']) > oldheight:
 						self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = img['@src']
 						oldheight = int(img['@height'])
 			elif info['@type'] in ['Genres', 'Themes']:
