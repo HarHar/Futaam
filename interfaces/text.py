@@ -53,7 +53,7 @@ if PS1[-1:] != ' ':
 
 NYAA = utils.NyaaWrapper()
 ANN = utils.ANNWrapper()
-VNDB = utils.VNDB('Futaam', '0.1')
+VNDB = utils.VNDB('Futaam', '0.1', debug='--verbose' in sys.argv)
 COLORS = utils.colors()
 COLORS.enable()
 
