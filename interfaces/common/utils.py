@@ -270,7 +270,6 @@ class ANNWrapper(object):
 		else:
 			foundlings = []
 			rawfoundlings = []
-			print self.caches['ANN_id_cache']	
 			for item in self.caches['ANN_id_cache'][stype]:
 				if name.lower() in item.lower():
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
