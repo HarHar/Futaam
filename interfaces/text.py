@@ -823,15 +823,15 @@ def main(argv):
 
         elif cmdsplit[0].lower() in ['o', 'oinfo']:
             accepted = False
-            if args.isdigit():
-                if args >= 0 and len(dbs[currentdb].dictionary['items']) >=\
-                int(args):
-                    eid = dbs[currentdb].dictionary['items'][int(args)]['aid']
+            if args.split(' ')[0].isdigit():
+                if args.split(' ')[0] >= 0 and len(dbs[currentdb].dictionary['items']) >=\
+                int(args.split(' ')[0]):
+                    eid = dbs[currentdb].dictionary['items'][int(args.split(' ')[0])]['aid']
                     etype = dbs[currentdb].dictionary[
-                        'items'][int(args)]['type']
+                        'items'][int(args.split(' ')[0])]['type']
                     accepted = True
                 else:
-                    print COLORS.fail + 'The entry ' + args +\
+                    print COLORS.fail + 'The entry ' + args.split(' ')[0] +\
                     ' is not on the list' + COLORS.default
             else:
                 title = args
@@ -932,8 +932,18 @@ def main(argv):
                             deep['episode_names'][ep]
                     print ''
                     print COLORS.bold + 'Staff list:' + COLORS.default
+                    if '--full' in cmdsplit:
+                        amount = len(deep['staff'])
+                    else: amount = 7
+                    i = 0
                     for staff in deep['staff']:
                         print '\t' + staff + ' (' + deep['staff'][staff] + ')'
+                        i += 1
+                        if i >= amount and len(deep['staff']) > amount:
+                            print COLORS.bold + '\tThere are ' + str(len(deep['staff']) - amount) + \
+                             ' other staff members, use "' + COLORS.default + cmd + ' --full"' +\
+                             COLORS.bold + ' to see more'
+                            break
 
                 elif etype == 'manga':
                     print COLORS.bold + 'Title: ' + COLORS.default +\
