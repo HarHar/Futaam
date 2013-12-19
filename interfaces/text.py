@@ -254,7 +254,7 @@ def main(argv):
             for replacer in ps1_replace:
                 ps1_temp = ps1_temp.replace(replacer, ps1_replace[replacer])
             ps1_temp = ps1_temp.replace(chr(5), '')
-            cmd = raw_input(ps1_temp + COLORS.default)
+            cmd = raw_input(ps1_temp + COLORS.default).lstrip()
             cmdsplit = cmd.split(' ')
             args = ''
             for arg in cmdsplit[1:]:
@@ -283,6 +283,7 @@ def main(argv):
             print '\tswitchdb or sdb \t - changes working database when' +\
 			'opened with multiple files'
             print '\tadd or a \t\t - adds an entry'
+            print '\tlist or ls\t\t - lists all entries'
             print '\tdelete, del or d \t - deletes an entry with the given' +\
 			'index'
             print '\tedit or e \t\t - edits an entry'
@@ -291,7 +292,7 @@ def main(argv):
 			'(if given entry number) or name'
             print '\tpicture, pic, image, img - shows an image of the entry' +\
 			'or name'
-            print '\tNYAA or n\t\t - searches nyaa.eu for torrent of an' +\
+            print '\tnyaa or n\t\t - searches nyaa.eu for torrent of an' +\
 			'entry (if given entry number) or name'
             print '\tsort or s\t\t - swaps or moves entries around'
             print '\tfilter, f or search\t - searches the database (by' +\
@@ -1030,6 +1031,8 @@ def main(argv):
               'status': status, 'lastwatched': last_ep, 'obs': obs})
             rebuild_ids(dbs[currentdb])
             print COLORS.green + 'Entry added' + COLORS.default + '\n'
+        elif cmdsplit[0] == '':
+            continue
         else:
             print COLORS.warning + 'Command not recognized' + COLORS.default
             continue
