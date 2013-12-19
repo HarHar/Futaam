@@ -885,7 +885,10 @@ def main(argv):
 
                 if etype == 'anime':
                     print COLORS.bold + 'Title: ' + COLORS.default +\
-                    deep['title']
+                    deep['title'] + \
+                        (' (' + deep['other_titles'].get('japanese') + ')' \
+                        if deep['other_titles'].get('japanese', '') != '' \
+                        else '')
                     if deep['end_date'] != None:
                         print COLORS.bold + 'Year: ' + COLORS.default +\
                         deep['start_date'] + ' - ' + deep['end_date']
@@ -899,6 +902,36 @@ def main(argv):
                     str(deep['episodes'])
                     print COLORS.bold + 'Synopsis: ' + COLORS.default +\
                     utils.remove_html_tags(deep['synopsis'])
+                    print ''
+                    if len(deep['OPsongs']) > 0:
+                        print COLORS.bold + 'Openings: ' + \
+                        COLORS.default + deep['OPsongs'][0]
+                        for song in deep['OPsongs'][1:]:
+                            print '\t' + song
+                    if len(deep['EDsongs']) > 0:
+                        print COLORS.bold + 'Endings: ' + \
+                        COLORS.default + deep['EDsongs'][0]
+                        for song in deep['EDsongs'][1:]:
+                            print '\t' + song
+                    print ''
+                    print COLORS.bold + 'Studio' +\
+                        ('s' if len(deep['credit']) > 1 else '') + ': ' + \
+                        COLORS.default + (' / '.join(deep['credit']))
+                    print ''
+                    print COLORS.bold + 'Character list:' + COLORS.default
+                    for character in deep['characters']:
+                        print '\t' + character + ' (voiced by ' + \
+                            deep['characters'][character] + ')'
+                    print ''
+                    print COLORS.bold + 'Episode list:' + COLORS.default
+                    for ep in sorted(deep['episode_names'], key=lambda x: int(x)):
+                        print '\t #' + ep + ' ' + \
+                            deep['episode_names'][ep]
+                    print ''
+                    print COLORS.bold + 'Staff list:' + COLORS.default
+                    for staff in deep['staff']:
+                        print '\t' + staff + ' (' + deep['staff'][staff] + ')'
+
                 elif etype == 'manga':
                     print COLORS.bold + 'Title: ' + COLORS.default +\
                     deep['title']

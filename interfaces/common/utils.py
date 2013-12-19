@@ -207,6 +207,9 @@ class ANNWrapper(object):
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'] = []
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = None
 		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'] = {}
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['characters'] = {}
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['staff'] = {}
+		self.caches['ANN_' + stype + '_cache'][entry['@id']]['credit'] = []
 		for info in entry['info']:
 			if info['@type'] == 'Alternative title':
 				try: #yeeeeeeeaaaah...
@@ -218,7 +221,7 @@ class ANNWrapper(object):
 				for img in info['img']:
 					if type(img) == str:
 						continue
-					if int(img['@height']) > oldheight:
+					if int(img['@height']) > oldheight or (int(img['@height']) > 500 and oldheight > 100):
 						if int(img['@height']) > 500 and oldheight > 100:
 							continue
 						self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = img['@src']
@@ -242,6 +245,22 @@ class ANNWrapper(object):
 					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = None
 			elif info['@type'] == 'Objectionable content':
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['classification'] = info['#text']
+
+		for episode in entry.get('episode', []):
+			if self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'].get(episode['@num']) != None:
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] += ' / ' + episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
+			else:
+				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
+
+		for cast in entry.get('cast', []):
+			self.caches['ANN_' + stype + '_cache'][entry['@id']]['characters'][cast['role']] = cast['person']['#text']
+
+		for staff in entry.get('staff', []):
+			self.caches['ANN_' + stype + '_cache'][entry['@id']]['staff'][staff['person']['#text']] = staff['task']
+
+		for credit in entry.get('credit', []):
+			self.caches['ANN_' + stype + '_cache'][entry['@id']]['credit'].append(credit['company']['#text'])
+
 		if len(entry.get('episode', [])) > 0:
 			for episode in entry['episode']:
 				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text']
