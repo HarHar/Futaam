@@ -134,7 +134,11 @@ class NyaaWrapper(object):
 		return xml_str[start + 1:end]	
 
 class ANNWrapper(object):
+	"""Provides a wrapper to ANN's Encyclopedia's XML API. It will 
+	automatically cache data localy to speed up searching."""
+
 	def __init__(self):
+		"""Sets up constant urls but not initialize the local ANN cache."""
 		self.searchURL = {'anime': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?anime=~',
 		'manga': 'http://cdn.animenewsnetwork.com/encyclopedia/api.xml?manga=~'}
 
@@ -147,8 +151,8 @@ class ANNWrapper(object):
 		self.URLEnc = lambda x: urllib.quote(x)
 
 	def init(self):
-		#Creates ~/.cache/futaam/ and populates it with the files ANN_anime_cache
-		# and ANN_manga_cache
+		"""Creates ~/.cache/futaam/ and populates it with the files ANN_anime_cache
+		and ANN_manga_cache."""
 		self.caches = {}
 		self.cacheDir = os.getenv('XDG_CACHE_HOME')
 		if self.cacheDir is None: self.cacheDir = os.path.join(os.path.expanduser('~'), '.cache/futaam')
@@ -169,11 +173,13 @@ class ANNWrapper(object):
 
 		return 0 #0 for everything alright 
 
-	def saveCache(self):
+	def save_cache(self):
+		"""Saves the ANN cache to the disk."""
 		for cache in self.caches:
 			json.dump(self.caches[cache], open(os.path.join(self.cacheDir, cache), 'w'))
 
-	def fetchReport(self, count):
+	def fetch_report(self, count):
+		"""HarHar will need to explain this one ¯\(°_o)/¯"""
 		count = str(count)
 
 		for stype in self.reportURL:
@@ -191,79 +197,87 @@ class ANNWrapper(object):
 
 			#Update time of last update #lel
 			self.caches['info']['lastTimeUpdated'] = time.time()
-		self.saveCache()
+		self.save_cache()
 
-	def mergeEntry(self, stype, entry):
+	def merge_entry(self, stype, entry):
+		"""Merges a new entry into the cache."""
 		oldheight = 0
+		to_be_merged = {}
+		to_be_merged['id'] = entry['@id']
+		to_be_merged['title']  = entry['@name']
+		to_be_merged['type'] = entry['@type']
+		to_be_merged['other_titles'] = {'english': [], 'japanese': [], 'synonyms': []}
+		to_be_merged['image_url'] = ''
+		to_be_merged['genres'] = []
+		to_be_merged['OPsongs'] = []
+		to_be_merged['EDsongs'] = []
+		to_be_merged['episodes'] = None
+		to_be_merged['episode_names'] = {}
+		to_be_merged['characters'] = {}
+		to_be_merged['staff'] = {}
+		to_be_merged['credit'] = []
 
-		self.caches['ANN_' + stype + '_cache'][entry['@id']] = {}
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['id'] = entry['@id']
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['title'] = entry['@name']
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['type'] = entry['@type']
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'] = {'english': [], 'japanese': [], 'synonyms': []}
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = ''
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'] = []
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['OPsongs'] = []
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'] = []
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = None
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'] = {}
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['characters'] = {}
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['staff'] = {}
-		self.caches['ANN_' + stype + '_cache'][entry['@id']]['credit'] = []
 		for info in entry['info']:
 			if info['@type'] == 'Alternative title':
 				try: #yeeeeeeeaaaah...
-					self.caches['ANN_' + stype + '_cache'][entry['@id']]['other_titles'][{'JA': 'japanese', 'EN': 'english'}[info['@lang']]] = info['#text']
-				except: pass
+					to_be_merged['other_titles'][{'JA': 'japanese', 'EN': 'english'}[info['@lang']]] = info['#text']
+				except: 
+					pass
 			elif info['@type'] == 'Picture':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = info['@src']
+				to_be_merged['image_url'] = info['@src']
 
 				for img in info['img']:
 					if type(img) == str:
 						continue
 					if int(img['@height']) > oldheight:
-						self.caches['ANN_' + stype + '_cache'][entry['@id']]['image_url'] = img['@src']
+						to_be_merged['image_url'] = img['@src']
 						oldheight = int(img['@height'])
 			elif info['@type'] in ['Genres', 'Themes']:
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['genres'].append(info['#text'])
+				to_be_merged['genres'].append(info['#text'])
 			elif info['@type'] == 'Plot Summary':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['synopsis'] = info['#text']
+				to_be_merged['synopsis'] = info['#text']
 			elif info['@type'] == 'Opening Theme':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['OPsongs'].append(info['#text'])
+				to_be_merged['OPsongs'].append(info['#text'])
 			elif info['@type'] == 'Ending Theme':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['EDsongs'].append(info['#text'])
+				to_be_merged['EDsongs'].append(info['#text'])
 			elif info['@type'] == 'Number of episodes':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episodes'] = int(info['#text'])
+				to_be_merged['episodes'] = int(info['#text'])
 			elif info['@type'] == 'Vintage':
 				if info['#text'].find(' to ') != -1:
-					self.caches['ANN_' + stype + '_cache'][entry['@id']]['start_date'] = info['#text'].split(' to ')[0]
-					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = info['#text'].split(' to ')[1]
+					to_be_merged['start_date'] = info['#text'].split(' to ')[0]
+					to_be_merged['end_date'] = info['#text'].split(' to ')[1]
 				else:
-					self.caches['ANN_' + stype + '_cache'][entry['@id']]['start_date'] = info['#text']
-					self.caches['ANN_' + stype + '_cache'][entry['@id']]['end_date'] = None
+					to_be_merged['start_date'] = info['#text']
+					to_be_merged['end_date'] = None
 			elif info['@type'] == 'Objectionable content':
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['classification'] = info['#text']
+				to_be_merged['classification'] = info['#text']
 
 		for episode in entry.get('episode', []):
-			if self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'].get(episode['@num']) != None:
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] += ' / ' + episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
+			if to_be_merged['episode_names'].get(episode['@num']) != None:
+				to_be_merged['episode_names'][episode['@num']] += ' / ' + episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
 			else:
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
+				to_be_merged['episode_names'][episode['@num']] = episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
 
 		for cast in entry.get('cast', []):
-			self.caches['ANN_' + stype + '_cache'][entry['@id']]['characters'][cast['role']] = cast['person']['#text']
+			to_be_merged['characters'][cast['role']] = cast['person']['#text']
 
 		for staff in entry.get('staff', []):
-			self.caches['ANN_' + stype + '_cache'][entry['@id']]['staff'][staff['person']['#text']] = staff['task']
-
-		for credit in entry.get('credit', []):
-			self.caches['ANN_' + stype + '_cache'][entry['@id']]['credit'].append(credit['company']['#text'])
+			to_be_merged['staff'][staff['person']['#text']] = staff['task']
+		
+		if type(entry.get('credit')) == dict:
+			to_be_merged['credit'].append(entry['credit']['company']['#text'])
+		else:
+			for credit in entry.get('credit', []):
+				to_be_merged['credit'].append(credit['company']['#text'])
 
 		if len(entry.get('episode', [])) > 0:
 			for episode in entry['episode']:
-				self.caches['ANN_' + stype + '_cache'][entry['@id']]['episode_names'][episode['@num']] = episode['title']['#text']
+				to_be_merged['episode_names'][episode['@num']] = episode['title']['#text']
+
+		self.caches['ANN_' + stype + '_cache'][entry['@id']] = to_be_merged
 
 	def search(self, name, stype, online=False):
+		"""Searches locally or online for the given name."""
 		if online:
 			queryurl = self.searchURL[stype] + self.URLEnc(name)
 			res = urllib2.urlopen(queryurl).read()
@@ -278,14 +292,14 @@ class ANNWrapper(object):
 			if "@id" in res['ann'][stype]:
 				entry = res['ann'][stype]
 				foundlings.append({'id': entry['@id'], 'title': entry['@name']})
-				self.mergeEntry(stype, entry)
+				self.merge_entry(stype, entry)
 			else:
 				for entry in res['ann'][stype]:
 					if name.lower() in entry['@name'].lower():
 						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
 						rawfoundlings.append(entry['@name'])
-						self.mergeEntry(stype, entry)
-			self.saveCache()
+						self.merge_entry(stype, entry)
+			self.save_cache()
 		else:
 			foundlings = []
 			rawfoundlings = []
@@ -303,6 +317,7 @@ class ANNWrapper(object):
 		return foundlings
 
 	def details(self, eid, stype):
+		"""Returns the details for the given ANN entry ID."""
 		if str(eid) in self.caches['ANN_' + stype + '_cache'].keys():
 			return self.caches['ANN_' + stype + '_cache'][str(eid)]
 
@@ -311,8 +326,8 @@ class ANNWrapper(object):
 		root = ET.fromstring(res)
 		del res; res = etree_to_dict(root)
 		
-		self.mergeEntry(stype, res['ann'][stype])
-		self.saveCache()
+		self.merge_entry(stype, res['ann'][stype])
+		self.save_cache()
 			
 		if str(eid) in self.caches['ANN_' + stype + '_cache'].keys():
 			return self.caches['ANN_' + stype + '_cache'][str(eid)]
