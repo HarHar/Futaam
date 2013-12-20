@@ -72,7 +72,7 @@ Note that the channel parameter must be enclosed by quotes or have the # escaped
 
 Graphical Interface
 ====
-The GUI for Futaam uses the Qt toolkit to display the entires in the open database and has dialogs for adding, editing, deleting, and swapping entries and viewing additional information (fetched from MAL) about them.
+The GUI for Futaam uses the Qt toolkit to display the entires in the open database and has dialogs for adding, editing, deleting, and swapping entries and viewing additional information (fetched from ANN) about them.
 
 Usage:
 

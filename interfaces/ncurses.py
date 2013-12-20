@@ -34,7 +34,6 @@ del os.environ['COLUMNS']
 
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
-MAL = utils.MALWrapper()
 ANN = utils.ANNWrapper()
 vndb = utils.VNDB('Futaam', '0.1')
 
