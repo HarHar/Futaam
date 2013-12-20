@@ -89,10 +89,10 @@ def main(argv):
         pass
     elif ANNInitRet == 1:
         print COLORS.header + 'Updating metadata...' + COLORS.default
-        ANN.fetchReport(50)
+        ANN.fetch_report(50)
     elif ANNInitRet == 2:
         print COLORS.header + 'Updating ANN metadata cache for the first time...' + COLORS.default
-        ANN.fetchReport('all')
+        ANN.fetch_report('all')
     dbfile = []
     host = ''
     password = ''
@@ -997,7 +997,7 @@ def main(argv):
                     COLORS.default).lower()
 
             if entry_type in ['anime', 'manga']:
-                search_results = ANN.search(title, entry_type)
+                search_results = ANN.search(title, entry_type, True)
             elif entry_type == 'vn':
                 search_results = VNDB.get(
                     'vn', 'basic', '(title~"' + title + '")', '')['items']
