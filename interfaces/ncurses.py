@@ -36,6 +36,7 @@ else:
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
 MAL = utils.MALWrapper()
+ANN = utils.ANNWrapper()
 vndb = utils.VNDB('Futaam', '0.1')
 
 class if_ncurses(object):
@@ -210,6 +211,16 @@ class if_ncurses(object):
 		self.footer = '[Q]uit / [H]elp'
 		self.f2 = self.footer
 
+		ANNInitRet = ANN.init()
+		if ANNInitRet == 0:
+			pass
+		elif ANNInitRet == 1:
+			print self.alert('Updating metadata...')
+			ANN.fetch_report(50)
+		elif ANNInitRet == 2:
+			print self.alert('Updating ANN metadata cache for the first time...')
+			ANN.fetch_report('all')
+
 		self.redraw()
 		self.drawitems()
 		while True:
@@ -374,11 +385,11 @@ class if_ncurses(object):
 		self.redraw(True)
 		name = self.prompt('Name: ', 2)
 		if t in ['anime', 'manga']:
-			searchResults = MAL.search(name, t)
+			searchResults = ANN.search(name, t)
 		elif t == 'vn':
 			searchResults = vndb.get('vn', 'basic,details', '(title~"' + name + '")', '')['items']
 		if len(searchResults) == 0:
-			self.alert(t[0].upper() + t[1:].lower() + ' not found on MAL :\\') #this will be better handled on the future
+			self.alert(t[0].upper() + t[1:].lower() + ' not found on ANN :\\') #this will be better handled on the future
 			self.redraw()
 			self.drawitems()
 			return
@@ -414,7 +425,7 @@ class if_ncurses(object):
 				selected = searchResults[self.scuritem]
 				genre = ''
 				if t in ['anime', 'manga']:
-					deep = MAL.details(selected['id'], t)
+					deep = ANN.details(selected['id'], t)
 					g = ''
 					for genre in deep['genres']:
 						g = g + genre + '/'
@@ -728,7 +739,7 @@ class if_ncurses(object):
 				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching URL... Please wait', curses.color_pair(5))
 				self.screen.refresh()
 				if entry['type'] in ['anime', 'manga']:
-					info = MAL.details(entry['aid'], entry['type'])
+					info = ANN.details(entry['aid'], entry['type'])
 				elif entry['type'] == 'vn':
 					info = vndb.get('vn', 'basic,details', '(id='+ str(entry['aid']) + ')', '')['items'][0]
 				else: return
@@ -759,7 +770,7 @@ class if_ncurses(object):
 				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching synopsis... Please wait', curses.color_pair(5))
 				self.screen.refresh()
 				if entry['type'] in ['anime', 'manga']:
-					info = MAL.details(entry['aid'], entry['type'])
+					info = ANN.details(entry['aid'], entry['type'])
 				elif entry['type'] == 'vn':
 					info = vndb.get('vn', 'basic,details', '(id='+ str(entry['aid']) + ')', '')['items'][0]
 					info['synopsis'] = info['description']
