@@ -20,7 +20,7 @@ import sys
 import subprocess as sp
 
 
-def main(argv):
+def main(argv, version):
     """The main method of the web interface installs relevant
 	javascript packages and then starts the web server."""
     cur_dir = os.path.dirname(__file__)

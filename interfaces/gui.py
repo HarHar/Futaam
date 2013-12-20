@@ -662,7 +662,7 @@ def table_menu(position):
             index, entry['name'], entry['obs'], 3, newEps, entry['genre'])
 
 
-def main(argv):
+def main(argv, version):
     global model
     global ui
     global uiPrefix

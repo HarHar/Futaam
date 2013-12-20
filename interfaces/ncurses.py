@@ -798,7 +798,7 @@ class if_ncurses(object):
 					self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
 					t += workwidth
 
-def main(argv):
+def main(argv, version):
 	try:
 		obj = if_ncurses(argv)
 	except:

@@ -125,7 +125,7 @@ class rServer(SocketServer.BaseRequestHandler):
 		nprint('[INFO] A client has disconnected')
 
 colors = utils.colors()
-def main(argv):
+def main(argv, version):
 	global daemon
 	for opt in ['-d', '--daemon', '-f', '--fork']:
 		if argv.__contains__(opt):

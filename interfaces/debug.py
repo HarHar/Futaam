@@ -39,7 +39,7 @@ from interfaces.common.parser import Parser
 COLORS = colors()
 COLORS.enable()
 
-def main(argv):
+def main(argv, version):
     dbfile = []
     host = ''
     port = 8500

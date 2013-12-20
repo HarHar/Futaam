@@ -81,7 +81,7 @@ def pick_entry(index, database):
         return None
 
 
-def main(argv):
+def main(argv, version):
     """The text interface's main method."""
     global PS1
     ANNInitRet = ANN.init()
