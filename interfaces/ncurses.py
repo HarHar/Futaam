@@ -24,14 +24,13 @@ import locale
 import urllib2
 from time import sleep as sleep
 import getpass
-try:
-  import readline
-except ImportError:
-  print "Module readline unavailable."
-else:
-  import rlcompleter
-  readline.parse_and_bind("tab: complete")
 
+#ncurses doesn't resize properly for god knows why
+#See http://bugs.python.org/issue2675
+os.environ['LINES'] = 'Wow Wow'
+os.environ['COLUMNS'] = 'just living in the futabase'
+del os.environ['LINES']
+del os.environ['COLUMNS']
 
 locale.setlocale(locale.LC_ALL,"")
 colors = utils.colors()
