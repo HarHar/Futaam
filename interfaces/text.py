@@ -28,6 +28,7 @@ import datetime
 import time
 import getpass
 from urllib2 import urlopen
+from interfaces import ARGS
 from interfaces.common import utils
 from interfaces.common import parser
 from interfaces.common import rtorrent_xmlrpc
@@ -93,108 +94,25 @@ def main(argv, version):
     elif ANNInitRet == 2:
         print COLORS.header + 'Updating ANN metadata cache for the first time...' + COLORS.default
         ANN.fetch_report('all')
-    dbfile = []
+	
+    # gather arguments
+    dbfile = ARGS.database
     host = ''
+    if ARGS.host:
+        host = ARGS.host
     password = ''
+    if ARGS.password:
+        password = ARGS.password
     username = ''
+    if ARGS.username:
+        username = ARGS.username
     port = 8500
-    i = 0
+    if ARGS.port:
+        port = ARGS.port
     hooks = []
-    for arg in argv:
-        if os.path.exists(arg):
-            dbfile.append(arg)
-        elif arg == '--hook':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing hook name' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print COLORS.fail + 'Missing hook name' + COLORS.default
-                sys.exit(1)
-            else:
-                if not (argv[i + 1] in parser.availableHooks):
-                    print COLORS.fail + 'Hook not available' + COLORS.default
-                    sys.exit(1)
-                else:
-                    hooks.append(parser.availableHooks[argv[i + 1]]())
-        elif arg == '--list-hooks':
-            for hook in parser.availableHooks:
-                print COLORS.header + hook + COLORS.default + ': ' +\
-				parser.availableHooks[hook].__doc__
-            sys.exit(0)
-        elif arg == '-c' or arg == '--create':
-            print COLORS.header + 'Creating database' + COLORS.default + '\n'
-            filename = raw_input('Path to new file> ')
-            if filename == '':
-                i = 0
-                while True:
-                    if i == 0:
-                        filename = 'unnamed.db'
-                    else:
-                        filename = 'unnamed.' + str(i) + '.db'
-                    if os.path.exists(filename):
-                        i += 1
-                        continue
-                    else:
-                        break
-            if os.path.exists(filename):
-                print COLORS.fail + 'File exists' + COLORS.default
-                sys.exit(1)
-            dbtype = 'json'
-            if dbtype == '':
-                dbtype = 'json'
-            title = raw_input('Database name> ')
-            if title == '':
-                title = 'Unnamed'
-            # No need to have a default one
-            description = raw_input('Description of your database> ')
-            parser.createDB(filename, dbtype, title, description)
-            print '\n\n' + COLORS.green + 'Database created' + COLORS.default
-            sys.exit(0)
-        elif arg == '--host':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing host' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print COLORS.fail + 'Missing host' + COLORS.default
-                sys.exit(1)
-            else:
-                host = argv[i + 1]
-        elif arg.lower().startswith('futa://'):
-            host = arg
-            host = host.replace('futa://', '')
-            host = host.split('/')[0]  # for now
-            if host.find(':') != -1:
-                port = host.split(':')[-1]
-                if port.isdigit():
-                    port = int(port)
-                else:
-                    print COLORS.fail + 'Port must be an integer' +\
-					COLORS.default
-                    exit(1)
-                host = host.split(':')[0]
-            if host.find('@') != -1:
-                username = host.split('@')[0]
-                host = host.split('@')[1]
-        elif arg == '--port':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing port' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() ==\
-			False:
-                print COLORS.fail + 'Missing port' + COLORS.default
-                sys.exit(1)
-            else:
-                port = int(argv[i + 1])
-        elif arg == '--username':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing username' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print COLORS.fail + 'Missing username' + COLORS.default
-                sys.exit(1)
-            else:
-                username = argv[i + 1]
-        i += 1
+    if ARGS.hooks:
+        hooks = ARGS.hooks
+
     if len(dbfile) == 0 and host == '':
         print COLORS.fail + 'No database specified' + COLORS.default
         print 'To create a database, use the argument "--create" or "-c"' +\

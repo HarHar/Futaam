@@ -14,17 +14,16 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-import curses
-import sys
 import os
-import threading
-from interfaces.common import *
+import sys
 import locale
 import urllib2
-from time import sleep as sleep
+import threading
 import getpass
-
+from time import sleep as sleep
+import curses
+from interfaces import ARGS
+from interfaces.common import *
 #ncurses doesn't resize properly for god knows why
 #See http://bugs.python.org/issue2675
 os.environ['LINES'] = 'Wow Wow'
@@ -84,13 +83,6 @@ class if_ncurses(object):
 
 	def __init__(self, argv):
 		self.curitem = 0
-		self.dbfile = []
-		self.host = ''
-		self.port = 8500
-		i = 0
-		self.password = ''
-		self.username = ''
-		self.hooks = []
 
 		self.confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
 		if os.path.exists(self.confpath):
@@ -100,70 +92,25 @@ class if_ncurses(object):
 		else:
 			self.confs = {}
 
+		# gather arguments
+		self.host = ''
+		self.port = 8500
+		i = 0
+		self.password = ''
+		self.username = ''
+		self.hooks = []
 
-		for x in argv:
-			if os.path.exists(x):
-				self.dbfile.append(x)
-			elif x.lower().startswith('futa://'):
-				self.host = x
-				self.host = self.host.replace('futa://', '')
-				self.host = self.host.split('/')[0] #for now
-				if self.host.find(':') != -1:
-					self.port = self.host.split(':')[-1]
-					if self.port.isdigit():
-						self.port = int(self.port)
-					else:
-						print colors.fail + 'Port must be an integer' + colors.default
-						exit(1)
-					self.host = self.host.split(':')[0]
-				if self.host.find('@') != -1:
-					self.username = self.host.split('@')[0]
-					self.host = self.host.split('@')[1]
-			elif x == '--host':
-				if len(argv) <= i:
-					print colors.fail + 'Missing host' + colors.default
-					sys.exit(1)
-				elif argv[i+1].startswith('--'):
-					print colors.fail + 'Missing host' + colors.default
-					sys.exit(1)	
-				else:
-					self.host = argv[i+1]
-			elif x == '--port':
-				if len(argv) <= i:
-					print colors.fail + 'Missing port' + colors.default
-					sys.exit(1)
-				elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
-					print colors.fail + 'Missing port' + colors.default
-					sys.exit(1)	
-				else:
-					self.port = int(argv[i+1])
-			elif x == '--username':
-				if len(argv) <= i:
-					print colors.fail + 'Missing username' + colors.default
-					sys.exit(1)
-				elif argv[i+1].startswith('--'):
-					print colors.fail + 'Missing username' + colors.default
-					sys.exit(1)	
-				else:
-					self.username = argv[i+1]
-			elif x == '--hook':
-				if len(argv) <= i:
-					print colors.fail + 'Missing hook name' + colors.default
-					sys.exit(1)
-				elif argv[i+1].startswith('--'):
-					print colors.fail + 'Missing hook name' + colors.default
-					sys.exit(1)
-				else:
-					if not (argv[i+1] in parser.availableHooks):
-						print colors.fail + 'Hook not available' + colors.default
-						sys.exit(1)
-					else:
-						self.hooks.append(parser.availableHooks[argv[i+1]]())
-			elif x == '--list-hooks':
-				for hook in parser.availableHooks:
-					print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
-				sys.exit(0)
-			i += 1	
+		self.dbfile = ARGS.database
+		if ARGS.host:
+			self.host = ARGS.host
+		if ARGS.password:
+			self.password = ARGS.password
+		if ARGS.username:
+			self.username = ARGS.username
+		if ARGS.port:
+			self.port = ARGS.port
+		if ARGS.hooks:
+			self.hooks = ARGS.hooks
 
 		if len(self.dbfile) == 0 and self.host == '':
 			print colors.fail + 'No database file specified' + colors.default
@@ -802,6 +749,7 @@ def main(argv, version):
 	try:
 		obj = if_ncurses(argv)
 	except:
+		print sys.exc_info()[0]
 		curses.endwin()
 		raise
 

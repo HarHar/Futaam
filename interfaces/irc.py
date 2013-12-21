@@ -72,8 +72,8 @@ def csStart():
 class IRCProtocol(irc.IRCClient):
     nickname = "FutaBot-"
 
-	def __init__(self, version):
-		self.versionNum = version
+    def __init__(self, version):
+        self.versionNum = version
 
     def connectionMade(self):
         global bot
@@ -99,8 +99,8 @@ class IRCFactory(protocol.ClientFactory):
     def __init__(self, channel, nicky, version):
         global nick
         nick = nicky
-		protocol = IRCProtocol(version)
-		self.channel = channel
+        protocol = IRCProtocol(version)
+        self.channel = channel
 
     def clientConnectionFailed(self, connector, reason):
         print "Connection failed because of %s" % reason
@@ -116,45 +116,18 @@ def main(argv, version):
     channel = ''
     nickname = 'FutaBot'
     port = 6667
-    i = 0
-    for arg in argv:
-        if arg == '--host':
-            if len(argv) <= i:
-                print 'Missing host'
-                exit()
-            elif argv[i + 1].startswith('--'):
-                print 'Missing host'
-                exit()
-            else:
-                host = argv[i + 1]
-        elif arg == '--chan' or arg == '--channel':
-            if len(argv) <= i:
-                print 'Missing channel'
-                exit()
-            elif argv[i + 1].startswith('--'):
-                print 'Missing channel'
-                exit()
-            else:
-                channel = argv[i + 1]
-        elif arg == '--port':
-            if len(argv) <= i:
-                print 'Missing port'
-                exit()
-            elif argv[i + 1].isdigit() == False:
-                print 'Invalid port'
-                exit()
-            else:
-                port = int(argv[i + 1])
-        elif arg == '--nick' or arg == '--nickname':
-            if len(argv) <= i:
-                print 'Missing nick'
-                exit()
-            elif argv[i + 1].startswith('--'):
-                print 'Missing nick'
-                exit()
-            else:
-                nickname = argv[i + 1]
-        i += 1
+	# gather arguments
+    if ARGS.host:
+        host = ARGS.host
+    password = ''
+    if ARGS.channel:
+        channel = ARGS.channel
+    if ARGS.port:
+        port = ARGS.port
+    hooks = []
+    if ARGS.nick:
+        nickname = ARGS.nick
+	
     try:
         socket.socket().connect(('localhost', controlPort))
     except socket.error:
