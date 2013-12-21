@@ -142,59 +142,16 @@ def main(argv, version):
 	global readonly
 	global username
 	files = []
-
 	hooks = []
-	i = 0
-	for arg in argv:
-		if os.path.exists(arg):
-			files.append(arg)
-		elif arg in ['--pass', '--password']:
-			if len(argv) <= i:
-				nprint(colors.fail + 'Missing password' + colors.default)
-				sys.exit(1)
-			elif argv[i+1].startswith('--'):
-				nprint(colors.fail + 'Missing password' + colors.default)
-				sys.exit(1)	
-			else:
-				password = hashlib.sha256(argv[i+1]).hexdigest()
-		elif arg in ['--user', '--username']:
-			if len(argv) <= i:
-				nprint(colors.fail + 'Missing username' + colors.default)
-				sys.exit(1)
-			elif argv[i+1].startswith('--'):
-				nprint(colors.fail + 'Missing username' + colors.default)
-				sys.exit(1)	
-			else:
-				username = argv[i+1]
-		elif arg in ['--port']:
-			if len(argv) <= i:
-				nprint(colors.fail + 'Missing port' + colors.default)
-				sys.exit(1)
-			elif argv[i+1].startswith('--') or argv[i+1].isdigit() == False:
-				nprint(colors.fail + 'Missing port' + colors.default)
-				sys.exit(1)	
-			else:
-				port = int(argv[i+1])
-		elif arg in ['--readonly', '-ro']:
-			readonly = True
-		elif arg == '--hook':
-			if len(argv) <= i:
-				print colors.fail + 'Missing hook name' + colors.default
-				sys.exit(1)
-			elif argv[i+1].startswith('--'):
-				print colors.fail + 'Missing hook name' + colors.default
-				sys.exit(1)
-			else:
-				if not (argv[i+1] in parser.availableHooks):
-					print colors.fail + 'Hook not available' + colors.default
-					sys.exit(1)
-				else:
-					hooks.append(parser.availableHooks[argv[i+1]]())
-		elif arg == '--list-hooks':
-			for hook in parser.availableHooks:
-				print colors.header + hook + colors.default + ': ' + parser.availableHooks[hook].__doc__
-			sys.exit(0)
-		i += 1
+
+	# gather arguments
+	files = ARGS.database
+	password = ARGS.password
+	port = ARGS.port
+	readonly=ARGS.readonly
+	if ARGS.hooks:
+		hooks = ARGS.hooks
+
 	if files == [] or password == '':
 		nprint(colors.header + '[Usage] ' + colors.default + sys.argv[0] + ' [file, [file2, file3]] --username [user] --password [pass] --port [number]')
 		sys.exit(1)

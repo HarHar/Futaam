@@ -17,6 +17,8 @@ arg_parser.add_argument("--hooks", help="what hooks to use, if any",
 nargs='+')
 arg_parser.add_argument("--nick", help="IRC nickname to use for the IRC\
 interface bot")
+arg_parser.add_argument("--readonly", help="sets remote interface to only\
+provide readonly access.", action="store_true")
 arg_parser.add_argument("--channel", help="IRC channel for the IRC interface\
 daemon to join")
 if sys.argv[1] != "--irc":
