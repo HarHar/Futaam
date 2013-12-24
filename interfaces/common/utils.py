@@ -297,28 +297,6 @@ class ANNWrapper(object):
 				split = url.split('http://www.animenewsnetwork.com/encyclopedia/anime.php?id=')
 				if len(split) > 1:
 					foundlings.append({'id': int(split[1]), 'title': remove_html_tags(HTMLEntitiesToUnicode(title.replace(' - Anime News Network', '')))})
-
-			#queryurl = self.searchURL[stype] + self.URLEnc(name)
-			#res = urllib2.urlopen(queryurl).read()
-			#root = ET.fromstring(res)
-			#del res; res = etree_to_dict(root)
-			#if res['ann'].get(stype) is None:
-			#	return []
-			
-			#foundlings = []
-			#rawfoundlings = []
-
-			#if "@id" in res['ann'][stype]:
-			#	entry = res['ann'][stype]
-			#	foundlings.append({'id': entry['@id'], 'title': entry['@name']})
-			#	self.merge_entry(stype, entry)
-			#else:
-			#	for entry in res['ann'][stype]:
-			#		if name.lower() in entry['@name'].lower():
-			#			foundlings.append({'id': entry['@id'], 'title': entry['@name']})
-			#			rawfoundlings.append(entry['@name'])
-			#			self.merge_entry(stype, entry)
-			#self.save_cache()
 		else:
 			foundlings = []
 			rawfoundlings = []
