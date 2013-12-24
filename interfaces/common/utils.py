@@ -296,7 +296,7 @@ class ANNWrapper(object):
 			for title, url in google(name + ' inurl:animenewsnetwork.com'):
 				split = url.split('http://www.animenewsnetwork.com/encyclopedia/anime.php?id=')
 				if len(split) > 1:
-					foundlings.append({'id': int(split[1]), 'title': title.replace(' - Anime News Network', '')})
+					foundlings.append({'id': int(split[1]), 'title': remove_html_tags(HTMLEntitiesToUnicode(title.replace(' - Anime News Network', '')))})
 
 			#queryurl = self.searchURL[stype] + self.URLEnc(name)
 			#res = urllib2.urlopen(queryurl).read()
