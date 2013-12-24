@@ -986,51 +986,65 @@ def main(argv):
                 print ''
 
         elif cmdsplit[0].lower() in ['add', 'a']:
+            online = False
+            repeat = True
             title = ''
-            while title == '':
-                title = raw_input(
-                    COLORS.bold + '<Title> ' + COLORS.default).replace('\n', '')
             entry_type = ''
-            while (entry_type in ['anime', 'manga', 'vn']) == False:
-                entry_type = raw_input(
-                    COLORS.bold + '<Anime, Manga or VN> ' +\
-                    COLORS.default).lower()
+            while repeat:
+                repeat = False
+                if title == '':
+                    while title == '':
+                        title = raw_input(
+                            COLORS.bold + '<Title> ' + COLORS.default).replace('\n', '')
+                    entry_type = ''
+                    while (entry_type in ['anime', 'manga', 'vn']) == False:
+                        entry_type = raw_input(
+                            COLORS.bold + '<Anime, Manga or VN> ' +\
+                            COLORS.default).lower()
 
-            if entry_type in ['anime', 'manga']:
-                search_results = ANN.search(title, entry_type, True)
-            elif entry_type == 'vn':
-                search_results = VNDB.get(
-                    'vn', 'basic', '(title~"' + title + '")', '')['items']
-            i = 0
-            for result in search_results:
-                if os.name != 'nt':
-                    print COLORS.bold + '[' + str(i) + '] ' + COLORS.default +\
-                    result['title']
-                else:
-                    print COLORS.bold + '[' + str(i) + '] ' + COLORS.default +\
-                    result['title'].encode('ascii', 'ignore')
-                i += 1
-            print COLORS.bold + '[N] ' + COLORS.default + 'None of the above'
-            print COLORS.bold + '[C] ' + COLORS.default + 'Cancel'
-            accepted = False
-            while accepted == False:
-                which = raw_input(
-                    COLORS.bold + 'Choose> ' + COLORS.default).replace('\n', '')
-                if which.lower() == 'n':
-                    accepted = True
-                if which.lower() == 'c':
-                	print ''
-                	accepted = True
-                if which.isdigit():
-                    if int(which) <= len(search_results):
-                        search_picked = search_results[int(which)]
-                        if entry_type in ['anime', 'manga']:
-                            deep = ANN.details(search_picked['id'], entry_type)
-                        elif entry_type == 'vn':
-                            deep = VNDB.get(
-                                'vn', 'basic,details', '(id=' +\
-                                 str(search_picked['id']) + ')', '')['items'][0]
+                if entry_type in ['anime', 'manga']:
+                    search_results = ANN.search(title, entry_type, online)
+                elif entry_type == 'vn':
+                    search_results = VNDB.get(
+                        'vn', 'basic', '(title~"' + title + '")', '')['items']
+                i = 0
+                for result in search_results:
+                    if os.name != 'nt':
+                        print COLORS.bold + '[' + str(i) + '] ' + COLORS.default +\
+                        result['title']
+                    else:
+                        print COLORS.bold + '[' + str(i) + '] ' + COLORS.default +\
+                        result['title'].encode('ascii', 'ignore')
+                    i += 1
+                if len(search_results) == 0:
+                    print 'No results found, searching online..'
+                    online = True
+                    repeat = True
+                    continue
+
+                print COLORS.bold + '[O] ' + COLORS.default + 'Search online'
+                print COLORS.bold + '[C] ' + COLORS.default + 'Cancel'
+                accepted = False
+                while accepted == False:
+                    which = raw_input(
+                        COLORS.bold + 'Choose> ' + COLORS.default).replace('\n', '')
+                    if which.lower() == 'o':
+                        online = True
+                        repeat = True
                         accepted = True
+                    elif which.lower() == 'c':
+                    	print ''
+                    	accepted = True
+                    elif which.isdigit():
+                        if int(which) <= len(search_results):
+                            search_picked = search_results[int(which)]
+                            if entry_type in ['anime', 'manga']:
+                                deep = ANN.details(search_picked['id'], entry_type)
+                            elif entry_type == 'vn':
+                                deep = VNDB.get(
+                                    'vn', 'basic,details', '(id=' +\
+                                     str(search_picked['id']) + ')', '')['items'][0]
+                            accepted = True
 
             if which.lower() == 'c': continue
             genre = ''
