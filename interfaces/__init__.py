@@ -24,7 +24,7 @@ daemon to join")
 if sys.argv[1] != "--irc":
     arg_parser.add_argument("database", help="the database file(s) to edit", 
     nargs='+')
-ARGS = arg_parser.parse_args(sys.argv[2:])
+ARGS = arg_parser.parse_args(sys.argv[2:] if sys.argv[1].find('futaam.py') != -1 else sys.argv[1:])
 
 if ARGS.create:
     import os
