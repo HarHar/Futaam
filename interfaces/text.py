@@ -940,7 +940,8 @@ def main(argv, version):
                     repeat = True
                     continue
 
-                print COLORS.bold + '[O] ' + COLORS.default + 'Search online'
+                if not online:
+                    print COLORS.bold + '[O] ' + COLORS.default + 'Search online'
                 print COLORS.bold + '[C] ' + COLORS.default + 'Cancel'
                 accepted = False
                 while accepted == False:
