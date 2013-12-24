@@ -178,7 +178,7 @@ def main():
 
     if os.path.exists(os.path.join(path, 'interfaces/') + interface + '.py'):
         load(os.path.join(path, 'interfaces/')
-             + interface + '.py').main(arguments)
+             + interface + '.py').main(arguments, __version__)
     elif os.path.exists(os.path.join(path, 'interfaces/') + interface + '.js'):
         subprocess.Popen(
             ['node', os.path.join(path, 'interfaces/') + interface + '.js']

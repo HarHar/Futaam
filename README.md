@@ -52,8 +52,6 @@ Usage (for the server):
 Usage (for the client):
 
     futaam --INTERFACENAME --host SERVER.IP.OR.HOSTNAME --port 1234
-    or
-    futaam --INTERFACENAME futa://server.ip.or.hostname:1234
 
 For the client, there will be no change on the 'appearance' of Futaam
 
@@ -66,7 +64,7 @@ The IRC interface is a bot that runs as a daemon, and then when using any other 
 Usage:
 
     futaam --irc --host irc.server.net --port 6667 --nick MyNick --channel "#anime"
-    futaam /path/to/database --INTERFACENAME --hook irc
+    futaam --INTERFACENAME --hook irc /path/to/database 
     
 Note that the channel parameter must be enclosed by quotes or have the # escaped
 
@@ -87,8 +85,8 @@ Hooks
 Hooks are used for announcing changes made to another place (IRC for instance)
 Usage:
 
-    futaam --hook HOOKNAME --INTERFACENAME /path/to/database 
-    futaam --hook irc --ncurses /home/john/animu.db
+    futaam --INTERFACENAME --hook HOOKNAME --INTERFACENAME /path/to/database 
+    futaam --ncurses --hook irc /home/john/animu.db
 
 Developers
 ====

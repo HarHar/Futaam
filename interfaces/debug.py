@@ -33,48 +33,28 @@ else:
 
 import os
 import sys
+from interfaces import ARGS
 from interfaces.common.utils import colors
 from interfaces.common.parser import Parser
 
 COLORS = colors()
 COLORS.enable()
 
-def main(argv):
+def main(argv, version):
     dbfile = []
     host = ''
     port = 8500
-    i = 0
-    for arg in argv:
-        if os.path.exists(arg):
-            dbfile.append(arg)
-        elif arg == '--host':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing host' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print COLORS.fail + 'Missing host' + COLORS.default
-                sys.exit(1)
-            else:
-                host = argv[i + 1]
-        elif arg == '--port':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing port' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() == False:
-                print COLORS.fail + 'Missing port' + COLORS.default
-                sys.exit(1)
-            else:
-                port = int(argv[i + 1])
-        elif arg == '--password':
-            if len(argv) <= i:
-                print COLORS.fail + 'Missing password' + COLORS.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print COLORS.fail + 'Missing password' + COLORS.default
-                sys.exit(1)
-            else:
-                password = argv[i + 1]
-        i += 1
+    password = ''
+	# gather arguments
+    dbfile = ARGS.database
+    host = ''
+    if ARGS.host:
+        host = ARGS.host
+    if ARGS.password:
+        password = ARGS.password
+    if ARGS.port:
+        port = ARGS.port
+
     if len(dbfile) == 0 and host == '':
         print COLORS.fail + 'No database specified' + COLORS.default
         sys.exit(1)

@@ -14,21 +14,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys
 import os
+import sys
 import urllib2
+import inspect
+import getpass
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
-import inspect
-import getpass
+from interfaces import ARGS
 from interfaces.common import parser
 from interfaces.common import utils
 DB_FILE = []
 HOST = ''
 PORT = 8500
 DBS = []
-
+PASSWORD = ''
+USERNAME = ''
+HOOKS = []
 
 def cur_dir():
     return os.path.dirname(inspect.getsourcefile(cur_dir)) + os.path.sep
@@ -611,12 +614,12 @@ def reloadTable():
     if HOST == '':
         model.load_db(filename, parser.Parser(DB_FILE[0]))
     else:
-        if password == '':
+        if PASSWORD == '':
             print colors.fail + 'Missing password! ' + colors.default +\
 			'Use "--password [pass]"'
             sys.exit(1)
         model.load_db(filename, parser.Parser(
-            HOST=host, PORT=port, password=password))
+            HOST, PORT, PASSWORD))
     ui.tableView.setModel(model)
     ui.tableView.resizeColumnsToContents()
     ui.tableView.verticalHeader().setResizeMode(
@@ -662,15 +665,18 @@ def table_menu(position):
             index, entry['name'], entry['obs'], 3, newEps, entry['genre'])
 
 
-def main(argv):
+def main(argv, version):
     global model
     global ui
     global uiPrefix
-    global DBS
-    global DB_FILE
-    global PORT
-    global HOST
     global ANN
+    global DB_FILE
+    global DBS
+    global USERNAME
+    global PASSWORD
+    global PORT 
+    global HOST
+    global HOOKS
 
     ANN = utils.ANNWrapper()
     ANN.init()
@@ -711,76 +717,18 @@ def main(argv):
         if filename != None:
             argv.append(filename)
 
-    password = ''
-    username = ''
-    hooks = []
-    i = 0
-    for x in argv:
-        if os.path.exists(x):
-            DB_FILE.append(x)
-        elif x == '--HOST':
-            if len(argv) <= i:
-                print colors.fail + 'Missing HOST' + colors.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print colors.fail + 'Missing HOST' + colors.default
-                sys.exit(1)
-            else:
-                HOST = argv[i + 1]
-        elif x.lower().startswith('futa://'):
-            HOST = x
-            HOST = host.replace('futa://', '')
-            HOST = host.split('/')[0]  # for now
-            if HOST.find(':') != -1:
-                PORT = HOST.split(':')[-1]
-                if PORT.isdigit():
-                    PORT = int(port)
-                else:
-                    print colors.fail + 'Port must be an integer' +\
-                    colors.default
-                    exit(1)
-                HOST = host.split(':')[0]
-            if HOST.find('@') != -1:
-                username = HOST.split('@')[0]
-                HOST = host.split('@')[1]
-        elif x == '--PORT':
-            if len(argv) <= i:
-                print colors.fail + 'Missing PORT' + colors.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--') or argv[i + 1].isdigit() == \
-            False:
-                print colors.fail + 'Missing PORT' + colors.default
-                sys.exit(1)
-            else:
-                PORT = int(argv[i + 1])
-        elif x == '--username':
-            if len(argv) <= i:
-                print colors.fail + 'Missing username' + colors.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print colors.fail + 'Missing username' + colors.default
-                sys.exit(1)
-            else:
-                username = argv[i + 1]
-        elif x == '--hook':
-            if len(argv) <= i:
-                print colors.fail + 'Missing hook name' + colors.default
-                sys.exit(1)
-            elif argv[i + 1].startswith('--'):
-                print colors.fail + 'Missing hook name' + colors.default
-                sys.exit(1)
-            else:
-                if not (argv[i + 1] in parser.availableHooks):
-                    print colors.fail + 'Hook not available' + colors.default
-                    sys.exit(1)
-                else:
-                    hooks.append(parser.availableHooks[argv[i + 1]]())
-        elif x == '--list-hooks':
-            for hook in parser.availableHooks:
-                print colors.header + hook + colors.default + ': ' +\
-                parser.availableHooks[hook].__doc__
-            sys.exit(0)
-        i += 1
+    # gather arguments
+    DB_FILE = ARGS.database
+    if ARGS.host:
+       HOST = ARGS.host
+    if ARGS.password:
+       PASSWORD = ARGS.password
+    if ARGS.username:
+        USERNAME = ARGS.username
+    if ARGS.port:
+        PORT = ARGS.port
+    if ARGS.hooks:
+        HOOKS = ARGS.hooks
 
     if len(DB_FILE) == 0 and HOST == '':
         print colors.fail + 'No database file specified' + colors.default
@@ -789,28 +737,28 @@ def main(argv):
     if HOST == '':
         DBS = []
         for fn in DB_FILE:
-            DBS.append(parser.Parser(fn, hooks=hooks))
+            DBS.append(parser.Parser(fn, hooks=HOOKS))
         currentdb = 0
     else:
-        if username == '':
+        if USERNAME == '':
             if 'default.user' in confs:
                 print '[' + colors.blue + 'info' + colors.default +\
                 '] using default user'
-                username = confs['default.user']
+                USERNAME = confs['default.user']
             else:
-                username = raw_input('Username for \'' + HOST + '\': ')
+                USERNAME = raw_input('Username for \'' + HOST + '\': ')
         if 'default.password' in confs:
             print '[' + colors.blue + 'info' + colors.default +\
             '] using default password'
-            password = confs['default.password']
+            PASSWORD = confs['default.password']
         else:
-            password = getpass.getpass(
-                'Password for ' + username + '@' + HOST + ': ')
+            PASSWORD = getpass.getpass(
+                'Password for ' + USERNAME + '@' + HOST + ': ')
         DBS = []
         try:
             DBS.append(
-                parser.Parser(HOST=host, PORT=port, username=username, 
-                password=password, hooks=hooks))
+                parser.Parser(HOST=host, PORT=port, username=USERNAME, 
+                password=password, hooks=HOOKS))
         except Exception, e:
             print '[' + colors.fail + 'error' + colors.default + '] ' +\
             str(e).replace('305 ', '')
