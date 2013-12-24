@@ -65,6 +65,16 @@ def etree_to_dict(t):
             d[t.tag] = text
     return d
 
+def google(search):
+    query = urllib.urlencode({'q': search})
+    response = urllib.urlopen('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query).read()
+    j = json.loads(response)
+    results = j['responseData']['results']
+    for result in results:
+        #title = result['title']
+        #print repr(result['title']) + ' -- ' + repr(result['url'])
+        yield (result['title'], urllib.unquote(result['url']))
+
 def showImage(url):
     remote_fo = urllib2.urlopen(url)
     with open('tempfile.' + url.split('.')[len(url.split('.'))-1], 'wb') as local_fo:
@@ -187,7 +197,10 @@ class ANNWrapper(object):
 				self.caches['ANN_id_cache'][stype] = {}
 
 			queryurl = self.reportURL[stype] + count
-			res = urllib2.urlopen(queryurl).read()
+			try:
+				res = urllib2.urlopen(queryurl).read()
+			except urllib2.URLError:
+				return
 			root = ET.fromstring(res)
 			del res; res = etree_to_dict(root) #recycling is important
 
@@ -279,27 +292,33 @@ class ANNWrapper(object):
 	def search(self, name, stype, online=False):
 		"""Searches locally or online for the given name."""
 		if online:
-			queryurl = self.searchURL[stype] + self.URLEnc(name)
-			res = urllib2.urlopen(queryurl).read()
-			root = ET.fromstring(res)
-			del res; res = etree_to_dict(root)
-			if res['ann'].get(stype) is None:
-				return []
-			
 			foundlings = []
-			rawfoundlings = []
+			for title, url in google(name + ' inurl:animenewsnetwork.com'):
+				split = url.split('http://www.animenewsnetwork.com/encyclopedia/anime.php?id=')
+				if len(split) > 1:
+					foundlings.append({'id': int(split[1]), 'title': title.replace(' - Anime News Network', '')})
 
-			if "@id" in res['ann'][stype]:
-				entry = res['ann'][stype]
-				foundlings.append({'id': entry['@id'], 'title': entry['@name']})
-				self.merge_entry(stype, entry)
-			else:
-				for entry in res['ann'][stype]:
-					if name.lower() in entry['@name'].lower():
-						foundlings.append({'id': entry['@id'], 'title': entry['@name']})
-						rawfoundlings.append(entry['@name'])
-						self.merge_entry(stype, entry)
-			self.save_cache()
+			#queryurl = self.searchURL[stype] + self.URLEnc(name)
+			#res = urllib2.urlopen(queryurl).read()
+			#root = ET.fromstring(res)
+			#del res; res = etree_to_dict(root)
+			#if res['ann'].get(stype) is None:
+			#	return []
+			
+			#foundlings = []
+			#rawfoundlings = []
+
+			#if "@id" in res['ann'][stype]:
+			#	entry = res['ann'][stype]
+			#	foundlings.append({'id': entry['@id'], 'title': entry['@name']})
+			#	self.merge_entry(stype, entry)
+			#else:
+			#	for entry in res['ann'][stype]:
+			#		if name.lower() in entry['@name'].lower():
+			#			foundlings.append({'id': entry['@id'], 'title': entry['@name']})
+			#			rawfoundlings.append(entry['@name'])
+			#			self.merge_entry(stype, entry)
+			#self.save_cache()
 		else:
 			foundlings = []
 			rawfoundlings = []
@@ -308,11 +327,11 @@ class ANNWrapper(object):
 					foundlings.append({'id': self.caches['ANN_id_cache'][stype][item], 'title': item})
 					rawfoundlings.append(item)
 
-		for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
-			if found[1] >= 69:
-				if found[0] in rawfoundlings:
-					continue
-				foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
+			for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
+				if found[1] >= 69:
+					if found[0] in rawfoundlings:
+						continue
+					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
 
 		return foundlings
 
