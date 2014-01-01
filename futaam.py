@@ -33,6 +33,7 @@ def main():
     import subprocess
     import json
     import hashlib
+    from interfaces import get_interface
     colors = utils.colors()
     confpath = os.path.join(os.environ['HOME'], '.futaam')
     if os.path.exists(confpath):
@@ -58,22 +59,6 @@ def main():
             print('--- ' + str(info) + ' ---')
             print traceback.format_exc()
             exit(1)
-
-    def get_interface(folder):
-        """Returns a list of interfaces without the .py"""
-        interfaces = []
-        from os.path import join
-        for root, dirs, files in os.walk(folder):
-            for filename in files:
-                if filename == "__init__.py" or filename in ["utils.py",
-				"parser.py", "rtorrent_xmlrpc.py"]:
-                    continue
-                fullname = join(root, filename)
-                if max(fullname.split('.')) == 'py' or max(
-				fullname.split('.')) == 'js':
-                    interfaces.append(
-                        fullname.split('/')[-1:][0].split('.')[0])
-        return interfaces
 
     def print_help(intf):
         """Prints help information"""

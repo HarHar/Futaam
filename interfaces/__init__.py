@@ -2,6 +2,34 @@
 # -*- coding: utf-8 -*-
 import argparse
 import sys
+import os
+
+def get_interface(folder):
+    """Returns a list of interfaces without the .py"""
+    interfaces = []
+    from os.path import join
+    for root, dirs, files in os.walk(folder):
+        for filename in files:
+            if filename == "__init__.py" or filename in ["utils.py",
+            "parser.py", "rtorrent_xmlrpc.py"]:
+                continue
+            fullname = join(root, filename)
+            if max(fullname.split('.')) == 'py' or max(
+            fullname.split('.')) == 'js':
+                interfaces.append(
+                    fullname.split('/')[-1:][0].split('.')[0])
+    return interfaces
+
+interface_list = get_interface(os.path.join(os.path.dirname(os.path.realpath(__file__))))
+arguments = []
+for arg in sys.argv[2:] if sys.argv[1].find('futaam.py') != -1 else sys.argv[1:]:
+    if arg[:2] == '--':
+        if arg[2:] in interface_list:
+            pass
+        else:
+            arguments.append(arg)
+    else:
+        arguments.append(arg)
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument("--create", help="flag for creating a new database", 
@@ -24,7 +52,7 @@ daemon to join")
 if sys.argv[1] != "--irc":
     arg_parser.add_argument("database", help="the database file(s) to edit", 
     nargs='+')
-ARGS = arg_parser.parse_args(sys.argv[2:] if sys.argv[1].find('futaam.py') != -1 else sys.argv[1:])
+ARGS = arg_parser.parse_args(arguments)
 
 if ARGS.create:
     import os
