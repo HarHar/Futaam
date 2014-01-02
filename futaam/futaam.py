@@ -170,4 +170,12 @@ def main():
             + arguments)
 
 if __name__ == '__main__':
+    try:
+        import futaam.interfaces
+    except ImportError:
+        import sys
+        sys.stderr.write('Error: you must install Futaam before using it\n')
+        sys.stderr.write('And you can always do a user install if you don\'t have ')
+        sys.stderr.write('root access (--user arg. to setup.py)\n')
+        sys.exit(404) #installation not found
     main()
