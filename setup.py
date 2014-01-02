@@ -34,14 +34,14 @@ setup(
         'PIL >= 0.1.0',
         'fuzzywuzzy >= 0.1.0',
     ],
-    packages=['interfaces', 'tests', 'docs'],
-    package_data={'interfaces': ['common/*.py']},
+    packages=['futaam', 'futaam.tests', 'futaam.interfaces',
+	    'futaam.interfaces.common'],
     entry_points={
         'console_scripts': [
-            'futaam = futaam:main',
+            'futaam = futaam.futaam:main',
         ],
         'gui_scripts': [
-            'futaam-gui = futaam:maingui',
+            'futaam-gui = futaam.futaam:maingui',
         ],
     },
 )

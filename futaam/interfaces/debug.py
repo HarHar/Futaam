@@ -33,9 +33,9 @@ else:
 
 import os
 import sys
-from interfaces import ARGS
-from interfaces.common.utils import colors
-from interfaces.common.parser import Parser
+from futaam.interfaces import ARGS
+from futaam.interfaces.common.utils import colors
+from futaam.interfaces.common.parser import Parser
 
 COLORS = colors()
 COLORS.enable()

@@ -22,7 +22,7 @@ from time import sleep
 import hashlib
 import time
 import copy
-from interfaces.common import utils
+from . import utils
 
 def createDB(filename, dbtype='json', name='', description='', items=[]):
 	if dbtype in ['json'] == False:

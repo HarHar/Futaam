@@ -22,9 +22,9 @@ import getpass
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from PyQt4 import uic
-from interfaces import ARGS
-from interfaces.common import parser
-from interfaces.common import utils
+from futaam.interfaces import ARGS
+from futaam.interfaces.common import parser
+from futaam.interfaces.common import utils
 DB_FILE = []
 HOST = ''
 PORT = 8500

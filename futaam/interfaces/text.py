@@ -28,10 +28,10 @@ import datetime
 import time
 import getpass
 from urllib2 import urlopen
-from interfaces import ARGS
-from interfaces.common import utils
-from interfaces.common import parser
-from interfaces.common import rtorrent_xmlrpc
+from futaam.interfaces import ARGS
+from futaam.interfaces.common import utils
+from futaam.interfaces.common import parser
+from futaam.interfaces.common import rtorrent_xmlrpc
 
 PS1 = '[%N]> '
 CONFPATH = os.path.join(

@@ -29,10 +29,10 @@ def main():
     import os
     import imp
     import traceback
-    import interfaces.common.utils as utils
     import subprocess
     import json
     import hashlib
+    import interfaces.common.utils as utils
     from interfaces import get_interface
     colors = utils.colors()
     confpath = os.path.join(os.environ['HOME'], '.futaam')

@@ -17,11 +17,11 @@
 import os
 import sys
 import hashlib
-from interfaces.common import *
 import socket
 import SocketServer
 import json
 from StringIO import StringIO
+from futaam.interfaces.common import *
 
 port = 8500
 password = ''

@@ -22,7 +22,7 @@ import SocketServer
 import threading
 import json
 import platform
-from interfaces.common import colors
+from futaam.interfaces.common import colors
 controlPort = 5124
 colors = utils.colors()
 
