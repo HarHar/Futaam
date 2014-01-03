@@ -2,6 +2,7 @@
 #from distutils.core import setup
 """The setup script for Futaam"""
 from setuptools import setup
+from futaam.futaam import __version__
 
 PACKAGE = "futaam"
 NAME = "Futaam"
@@ -9,7 +10,7 @@ DESCRIPTION = "An anime/manga/vn list (backlog) manager"
 AUTHOR = "HarHar/TacticalGenius"
 AUTHOR_EMAIL = "root@harh.net"
 URL = "https://github.com/HarHar/Futaam"
-VERSION = __import__(PACKAGE).__version__
+VERSION = __version__
 
 setup(
     name=NAME,

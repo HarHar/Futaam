@@ -1,1 +1,1 @@
-__version__="0.3"
+"""The root of the futaam package"""
