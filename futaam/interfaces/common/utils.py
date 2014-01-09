@@ -264,12 +264,6 @@ class ANNWrapper(object):
 			elif info['@type'] == 'Objectionable content':
 				to_be_merged['classification'] = info['#text']
 
-		for episode in entry.get('episode', []):
-			if to_be_merged['episode_names'].get(episode['@num']) != None:
-				to_be_merged['episode_names'][episode['@num']] += ' / ' + episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
-			else:
-				to_be_merged['episode_names'][episode['@num']] = episode['title']['#text'] + ' (' + episode['title']['@lang'] + ')'
-
 		for cast in entry.get('cast', []):
 			to_be_merged['characters'][cast['role']] = cast['person']['#text']
 
@@ -284,7 +278,16 @@ class ANNWrapper(object):
 
 		if len(entry.get('episode', [])) > 0:
 			for episode in entry['episode']:
-				to_be_merged['episode_names'][episode['@num']] = episode['title']['#text']
+				if '#text' in episode['title']:
+					to_be_merged['episode_names'][episode['@num']] = episode['title']['#text']
+				else:
+					if isinstance(episode['title'], basestring):
+						to_be_merged['episode_names'][episode['@num']] = episode['title']
+					else:
+						titles = []
+						for title in episode['title']:
+							titles.append(title['#text'])
+						to_be_merged['episode_names'][episode['@num']] = '/'.join(titles)
 
 		self.caches['ANN_' + stype + '_cache'][entry['@id']] = to_be_merged
 
@@ -305,7 +308,7 @@ class ANNWrapper(object):
 					rawfoundlings.append(item)
 
 			for found in process.extract(name, self.caches['ANN_id_cache'][stype], limit=10):
-				if found[1] >= 69:
+				if found[1] >= 60:
 					if found[0] in rawfoundlings:
 						continue
 					foundlings.append({'title': found[0], 'id': self.caches['ANN_id_cache'][stype][found[0]]})
