@@ -22,6 +22,10 @@ def get_interface(folder):
 
 interface_list = get_interface(os.path.join(os.path.dirname(os.path.realpath(__file__))))
 arguments = []
+
+if len(sys.argv) == 1:
+    sys.argv.append('--help')
+
 for arg in sys.argv[2:] if sys.argv[1].find('futaam.py') != -1 else sys.argv[1:]:
     if arg[:2] == '--':
         if arg[2:] in interface_list:
