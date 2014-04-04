@@ -709,6 +709,7 @@ class if_ncurses(object):
 
 		workwidth = terminalsize[1] - s-1
 		n = 0
+		noHTML = lambda x: utils.HTMLEntitiesToUnicode(utils.remove_html_tags(x))
 		
 		if entry.get('aid') != None:
 			try:
@@ -735,15 +736,23 @@ class if_ncurses(object):
 			if len(info['synopsis']) < workwidth:
 				self.screen.addstr(l, s + len('Synopsis: '), info['synopsis'])
 			else:
-				self.screen.addstr(l, s + len('Synopsis: '), utils.HTMLEntitiesToUnicode(info['synopsis'][:workwidth-len('Synopsis: ')]).encode('utf-8'))
 				t = workwidth-len('Synopsis: ')
-				while len(info['synopsis'][t:t+workwidth]) != 0:
-					l += 1
-					if l >= terminalsize[0]-5:
-						self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
-						break
-					self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
-					t += workwidth
+				pos = s + len('Synopsis: ')
+				for word in info['synopsis'].split():
+					if pos+len(word) >= terminalsize[1]-1:
+						pos = s
+						l += 1
+						if l >= terminalsize[0]-5:
+							break
+					self.screen.addstr(l, pos, noHTML(word))
+					pos += len(word) + 1
+				#while len(info['synopsis'][t:t+workwidth]) != 0:
+				#	l += 1
+				#	if l >= terminalsize[0]-5:
+				#		self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
+				#		break
+				#	self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
+				#	t += workwidth
 
 def main(argv, version):
 	try:
