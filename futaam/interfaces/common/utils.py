@@ -268,7 +268,11 @@ class ANNWrapper(object):
 			to_be_merged['characters'][cast['role']] = cast['person']['#text']
 
 		for staff in entry.get('staff', []):
-			to_be_merged['staff'][staff['person']['#text']] = staff['task']
+			if isinstance(staff, basestring):
+				to_be_merged['staff'][entry['staff']['person']['#text']] = entry['staff']['task']
+				break
+			else:
+				to_be_merged['staff'][staff['person']['#text']] = staff['task']
 		
 		if type(entry.get('credit')) == dict:
 			to_be_merged['credit'].append(entry['credit']['company']['#text'])

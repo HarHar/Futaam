@@ -816,12 +816,14 @@ def main(argv, version):
                         print COLORS.bold + 'Year: ' + COLORS.default +\
                         deep['start_date'] + ' - ongoing'
                     print COLORS.bold + 'Type: ' + COLORS.default + deep['type']
-                    print COLORS.bold + 'Classification: ' + COLORS.default +\
-                    deep['classification']
+                    if deep.get('classification', None) != None:
+                        print COLORS.bold + 'Classification: ' + COLORS.default +\
+                        deep['classification']
                     print COLORS.bold + 'Episodes: ' + COLORS.default +\
                     str(deep['episodes'])
-                    print COLORS.bold + 'Synopsis: ' + COLORS.default +\
-                    utils.remove_html_tags(deep['synopsis'])
+                    if deep.get('synopsis', None) != None:
+                        print COLORS.bold + 'Synopsis: ' + COLORS.default +\
+                        utils.remove_html_tags(deep['synopsis'])
                     print COLORS.bold + 'Picture available: ' + COLORS.default + \
                         ('yes' if deep['image_url'] != '' else 'no')
                     print ''
