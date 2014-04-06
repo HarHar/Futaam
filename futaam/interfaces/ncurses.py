@@ -734,6 +734,10 @@ class if_ncurses(object):
 			t = workwidth-len('Synopsis: ')
 			pos = s + len('Synopsis: ')
 			for i, word in enumerate(synopsis.split()):
+				newLine = False
+				if word.find('\n') != -1:
+					newLine = True
+					word = word.replace('\n', '')
 				if pos+len(word) >= terminalsize[1]:
 					opos = pos
 					pos = s
@@ -746,6 +750,9 @@ class if_ncurses(object):
 						break
 				self.screen.addstr(l, pos, noHTML(word).encode('utf8'))
 				pos += len(word) + 1
+				if newLine:
+					l += 1
+					pos = s
 
 	def drawinfo(self):
 		terminalsize = self.get_terminal_size()
@@ -769,7 +776,6 @@ class if_ncurses(object):
 				else:
 					return
 				info['synopsis'] = utils.remove_html_tags(info['synopsis'])
-				info['synopsis'] = info['synopsis'].replace('\n', ' | ')
 				self.screen.border()
 				out = {'anime': 'Anime', 'manga': 'Manga', 'vn': 'VN'}[entry['type']]
 				self.screen.addstr(terminalsize[0]-1, terminalsize[1]-len(out)-1, out, {'anime': curses.color_pair(3), 'manga': curses.color_pair(2), 'vn': curses.color_pair(5)}[entry['type']] + curses.A_REVERSE)
