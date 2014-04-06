@@ -704,6 +704,8 @@ class if_ncurses(object):
 					info = vndb.get('vn', 'basic,details', '(id='+ str(entry['aid']) + ')', '')['items'][0]
 				else: return
 				self.screen.border()
+				self.redraw()
+				self.drawitems()
 			except urllib2.HTTPError, info:
 				self.alert('Error: ' + str(info), 2)
 				self.redraw()
