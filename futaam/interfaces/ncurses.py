@@ -755,7 +755,7 @@ class if_ncurses(object):
 
 		self.screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
 		if len(synopsis) < workwidth:
-			self.screen.addstr(l, s + len('Synopsis: '), synopsis)
+			self.screen.addstr(l, s + len('Synopsis: '), synopsis.encode('utf8'))
 		else:
 			t = workwidth-len('Synopsis: ')
 			pos = s + len('Synopsis: ')
