@@ -82,6 +82,7 @@ class if_ncurses(object):
 	    return width
 
 	def __init__(self, argv):
+		self.synopsis = ''
 		self.curitem = 0
 
 		self.confpath = os.path.join(os.getenv('USERPROFILE') or os.getenv('HOME'), '.futaam')
@@ -178,7 +179,15 @@ class if_ncurses(object):
 				curses.curs_set(1)
 				curses.endwin()
 			
-			if x == curses.KEY_RESIZE: self.showing = []; self.range_min = 0; self.range_max = 0; self.redraw(); self.drawitems(); continue
+			if x == curses.KEY_RESIZE:
+				self.showing = []
+				self.range_min = 0
+				self.range_max = 0
+				self.redraw()
+				self.drawitems()
+				if self.synopsis:
+					self.drawSynopsis()
+				continue
 
 			if x == ord('q') or x == ord('Q') or x == 27:
 				curses.endwin()
@@ -229,12 +238,14 @@ class if_ncurses(object):
 			elif x == ord('i') or x == ord('I'):
 				self.sI()
 			elif x == 258: #DOWN
+				self.synopsis = ''
 				if len(self.dbs[self.currentdb].dictionary['items'])-1 == self.curitem:
 					continue
 				self.curitem += 1
 				self.redraw()
 				self.drawitems()
 			elif x == 259: #UP
+				self.synopsis = ''
 				if self.curitem == 0:
 					continue
 				self.curitem -= 1
@@ -700,6 +711,37 @@ class if_ncurses(object):
 			self.screen.border()
 			self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 
+	def drawSynopsis(self):
+		terminalsize = self.get_terminal_size()
+		entry = self.dbs[self.currentdb].dictionary['items'][self.curitem]
+		s = 27
+		l = 7 if entry['type'] in ['anime', 'manga'] else 5 if entry['type'] == 'vn' else 7
+
+		workwidth = terminalsize[1] - s-1
+		n = 0
+		noHTML = lambda x: utils.HTMLEntitiesToUnicode(utils.remove_html_tags(x))
+
+		synopsis = self.synopsis
+
+		self.screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
+		if len(synopsis) < workwidth:
+			self.screen.addstr(l, s + len('Synopsis: '), synopsis)
+		else:
+			t = workwidth-len('Synopsis: ')
+			pos = s + len('Synopsis: ')
+			for i, word in enumerate(synopsis.split()):
+				if pos+len(word) >= terminalsize[1]:
+					opos = pos
+					pos = s
+					l += 1
+					if l >= terminalsize[0]-3:
+						if i < len(synopsis.split()):
+							if terminalsize[1]-opos-1 > 0:
+								self.screen.addstr(l-1, opos, noHTML(word[:terminalsize[1]-opos-1]))
+							self.screen.addstr(l-1, terminalsize[1]-4, '...')
+						break
+				self.screen.addstr(l, pos, noHTML(word))
+				pos += len(word) + 1
 
 	def drawinfo(self):
 		terminalsize = self.get_terminal_size()
@@ -732,27 +774,9 @@ class if_ncurses(object):
 			except urllib2.HTTPError, info:
 				self.screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
 				return
-			self.screen.addstr(l, s, 'Synopsis: ', curses.A_BOLD)
-			if len(info['synopsis']) < workwidth:
-				self.screen.addstr(l, s + len('Synopsis: '), info['synopsis'])
-			else:
-				t = workwidth-len('Synopsis: ')
-				pos = s + len('Synopsis: ')
-				for word in info['synopsis'].split():
-					if pos+len(word) >= terminalsize[1]-1:
-						pos = s
-						l += 1
-						if l >= terminalsize[0]-5:
-							break
-					self.screen.addstr(l, pos, noHTML(word))
-					pos += len(word) + 1
-				#while len(info['synopsis'][t:t+workwidth]) != 0:
-				#	l += 1
-				#	if l >= terminalsize[0]-5:
-				#		self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth-3].replace('\n', '').replace('\r', '') + '...')).encode('utf-8'))
-				#		break
-				#	self.screen.addstr(l, s, utils.HTMLEntitiesToUnicode(utils.remove_html_tags(info['synopsis'][t:t+workwidth].replace('\n', '').replace('\r', ''))).encode('utf-8'))
-				#	t += workwidth
+			self.synopsis = info['synopsis']
+			self.drawSynopsis()
+
 
 def main(argv, version):
 	try:
