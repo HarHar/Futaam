@@ -737,10 +737,10 @@ class if_ncurses(object):
 					if l >= terminalsize[0]-2:
 						if i < len(synopsis.split()):
 							if terminalsize[1]-opos-1 > 0:
-								self.screen.addstr(l-1, opos, noHTML(word[:terminalsize[1]-opos-1]))
+								self.screen.addstr(l-1, opos, noHTML(word[:terminalsize[1]-opos-1]).encode('utf8'))
 							self.screen.addstr(l-1, terminalsize[1]-4, '...')
 						break
-				self.screen.addstr(l, pos, noHTML(word))
+				self.screen.addstr(l, pos, noHTML(word).encode('utf8'))
 				pos += len(word) + 1
 
 	def drawinfo(self):
