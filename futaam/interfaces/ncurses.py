@@ -734,7 +734,7 @@ class if_ncurses(object):
 					opos = pos
 					pos = s
 					l += 1
-					if l >= terminalsize[0]-3:
+					if l >= terminalsize[0]-2:
 						if i < len(synopsis.split()):
 							if terminalsize[1]-opos-1 > 0:
 								self.screen.addstr(l-1, opos, noHTML(word[:terminalsize[1]-opos-1]))
