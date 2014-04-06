@@ -670,6 +670,10 @@ class if_ncurses(object):
 						fix = ' ' * sizeleft
 						self.screen.addstr(t, 27 + len(field[0]), showstr.encode('utf-8') + fix)
 						t += 1
+					if entry['type'] in ['anime', 'manga']: #what ANN handles
+						if entry['aid'] in ANN.caches['ANN_' + entry['type'] + '_cache']:
+							self.synopsis = ANN.details(entry['aid'], entry['type'])['synopsis']
+							self.drawSynopsis()
 			else:
 				bold = 0
 
