@@ -24,6 +24,8 @@ from time import sleep as sleep
 import curses
 from futaam.interfaces import ARGS
 from futaam.interfaces.common import *
+import wikipedia
+import libxml2
 #ncurses doesn't resize properly for god knows why
 #See http://bugs.python.org/issue2675
 os.environ['LINES'] = 'Wow Wow'
@@ -717,7 +719,27 @@ class if_ncurses(object):
 				return
 			self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
 			self.screen.refresh()
-			utils.showImage(info['image' + {'anime': '_url', 'manga': '_url', 'vn': ''}[entry['type']]])
+
+			wiki_page = wikipedia.page(info['title'])
+			parsed = libxml2.htmlParseDoc(wiki_page.html().encode('utf-8'), 'UTF-8')
+
+			## libxml2 can shit up the terminal
+			self.screen.refresh()
+			self.screen.border()
+			self.redraw()
+			self.drawitems()
+			self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
+			##
+
+			try:
+				img = parsed.xpathEval2('//table[@class="infobox"]//img[1]/@src')[0].getContent()
+			except:
+				img = ''
+			if img.startswith('//'): img = 'http:' + img
+			if img != '':
+				utils.showImage(img)
+			else:
+				utils.showImage(info['image' + {'anime': '_url', 'manga': '_url', 'vn': ''}[entry['type']]])
 			self.screen.border()
 			self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 

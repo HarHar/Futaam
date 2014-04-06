@@ -34,6 +34,7 @@ setup(
         'beautifulsoup4 >= 0.1.0',
         'PIL >= 0.1.0',
         'fuzzywuzzy >= 0.1.0',
+        'wikipedia >= 0.1.0',
     ],
     packages=['futaam', 'futaam.tests', 'futaam.interfaces',
 	    'futaam.interfaces.common'],
