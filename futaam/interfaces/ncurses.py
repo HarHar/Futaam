@@ -174,7 +174,6 @@ class if_ncurses(object):
 				x = self.screen.getch()
 			except:
 				curses.nocbreak()
-				stdscr.keypad(0)
 				curses.echo()
 				curses.curs_set(1)
 				curses.endwin()
@@ -190,8 +189,13 @@ class if_ncurses(object):
 				continue
 
 			if x == ord('q') or x == ord('Q') or x == 27:
+				curses.nocbreak()
+				curses.echo()
+				curses.curs_set(1)
 				curses.endwin()
-				sys.exit(0)
+				print colors.green + 'Bye bye~' + colors.default
+				sys.stdout.flush()
+				os._exit(0)
 			if x == ord('h') or x == ord('H'):
 				if self.get_terminal_height() < 13:
 					self.alert('Screen too small')
