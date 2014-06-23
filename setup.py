@@ -32,7 +32,7 @@ setup(
     install_requires=[
         'BeautifulSoup >= 0.1.0',
         'beautifulsoup4 >= 0.1.0',
-        'PIL >= 0.1.0',
+        'pillow >= 0.1.0',
         'fuzzywuzzy >= 0.1.0',
         'wikipedia >= 0.1.0',
     ],
