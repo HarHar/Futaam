@@ -16,21 +16,22 @@
 """
 import json
 import urllib
-import urllib2
+import urllib.parse
+#import urllib2
+from urllib.request import urlopen
 import re
-from HTMLParser import HTMLParser
+import html
 from PIL import Image
 import shutil
 try:
-	from BeautifulSoup import BeautifulStoneSoup
 	from bs4 import BeautifulSoup
 	from bs4 import UnicodeDammit
 except:
-	print 'You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.'
+	print('You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.')
 	exit()
 import os, inspect
-from urllib2 import urlopen
-from urllib import quote
+#from urllib2 import urlopen
+from urllib.parse import quote
 from xml.dom import minidom
 import socket
 import time
@@ -50,11 +51,11 @@ def etree_to_dict(t):
     if children:
         dd = defaultdict(list)
         for dc in map(etree_to_dict, children):
-            for k, v in dc.iteritems():
+            for k, v in dc.items():
                 dd[k].append(v)
-        d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in dd.iteritems()}}
+        d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in dd.items()}}
     if t.attrib:
-        d[t.tag].update(('@' + k, v) for k, v in t.attrib.iteritems())
+        d[t.tag].update(('@' + k, v) for k, v in t.attrib.items())
     if t.text:
         text = t.text.strip()
         if children or t.attrib:
@@ -72,10 +73,10 @@ def google(search):
     for result in results:
         #title = result['title']
         #print repr(result['title']) + ' -- ' + repr(result['url'])
-        yield (result['title'], urllib.unquote(result['url']))
+        yield (result['title'], urllib.parse.unquote(result['url']))
 
 def showImage(url):
-    remote_fo = urllib2.urlopen(url)
+    remote_fo = urlopen(url)
     with open('tempfile.' + url.split('.')[len(url.split('.'))-1], 'wb') as local_fo:
         shutil.copyfileobj(remote_fo, local_fo)
     im = Image.open('tempfile.' + url.split('.')[len(url.split('.'))-1])
@@ -85,9 +86,9 @@ class colors():
     def __init__(self):
         self.enable()
     def enable(self):
-    	if os.name == 'nt':
-    		self.disable()
-    		return
+        if os.name == 'nt':
+            self.disable()
+            return
         self.header = '\033[95m'
         self.blue = '\033[94m'
         self.green = '\033[92m'
@@ -110,8 +111,9 @@ def remove_html_tags(data):
 
 def HTMLEntitiesToUnicode(text):
     """Converts HTML entities to unicode.  For example '&amp;' becomes '&'."""
-    text = unicode(BeautifulStoneSoup(text, convertEntities=BeautifulStoneSoup.ALL_ENTITIES))
-    return text
+    #text = unicode(BeautifulStoneSoup(text, convertEntities=BeautifulStoneSoup.ALL_ENTITIES))
+    #return text
+    return html.unescape(text)
 
 class NyaaWrapper(object):
 	def search(self, term):
@@ -157,7 +159,7 @@ class ANNWrapper(object):
 		self.reportURL = {'anime': 'http://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=anime&nlist=',
 		'manga': 'http://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&type=manga&nlist='}
 
-		self.URLEnc = lambda x: urllib.quote(x)
+		self.URLEnc = lambda x: urllib.parse.quote(x)
 
 	def init(self):
 		"""Creates ~/.cache/futaam/ and populates it with the files ANN_anime_cache
@@ -197,7 +199,7 @@ class ANNWrapper(object):
 
 			queryurl = self.reportURL[stype] + count
 			try:
-				res = urllib2.urlopen(queryurl).read()
+				res = urlopen(queryurl).read()
 			except urllib2.URLError:
 				return
 			root = ET.fromstring(res)
@@ -268,11 +270,7 @@ class ANNWrapper(object):
 			to_be_merged['characters'][cast['role']] = cast['person']['#text']
 
 		for staff in entry.get('staff', []):
-			if isinstance(staff, basestring):
-				to_be_merged['staff'][entry['staff']['person']['#text']] = entry['staff']['task']
-				break
-			else:
-				to_be_merged['staff'][staff['person']['#text']] = staff['task']
+			to_be_merged['staff'][staff['person']['#text']] = staff['task']
 		
 		if type(entry.get('credit')) == dict:
 			to_be_merged['credit'].append(entry['credit']['company']['#text'])
@@ -325,7 +323,7 @@ class ANNWrapper(object):
 			return self.caches['ANN_' + stype + '_cache'][str(eid)]
 
 		queryurl = self.detailsURL[stype] + str(eid)
-		res = urllib2.urlopen(queryurl).read()
+		res = urlopen(queryurl).read()
 		root = ET.fromstring(res)
 		del res; res = etree_to_dict(root)
 		

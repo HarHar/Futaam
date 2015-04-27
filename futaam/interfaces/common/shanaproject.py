@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import json
 import os.path
 import datetime
@@ -10,7 +10,7 @@ try:
 	from bs4 import BeautifulSoup
 	from bs4 import UnicodeDammit
 except:
-	print 'You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.'
+	print('You must have the python BeautifulSoup module: install pip and execute "pip install beautifulsoup; pip install beautifulsoup4", as root.')
 	exit()
 
 cp = os.path.join(os.environ['HOME'], '.futaam')
@@ -29,7 +29,7 @@ class ShanaParser(object):
 		if not (self.conf.get('{0}/{1}'.format(today.month, today.year)) is None):
 			return self.conf['{0}/{1}'.format(today.month, today.year)]
 
-		soup = BeautifulSoup(urllib2.urlopen(self.url).read())
+		soup = BeautifulSoup(urllib.request.urlopen(self.url).read())
 		divs = []
 		for el in soup.findAll('div'):
 			if el.get('class') != None:

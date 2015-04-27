@@ -64,8 +64,8 @@ if ARGS.create:
     from interfaces.common import parser
 
     COLORS = colors()
-    print COLORS.header + 'Creating database' + COLORS.default + '\n'
-    filename = raw_input('Path to new file> ')
+    print(COLORS.header + 'Creating database' + COLORS.default + '\n')
+    filename = input('Path to new file> ')
     if filename == '':
         i = 0
         while True:
@@ -79,16 +79,16 @@ if ARGS.create:
             else:
                 break
     if os.path.exists(filename):
-       print COLORS.fail + 'File exists' + COLORS.default
+       print(COLORS.fail + 'File exists' + COLORS.default)
        sys.exit(1)
     dbtype = 'json'
     if dbtype == '':
         dbtype = 'json'
-    title = raw_input('Database name> ')
+    title = input('Database name> ')
     if title == '':
         title = 'Unnamed'
     # No need to have a default one
-    description = raw_input('Description of your database> ')
+    description = input('Description of your database> ')
     parser.createDB(filename, dbtype, title, description)
-    print '\n\n' + COLORS.green + 'Database created' + COLORS.default
+    print('\n\n' + COLORS.green + 'Database created' + COLORS.default)
     sys.exit(0)

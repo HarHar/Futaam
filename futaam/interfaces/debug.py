@@ -26,7 +26,7 @@ The variables you'll most likely want to use is 'dbs'
 try:
     import readline
 except ImportError:
-    print "Module readline unavailable."
+    print("Module readline unavailable.")
 else:
     import rlcompleter
     readline.parse_and_bind("tab: complete")
@@ -56,7 +56,7 @@ def main(argv, version):
         port = ARGS.port
 
     if len(dbfile) == 0 and host == '':
-        print COLORS.fail + 'No database specified' + COLORS.default
+        print(COLORS.fail + 'No database specified' + COLORS.default)
         sys.exit(1)
 
     if host == '':
@@ -66,11 +66,11 @@ def main(argv, version):
         currentDb = 0
     else:
         if password == '':
-            print COLORS.fail + 'Missing password! ' + COLORS.default +\
-			'Use "--password [pass]"'
+            print(COLORS.fail + 'Missing password! ' + COLORS.default +\
+			'Use "--password [pass]"')
             sys.exit(1)
         dbs = []
         currentDb = 0
 
     while True:
-        exec 'print(repr(' + raw_input('>>> ') + '))'
+        exec('print(repr(' + input('>>> ') + '))')

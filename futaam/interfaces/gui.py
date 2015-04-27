@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import inspect
 import getpass
 from PyQt4 import QtGui
@@ -107,7 +107,7 @@ class TableModel(QtCore.QAbstractTableModel):
             return 'h'
 
     def rebuildIds(self):
-        for x in xrange(0, self.db.dictionary['count']):
+        for x in range(0, self.db.dictionary['count']):
             self.db.dictionary['items'][x]['id'] = x
         self.db.save()
 
@@ -138,7 +138,7 @@ class TableModel(QtCore.QAbstractTableModel):
         # NOTE: The string we've gotten back from Qt
         # functions are QStrings and need to be converted
         # back into regular ones before we can save them
-        entry['name'] = unicode(title)
+        entry['name'] = str(title)
         entry['obs'] = str(obs)
         entry['lastwatched'] = str(eps)
         entry['status'] = model.cbIndexToStatus(status)
@@ -199,7 +199,7 @@ class AddEntryDialog(QtGui.QDialog):
         else:
             search_results = []
         for result in search_results:
-            self.resultSelect.addItem(unicode(result["title"]))
+            self.resultSelect.addItem(str(result["title"]))
         self.results = search_results
 
     def resultChanged(self, index):
@@ -419,7 +419,7 @@ class EntryInfoDialog(QtGui.QDialog):
             os.remove(".temp")
         x = open(".temp", "w")
         img_key = '_url' if self.currentEntry['type'] != 'vn' else ''
-        x.write(urllib2.urlopen(details['image' + img_key]).read())
+        x.write(urllib.request.urlopen(details['image' + img_key]).read())
         x.close()
         self.ui.pictureLabel.setText(
             "<img src='.temp' width='225' height='350' align='right' />")
@@ -615,8 +615,8 @@ def reloadTable():
         model.load_db(filename, parser.Parser(DB_FILE[0]))
     else:
         if PASSWORD == '':
-            print colors.fail + 'Missing password! ' + colors.default +\
-			'Use "--password [pass]"'
+            print(colors.fail + 'Missing password! ' + colors.default +\
+			'Use "--password [pass]"')
             sys.exit(1)
         model.load_db(filename, parser.Parser(
             HOST, PORT, PASSWORD))
@@ -660,7 +660,7 @@ def table_menu(position):
     elif action == incrementAction:
         index = ui.tableView.indexAt(position).row()
         entry = model.db.dictionary['items'][index]
-        newEps = unicode(int(entry['lastwatched']) + 1)
+        newEps = str(int(entry['lastwatched']) + 1)
         model.editEntry(
             index, entry['name'], entry['obs'], 3, newEps, entry['genre'])
 
@@ -731,7 +731,7 @@ def main(argv, version):
         HOOKS = ARGS.hooks
 
     if len(DB_FILE) == 0 and HOST == '':
-        print colors.fail + 'No database file specified' + colors.default
+        print(colors.fail + 'No database file specified' + colors.default)
         help()
         sys.exit(1)
     if HOST == '':
@@ -742,14 +742,14 @@ def main(argv, version):
     else:
         if USERNAME == '':
             if 'default.user' in confs:
-                print '[' + colors.blue + 'info' + colors.default +\
-                '] using default user'
+                print('[' + colors.blue + 'info' + colors.default +\
+                '] using default user')
                 USERNAME = confs['default.user']
             else:
-                USERNAME = raw_input('Username for \'' + HOST + '\': ')
+                USERNAME = input('Username for \'' + HOST + '\': ')
         if 'default.password' in confs:
-            print '[' + colors.blue + 'info' + colors.default +\
-            '] using default password'
+            print('[' + colors.blue + 'info' + colors.default +\
+            '] using default password')
             PASSWORD = confs['default.password']
         else:
             PASSWORD = getpass.getpass(
@@ -759,9 +759,9 @@ def main(argv, version):
             DBS.append(
                 parser.Parser(HOST=host, PORT=port, username=USERNAME, 
                 password=password, hooks=HOOKS))
-        except Exception, e:
-            print '[' + colors.fail + 'error' + colors.default + '] ' +\
-            str(e).replace('305 ', '')
+        except Exception as e:
+            print('[' + colors.fail + 'error' + colors.default + '] ' +\
+            str(e).replace('305 ', ''))
             sys.exit(1)
         currentdb = 0
 
@@ -815,5 +815,5 @@ def main(argv, version):
 
 
 def print_help():
-    print """USAGE: ./futaam.py --gui [DATABASE] [Qt Options]"""
+    print("""USAGE: ./futaam.py --gui [DATABASE] [Qt Options]""")
     quit()

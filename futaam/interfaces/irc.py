@@ -18,7 +18,7 @@ from twisted.internet import reactor, protocol
 from twisted.words.protocols import irc
 import socket
 import os
-import SocketServer
+import socketserver
 import threading
 import json
 import platform
@@ -27,7 +27,7 @@ controlPort = 5124
 colors = utils.colors()
 
 
-class controlSocket(SocketServer.BaseRequestHandler):
+class controlSocket(socketserver.BaseRequestHandler):
 
     def setup(self):
         pass
@@ -63,9 +63,9 @@ class controlSocket(SocketServer.BaseRequestHandler):
 
 
 def csStart():
-    SocketServer.ThreadingTCPServer(
+    socketserver.ThreadingTCPServer(
         ('localhost', controlPort), controlSocket).serve_forever()
-    print '[FATAL] IRC control port has closed'
+    print('[FATAL] IRC control port has closed')
     os.kill(os.getpid(), 9)
 
 
@@ -103,11 +103,11 @@ class IRCFactory(protocol.ClientFactory):
         self.channel = channel
 
     def clientConnectionFailed(self, connector, reason):
-        print "Connection failed because of %s" % reason
+        print("Connection failed because of %s" % reason)
         reactor.stop()
 
     def clientConnectionLost(self, connector, reason):
-        print "Connection lost: %s" % reason
+        print("Connection lost: %s" % reason)
         connector.connect()
 
 
@@ -132,10 +132,10 @@ def main(argv, version):
         socket.socket().connect(('localhost', controlPort))
     except socket.error:
         if host == '' or channel == '':
-            print 'IRC server and/or channel not specified'
-            print 'Use: --host [irc server] --channel [name]'
+            print('IRC server and/or channel not specified')
+            print('Use: --host [irc server] --channel [name]')
             exit()
-        print 'IRC control port refused connection, starting IRC daemon...'
+        print('IRC control port refused connection, starting IRC daemon...')
 
         if os.fork() != 0:
             exit()
@@ -152,8 +152,8 @@ def main(argv, version):
         reactor.connectTCP(host, port, fact)
         reactor.run()
         os.kill(os.getpid(), 9)  # otherwise the thread will make it hang :\
-    print 'IRC bot daemon already running'
-    print 'Choose another interface and use the argument --ircnotify'
+    print('IRC bot daemon already running')
+    print('Choose another interface and use the argument --ircnotify')
 
 
 def print_help():

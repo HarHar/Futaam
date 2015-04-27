@@ -27,23 +27,23 @@ def main(argv, version):
     already_installed = False
 
     if os.name == 'nt':
-        git_path = raw_input("Enter path to git executable: ")
+        git_path = input("Enter path to git executable: ")
         try:
             sp.Popen([git_path, "--version"], stdout=-1)
         except OSError:
-            print "Git not found, please install it to continue"
+            print("Git not found, please install it to continue")
             sys.exit(1)
-        node_path = raw_input("Enter path to node.js executable: ")
+        node_path = input("Enter path to node.js executable: ")
         try:
             sp.Popen([node_path, "--version"], stdout=-1)
         except OSError:
-            print "Node not found, please install it continue"
+            print("Node not found, please install it continue")
             sys.exit(1)
-        npm_path = raw_input("Enter path to npm executable: ")
+        npm_path = input("Enter path to npm executable: ")
         try:
             sp.Popen([npm_path, "--version"], stdout=-1)
         except OSError:
-            print "NPM not found, please install it continue"
+            print("NPM not found, please install it continue")
             sys.exit(1)
 
         if os.path.exists(cur_dir + '\\Futaam-Web'):
@@ -56,28 +56,28 @@ def main(argv, version):
             os.chdir(cur_dir + '\\Futaam-Web')
             os.popen(npm_path + ' install')  # Install dependencies
             if already_installed == False:
-                print 'Futaam-Web is now installed. Use "node ' +\
+                print('Futaam-Web is now installed. Use "node ' +\
 				cur_dir + '\\Futaam-Web\\FutaamWeb.js --db file" for launching'+\
-				'it anytime'
+				'it anytime')
             if len(argv) > 0:
-                print 'Launching Futaam-Web'
+                print('Launching Futaam-Web')
                 os.system(node_path + " " + cur_dir +
                           '\\Futaam-Web\\FutaamWeb.js --db ' + argv[0])
     else:
         try:
             sp.Popen(['git', '--version'], stdout=-1)
         except OSError:
-            print 'Git not found, please install it to continue'
+            print('Git not found, please install it to continue')
             sys.exit(1)
         try:
             sp.Popen(['node', '--version'], stdout=-1)
         except OSError:
-            print 'Node not found, please install it to continue'
+            print('Node not found, please install it to continue')
             sys.exit(1)
         try:
             sp.Popen(['npm', '--version'], stdout=-1)
         except OSError:
-            print 'NPM not found, please install it to continue'
+            print('NPM not found, please install it to continue')
             sys.exit(1)
 
         if os.path.exists(cur_dir + '/Futaam-Web/'):
@@ -90,11 +90,11 @@ def main(argv, version):
             os.chdir(cur_dir + '/Futaam-Web')
             os.popen('npm install')  # Install dependencies
             if already_installed == False:
-                print '\033[92mFutaam-Web is now installed. Use "node ' +\
+                print('\033[92mFutaam-Web is now installed. Use "node ' +\
 				cur_dir + '/Futaam-Web/FutaamWeb.js --db file" for' +\
-				'launching it anytime\033[0m'
+				'launching it anytime\033[0m')
             if len(argv) > 0:
-                print 'Launching Futaam-Web'
+                print('Launching Futaam-Web')
                 os.system(
                     'node ' + cur_dir + '/Futaam-Web/FutaamWeb.js --db ' +
 					argv[0])

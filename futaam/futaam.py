@@ -34,8 +34,8 @@ def main():
     import subprocess
     import json
     import hashlib
-    import interfaces.common.utils as utils
-    from interfaces import get_interface
+    import futaam.interfaces.common.utils as utils
+    from futaam.interfaces import get_interface
     colors = utils.colors()
     confpath = os.path.join(os.environ['HOME'], '.futaam')
     if os.path.exists(confpath):
@@ -56,10 +56,10 @@ def main():
             return imp.load_module(filepath.split('/')[-1:][0].split('.')[0],
 			interface_file, os.path.realpath(filepath), ('.py', 'U', 1))
         except (IOError, ImportError) as info:
-            print(colors.fail + 'Could not load submodule: ' +
-                  filepath + colors.default)
-            print('--- ' + str(info) + ' ---')
-            print traceback.format_exc()
+            print((colors.fail + 'Could not load submodule: ' +
+                  filepath + colors.default))
+            print(('--- ' + str(info) + ' ---'))
+            print(traceback.format_exc())
             exit(1)
 
     def print_help(intf):
@@ -95,10 +95,10 @@ def main():
         if i == 0:
             continue
         if arg[:6] == '--help':
-            print(print_help(arg[6:]))
+            print((print_help(arg[6:])))
             sys.exit(0)
         elif arg[:2] == '-h':
-            print(print_help(arg[2:]))
+            print((print_help(arg[2:])))
             sys.exit(0)
         elif arg == '--interfaces' or arg == '-i' or arg == '--modules' \
         or arg == '-m':
@@ -109,15 +109,15 @@ def main():
                 txt += i + ', '
             txt = txt[:-2] + '.'
             sys.stdout.write(txt + colors.default)
-            print '\n\nTo obtain help on them, use --help-interface, replacing \
-            \'interface\' with the name you want'
+            print('\n\nTo obtain help on them, use --help-interface, replacing \
+            \'interface\' with the name you want')
             sys.exit(0)
         elif arg.lower() in ['--conf', '--config']:
             if len(sys.argv) <= i + 1:
-                print 'Missing argument for ' + arg
+                print('Missing argument for ' + arg)
                 sys.exit(1)
             elif sys.argv[i + 1].startswith('--'):
-                print 'Missing argument for ' + arg
+                print('Missing argument for ' + arg)
                 sys.exit(1)
 
             key = sys.argv[i + 1]
@@ -128,9 +128,9 @@ def main():
             else:
                 if len(sys.argv) <= i + 2:
                     if key in conf:
-                        print 'Unsetting ' + key
+                        print('Unsetting ' + key)
                     else:
-                        print 'Key not found'
+                        print('Key not found')
                         sys.exit(1)
                     value = None
                 else:
@@ -148,9 +148,9 @@ def main():
         elif arg[:2] == '--':
             if arg[2:] in interface_list:
                 if interface != None:
-                    print(colors.warning + 'Ignoring argument --' + interface +
+                    print((colors.warning + 'Ignoring argument --' + interface +
                           '. Make sure interfaces don\'t conflict with \
-						  internal triggers.' + colors.default)
+						  internal triggers.' + colors.default))
                 interface = arg[2:]
             else:
                 arguments.append(arg)

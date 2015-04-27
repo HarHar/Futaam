@@ -16,7 +16,6 @@
 """
 import json
 import os
-from StringIO import StringIO
 import socket
 from time import sleep
 import hashlib
@@ -107,11 +106,11 @@ class Parser(object):
 				rc = ''
 				while rc[-1:] != chr(4):
 					rc += self.sock.recv(4096)
-				if json.load(StringIO(rc[:-1]))['response'].find('err:') == 0:
-					print(json.load(StringIO(rc[:-1]))['response'].replace('err:', '').strip())
+				if json.loads(rc[:-1])['response'].find('err:') == 0:
+					print(json.loads(rc[:-1])['response'].replace('err:', '').strip())
 					exit(1)
 
-				self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))
+				self.dictionary = json.load(json.loads(rc[:-1])['response'])
 				return
 			else:
 				raise Exception(rc)
@@ -127,7 +126,7 @@ class Parser(object):
 
 			if lines[0].lower() == '[json]':
 				self.dbtype = 'json'
-				self.dictionary = json.load(StringIO(txt[len('[json]\n'):]))
+				self.dictionary = json.loads(txt[len('[json]\n'):])
 			else:
 				raise Exception('Invalid database type')
 		else:
@@ -187,5 +186,5 @@ class Parser(object):
 			rc = ''
 			while rc[-1:] != chr(4):
 				rc += self.sock.recv(4096)
-			self.dictionary = json.load(StringIO(json.load(StringIO(rc[:-1]))['response']))
+			self.dictionary = json.loads(json.load(rc[:-1])['response'])
 

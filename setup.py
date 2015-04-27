@@ -27,10 +27,9 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
-        "Programming Language :: Python",
+        "Programming Language :: Python :: 3 :: Only",
     ],
     install_requires=[
-        'BeautifulSoup >= 0.1.0',
         'beautifulsoup4 >= 0.1.0',
         'pillow >= 0.1.0',
         'fuzzywuzzy >= 0.1.0',

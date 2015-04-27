@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
 import locale
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import threading
 import getpass
 from time import sleep as sleep
@@ -116,7 +116,7 @@ class if_ncurses(object):
 			self.hooks = ARGS.hooks
 
 		if len(self.dbfile) == 0 and self.host == '':
-			print colors.fail + 'No database file specified' + colors.default
+			print(colors.fail + 'No database file specified' + colors.default)
 			sys.exit(1)
 
 		if self.host == '':
@@ -127,12 +127,12 @@ class if_ncurses(object):
 		else:
 			if self.username == '':
 				if 'default.user' in self.confs:
-					print '[' + colors.blue + 'info' + colors.default +'] using default user'
+					print('[' + colors.blue + 'info' + colors.default +'] using default user')
 					self.username = self.confs['default.user']
 				else:
-					self.username = raw_input('Username for \'' + self.host + '\': ')
+					self.username = input('Username for \'' + self.host + '\': ')
 			if 'default.password' in self.confs:
-				print '[' + colors.blue + 'info' + colors.default +'] using default password'
+				print('[' + colors.blue + 'info' + colors.default +'] using default password')
 				self.password = self.confs['default.password']
 			else:
 				self.password = getpass.getpass('Password for ' + self.username + '@' + self.host + ': ')
@@ -163,10 +163,10 @@ class if_ncurses(object):
 		if ANNInitRet == 0:
 			pass
 		elif ANNInitRet == 1:
-			print self.alert('Updating metadata...')
+			print(self.alert('Updating metadata...'))
 			ANN.fetch_report(50)
 		elif ANNInitRet == 2:
-			print self.alert('Updating ANN metadata cache for the first time...')
+			print(self.alert('Updating ANN metadata cache for the first time...'))
 			ANN.fetch_report('all')
 
 		self.redraw()
@@ -195,7 +195,7 @@ class if_ncurses(object):
 				curses.echo()
 				curses.curs_set(1)
 				curses.endwin()
-				print colors.green + 'Bye bye~' + colors.default
+				print(colors.green + 'Bye bye~' + colors.default)
 				sys.stdout.flush()
 				os._exit(0)
 			if x == ord('h') or x == ord('H'):
@@ -233,7 +233,7 @@ class if_ncurses(object):
 					continue
 
 				##### REBUILD IDS #####
-				for x in xrange(0, self.dbs[self.currentdb].dictionary['count']):
+				for x in range(0, self.dbs[self.currentdb].dictionary['count']):
 					self.dbs[self.currentdb].dictionary['items'][x]['id'] = x
 				#######################
 				self.dbs[self.currentdb].save()
@@ -432,7 +432,7 @@ class if_ncurses(object):
 				except:
 					self.dbs[self.currentdb].dictionary['count'] = 1
 				self.dbs[self.currentdb].dictionary['items'].append({'id': self.dbs[self.currentdb].dictionary['count'], 'type': t, 'aid': selected['id'], 'name': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(title)), 'genre': utils.HTMLEntitiesToUnicode(utils.remove_html_tags(genre)), 'status': x.lower(), 'lastwatched': lastEp, 'obs': obs})
-				for x in xrange(0, self.dbs[self.currentdb].dictionary['count']):
+				for x in range(0, self.dbs[self.currentdb].dictionary['count']):
 					self.dbs[self.currentdb].dictionary['items'][x]['id'] = x	
 				self.dbs[self.currentdb].save()
 				self.screen.addstr(11, 2, 'Entry added!', curses.color_pair(3) + curses.A_REVERSE)
@@ -520,11 +520,11 @@ class if_ncurses(object):
 			if w > terminalsize[1]-5:
 				continue
 			try:
-				self.screen.addstr(line, w, unichr(x), curses.A_REVERSE)
+				self.screen.addstr(line, w, chr(x), curses.A_REVERSE)
 			except:
 				continue
 			w += 1
-			ret += unichr(x)
+			ret += chr(x)
 		ret = ret.replace('\n', '')
 		curses.curs_set(0)
 		return ret
@@ -534,7 +534,7 @@ class if_ncurses(object):
 		if terminalsize[0] < 12 or terminalsize[1] < 46:
 			self.screen.keypad(0)
 			curses.endwin()
-			print colors.fail + '\nScreen too small :C' + colors.default
+			print(colors.fail + '\nScreen too small :C' + colors.default)
 			sys.exit(1)
 		i = 0
 		y = 1
@@ -603,7 +603,7 @@ class if_ncurses(object):
 		self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
 		if noxtra == False:
 			for line in range(1, terminalsize[0]-1):
-				self.screen.addstr(line, 25, u'│'.encode('utf-8'))
+				self.screen.addstr(line, 25, '│'.encode('utf-8'))
 
 			self.screen.addstr(terminalsize[0]-2, 1, self.footer)
 
@@ -612,7 +612,7 @@ class if_ncurses(object):
 		if terminalsize[0] < 12 or terminalsize[1] < 46:
 			self.screen.keypad(0)
 			curses.endwin()
-			print colors.fail + '\nScreen too small :C' + colors.default
+			print(colors.fail + '\nScreen too small :C' + colors.default)
 			sys.exit(1)
 		i = 0
 		y = 1
@@ -663,7 +663,7 @@ class if_ncurses(object):
 					del out
 					for field in fields:
 						self.screen.addstr(t, 27, field[0], curses.A_BOLD)
-						if isinstance(field[1], basestring):
+						if isinstance(field[1], str):
 							showstr = field[1]
 							sizeleft = int(terminalsize[1]) - int(len(str(field[0])) + len(field[1])) - 28
 						else:
@@ -712,7 +712,7 @@ class if_ncurses(object):
 				self.screen.border()
 				self.redraw()
 				self.drawitems()
-			except urllib2.HTTPError, info:
+			except urllib.error.HTTPError as info:
 				self.alert('Error: ' + str(info), 2)
 				self.redraw()
 				self.drawitems()
@@ -807,7 +807,7 @@ class if_ncurses(object):
 				self.screen.addstr(terminalsize[0]-1, terminalsize[1]-len(out)-1, out, {'anime': curses.color_pair(3), 'manga': curses.color_pair(2), 'vn': curses.color_pair(5)}[entry['type']] + curses.A_REVERSE)
 				del out
 				self.screen.addstr(0, 2, self.dbs[self.currentdb].dictionary['name'] + ' - ' + self.dbs[self.currentdb].dictionary['description'], curses.color_pair(1))
-			except urllib2.HTTPError, info:
+			except urllib.error.HTTPError as info:
 				self.screen.addstr(l, s, 'Error: ' + str(info), curses.color_pair(1) + curses.A_BOLD)
 				return
 			self.synopsis = info['synopsis']
@@ -818,7 +818,7 @@ def main(argv, version):
 	try:
 		obj = if_ncurses(argv)
 	except:
-		print sys.exc_info()[0]
+		print(sys.exc_info()[0])
 		curses.endwin()
 		raise
 

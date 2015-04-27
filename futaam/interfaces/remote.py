@@ -18,9 +18,9 @@ import os
 import sys
 import hashlib
 import socket
-import SocketServer
+import socketserver
 import json
-from StringIO import StringIO
+from io import StringIO
 from futaam.interfaces.common import *
 
 port = 8500
@@ -36,7 +36,7 @@ def nprint(s):
 	if not daemon:
 		print(s)
 
-class rServer(SocketServer.BaseRequestHandler):
+class rServer(socketserver.BaseRequestHandler):
 	def setup(self):
 		global password
 		global username
@@ -160,7 +160,7 @@ def main(argv, version):
 			dbs.append(parser.Parser(fn, hooks=hooks))
 
 		nprint('[INFO] Listening on port ' + str(port))
-		rserver = SocketServer.ThreadingTCPServer(('', port), rServer)
+		rserver = socketserver.ThreadingTCPServer(('', port), rServer)
 		try:
 			rserver.serve_forever()
 		except KeyboardInterrupt:
