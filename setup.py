@@ -30,6 +30,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     install_requires=[
+        'lxml >= 3.4.4',
         'beautifulsoup4 >= 0.1.0',
         'pillow >= 0.1.0',
         'fuzzywuzzy >= 0.1.0',

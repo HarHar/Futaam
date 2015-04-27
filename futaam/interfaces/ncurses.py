@@ -25,7 +25,7 @@ import curses
 from futaam.interfaces import ARGS
 from futaam.interfaces.common import *
 import wikipedia
-import libxml2
+import lxml.html
 #ncurses doesn't resize properly for god knows why
 #See http://bugs.python.org/issue2675
 os.environ['LINES'] = 'Wow Wow'
@@ -673,8 +673,8 @@ class if_ncurses(object):
 							self.screen.addstr(t, 27 + len(field[0]), field[1][:sizeleft-3].encode('utf-8') + '...')
 							t += 1
 							continue
-						fix = ' ' * sizeleft
-						self.screen.addstr(t, 27 + len(field[0]), showstr.encode('utf-8') + fix)
+						fix = u' ' * sizeleft
+						self.screen.addstr(t, 27 + len(field[0]), showstr.encode('utf-8') + fix.encode('utf-8'))
 						t += 1
 					if entry['type'] in ['anime', 'manga']: #what ANN handles
 						if entry['aid'] in ANN.caches['ANN_' + entry['type'] + '_cache']:
@@ -722,7 +722,7 @@ class if_ncurses(object):
 
 			try:
 				wiki_page = wikipedia.page(info['title'])
-				parsed = libxml2.htmlParseDoc(wiki_page.html().encode('utf-8'), 'UTF-8')
+				parsed = lxml.html.document_fromstring(wiki_page.html().encode('utf8'))
 				## libxml2 can shit up the terminal
 				self.screen.refresh()
 				self.screen.border()
@@ -730,7 +730,7 @@ class if_ncurses(object):
 				self.drawitems()
 				self.screen.addstr(self.get_terminal_height()-1, 1, 'Fetching image... Please wait', curses.color_pair(5))
 				##
-				img = parsed.xpathEval2('//table[@class="infobox"]//img[1]/@src')[0].getContent()
+				img = parsed.xpath('//table[@class="infobox"]//img[1]/@src')[0].getContent()
 			except:
 				img = ''
 			if img.startswith('//'): img = 'http:' + img
