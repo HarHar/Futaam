@@ -50,9 +50,9 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role=QtCore.Qt.DisplayRole):
         if index.isValid() == False:
-            return QtCore.QVariant()
+            return None
         if index.row() >= self.rowCount() or index.row() < 0:
-            return QtCore.QVariant()
+            return None
 
         if role == QtCore.Qt.DisplayRole:
             if index.column() == 0:
@@ -66,7 +66,7 @@ class TableModel(QtCore.QAbstractTableModel):
             elif index.column() == 4:
                 return self.anime_list[index.row()][4]
 
-        return QtCore.QVariant()
+        return None
 
     def get_entry_names(self):
         names = []
@@ -75,12 +75,11 @@ class TableModel(QtCore.QAbstractTableModel):
         return names
 
     def headerData(self, column, orientation, role=QtCore.Qt.DisplayRole):
-        if orientation == QtCore.Qt.Horizontal and role ==\
-		QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(self.headers[column])
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return self.headers[column]
         if orientation == QtCore.Qt.Vertical and role == QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(" ")
-        return QtCore.QVariant()
+            return ' '
+        return None
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.anime_list)
